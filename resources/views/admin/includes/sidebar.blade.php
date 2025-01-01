@@ -32,6 +32,16 @@
                     <li class="{{ Request::is('admin/students') ? 'active' : ' ' }}"><a class="nav-link" href="{{ route('students.index') }}"> User List</a></li>
                 </ul>
             </li>
+            <li class="dropdown">
+                <a href="javascript:void(0);" class="menu-toggle nav-link has-dropdown {{ Request::is('admin/faculty*') ? 'active' : ' ' }}">
+                    <i class="ph ph-user-list"></i>
+                    <span> Faculty Management</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="{{ Request::is('admin/faculty/create') ? 'active' : ' ' }}"><a class="nav-link" href="{{ route('faculty.create') }}">Create  User</a></li>
+                    <li class="{{ Request::is('admin/faculty') ? 'active' : ' ' }}"><a class="nav-link" href="{{ route('faculty.index') }}"> User List</a></li>
+                </ul>
+            </li>
 
             {{-- <li class="dropdown">
                 <a href="" class="menu-toggle nav-link has-dropdown">

@@ -14,12 +14,10 @@ use Illuminate\Support\Facades\Storage;
 use File;
 use Illuminate\Validation\Rule;
 
-use function PHPUnit\Framework\fileExists;
-
-class CustomerController extends Controller
+class FacultyController extends Controller
 {
-    use ImageTrait;
 
+    use ImageTrait;
     /**
      * Display a listing of the resource.
      *
@@ -27,9 +25,9 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $students = User::Role('STUDENT')->orderBy('name', 'desc')->paginate(15);
+        $faculty = User::Role('FACULTY')->orderBy('name', 'desc')->paginate(15);
 
-        return view('admin.student.list')->with(compact('students'));
+        return view('admin.faculty.list')->with(compact('faculty'));
     }
 
     /**
@@ -41,7 +39,7 @@ class CustomerController extends Controller
     {
         $countries = Country::get();
         $cities = City::get();
-        return view('admin.student.create')->with(compact('countries', 'cities'));
+        return view('admin.faculty.create')->with(compact('countries', 'cities'));
     }
 
     /**
@@ -52,8 +50,9 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+
         $request->validate([
-            'register_as' => 'required|in:1,2,3', // Must match enum values
+            // 'register_as' => 'required|in:1,2,3', // Must match enum values
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:15',
@@ -63,14 +62,12 @@ class CustomerController extends Controller
             'address' => 'required|string|max:255',
             'city_id' => 'required|string|max:255',
             'country_id' => 'required|string|max:255',
-            'student_age' => 'required|integer|min:1|max:120',
-            'student_class' => 'required|string|max:255',
-            'institute_name' => 'required|string|max:255',
+            'degree'=>'required|string|max:255',
             'status' => 'required|boolean',
         ]);
 
         $data = new User();
-        $data->register_as = $request->register_as;
+        $data->register_as = 3;
         $data->name = $request->name;
         $data->email = $request->email;
         $data->phone = $request->phone;
@@ -78,24 +75,23 @@ class CustomerController extends Controller
         $data->address = $request->address;
         $data->city_id = $request->city_id;
         $data->country_id = $request->country_id;
-        $data->student_age = $request->student_age;
-        $data->student_class = $request->student_class;
-        $data->institute_name = $request->institute_name;
+        $data->degree = $request->degree;
         $data->status = $request->status ?? 0; // Default to 0 if not provided
+        // dd($data);
         $data->save();
 
-        $data->assignRole('STUDENT'); // Assuming you have roles set up
+        $data->assignRole('FACULTY'); // Assuming you have roles set up
 
         $maildata = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
-            'type' => 'Student',
+            'type' => 'Faculty',
         ];
 
         // Mail::to($request->email)->send(new RegistrationMail($maildata));
 
-        return redirect()->route('students.index')->with('message', 'Student created successfully.');
+        return redirect()->route('faculty.index')->with('message', 'Faculty created successfully.');
     }
 
 
@@ -105,7 +101,10 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id) {}
+    public function show($id)
+    {
+        //
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -117,8 +116,8 @@ class CustomerController extends Controller
     {
         $countries = Country::get();
         $cities = City::get();
-        $student = User::findOrFail($id);
-        return view('admin.student.edit')->with(compact('student', 'countries', 'cities'));
+        $faculty = User::findOrFail($id);
+        return view('admin.faculty.edit')->with(compact('faculty', 'countries', 'cities'));
     }
 
     /**
@@ -130,14 +129,13 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $request->validate([
             'email' => [
                 'required',
                 'regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix',
                 Rule::unique('users')->ignore($id), // Exclude the current user's email
             ],
-            'register_as' => 'required|in:1,2,3', // Must match enum values
+
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
             'password' => 'nullable|min:8',
@@ -146,9 +144,7 @@ class CustomerController extends Controller
             'address' => 'required|string|max:255',
             'city_id' => 'required|string|max:255',
             'country_id' => 'required|string|max:255',
-            'student_age' => 'required|integer|min:1|max:120',
-            'student_class' => 'required|string|max:255',
-            'institute_name' => 'required|string|max:255',
+            'degree'=> 'required|string|max:255',
             'status' => 'required|boolean',
         ]);
 
@@ -161,9 +157,8 @@ class CustomerController extends Controller
         $data->address = $request->address;
         $data->city_id = $request->city_id;
         $data->country_id = $request->country_id;
-        $data->student_age = $request->student_age;
-        $data->student_class = $request->student_class;
-        $data->institute_name = $request->institute_name;
+        $data->degree=$request->degree;
+
         $data->status = $request->status ?? 0; // Default to 0 if not provided
         if ($request->password != null) {
             $request->validate([
@@ -174,7 +169,7 @@ class CustomerController extends Controller
         }
 
         $data->save();
-        return redirect()->route('students.index')->with('message', 'Student updated successfully.');
+        return redirect()->route('faculty.index')->with('message', 'Faculty updated successfully.');
     }
 
     /**
@@ -188,7 +183,7 @@ class CustomerController extends Controller
         //
     }
 
-    public function changeCustomersStatus(Request $request)
+    public function changeFacultyStatus(Request $request)
     {
         $user = User::find($request->user_id);
         $user->status = $request->status;
@@ -200,7 +195,7 @@ class CustomerController extends Controller
     {
         $user = User::findOrFail($id);
         $user->delete();
-        return redirect()->route('students.index')->with('error', 'Student has been deleted successfully.');
+        return redirect()->route('faculty.index')->with('error', 'Faculty has been deleted successfully.');
     }
 
     public function fetchData(Request $request)
@@ -212,47 +207,23 @@ class CustomerController extends Controller
             $query = str_replace(" ", "%", $query);
 
             // Eager load city and country relationships
-            $students = User::with(['city', 'country'])
+            $faculty = User::with(['city', 'country'])
                 ->where('id', 'like', '%' . $query . '%')
                 ->orWhere('name', 'like', '%' . $query . '%')
                 ->orWhere('email', 'like', '%' . $query . '%')
                 ->orWhere('phone', 'like', '%' . $query . '%')
                 ->orWhere('address', 'like', '%' . $query . '%')
-                ->orWhereHas('city', function ($q) use ($query) {
+                ->orWhereHas('city', function($q) use ($query) {
                     $q->where('name', 'like', '%' . $query . '%');
                 })
-                ->orWhereHas('country', function ($q) use ($query) {
+                ->orWhereHas('country', function($q) use ($query) {
                     $q->where('name', 'like', '%' . $query . '%');
                 })
                 ->orderBy($sort_by, $sort_type)
-                ->Role('STUDENT')
+                ->Role('FACULTY')
                 ->paginate(15);
 
-            return response()->json(['data' => view('admin.student.table', compact('students'))->render()]);
+            return response()->json(['data' => view('admin.faculty.table', compact('faculty'))->render()]);
         }
     }
-    public function getClasses(Request $request)
-    {
-        $registerAs = $request->input('register_as');
-        $classes = [];
-
-        if ($registerAs == 1) {
-            $classes = config('class.school_class');
-        } elseif ($registerAs == 2) {
-            $classes = config('class.college_class');
-        }
-
-        return response()->json($classes);
-    }
-    public function getCities(Request $request)
-    {
-        $countryId = $request->input('country_id');
-
-        // Fetch cities based on country id
-        $cities = City::where('country_id', $countryId)->get();
-
-        // Return cities as JSON response
-        return response()->json($cities);
-    }
-
 }
