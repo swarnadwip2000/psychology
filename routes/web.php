@@ -4,10 +4,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ForgetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\SellerController;
+use App\Http\Controllers\Frontend\CmsController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\StudentController;
+use App\Http\Controllers\Frontend\TeacherController;
 use Illuminate\Support\Facades\Artisan;
 
 /*
@@ -27,7 +29,8 @@ Route::get('clear', function () {
     return "Optimize clear has been successfully";
 });
 
-Route::get('/', [AuthController::class, 'login'])->name('admin.login');
+Route::get('/admin', [AuthController::class, 'redirectAdminLogin']);
+Route::get('/admin/login', [AuthController::class, 'login'])->name('admin.login');
 Route::post('/login-check', [AuthController::class, 'loginCheck'])->name('admin.login.check');  //login check
 Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword'])->name('admin.forget.password');
 Route::post('change-password', [ForgetPasswordController::class, 'changePassword'])->name('admin.change.password');
@@ -56,4 +59,62 @@ Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
     Route::get('/changeCustomerStatus', [CustomerController::class, 'changeCustomersStatus'])->name('students.change-status');
     Route::get('/student-fetch-data', [CustomerController::class, 'fetchData'])->name('students.fetch-data');
 
+});
+
+
+
+
+Route::controller(HomeController::class)->group(function(){
+    Route::get('/', 'index')->name('front.home');
+
+    Route::prefix('registration')->group(function(){
+        Route::get('school', 'school_registration')->name('front.school_registration');
+        Route::get('college', 'college_registration')->name('front.college_registration');
+        Route::get('faculty', 'faculty_registration')->name('front.faculty_registration');
+        Route::post('faculty', 'faculty_registration_success')->name('front.faculty_registration_success');
+
+        Route::post('success', "registrationSuccess")->name('front.registration_success');
+        Route::get('email-confirmation', 'emailConfirmation')->name('front.email_confirmation');
+        Route::get('subscription', 'subscription')->name('front.subscriptions');
+        Route::get('payment', 'payment')->name('front.payment');
+
+    });
+
+    Route::get('email-verification', 'emailVerification')->name('email_verification');
+
+    Route::prefix('login')->group(function(){
+        Route::get('student', 'student_login')->name('front.student_login');
+        Route::post('student', 'student_login_success')->name('front.student_login_success');
+        Route::get('faculty', 'faculty_login')->name('front.faculty_login');
+        Route::post('faculty', 'faculty_login_success')->name('front.faculty_login_success');
+    });
+
+});
+
+Route::controller(StudentController::class)->middleware('student.auth')->group(function(){
+    Route::prefix('student')->group(function(){
+        Route::get('dashboard', 'dashboard')->name('front.student_dashboard');
+        Route::get('book-now', 'bookTeacher')->name('student.book_now');
+        Route::get('get-slot', 'getAvailableSlot')->name('student.available_slot');
+        Route::get('live-class', 'liveClass')->name('front.live_class');
+        Route::post('logout', 'logout')->name('student.logout');
+
+        Route::prefix('booking')->group(function(){
+            Route::post('/', 'facultyBooking')->name('student.faculity_booking');
+
+        });
+
+    });
+});
+
+Route::controller(TeacherController::class)->middleware('teacher.auth')->group(function(){
+    Route::prefix('teacher')->group(function(){
+        Route::get('dashboard', 'dashboard')->name('auth_teacher_dashboard');
+        Route::get('session', 'session')->name('auth_teacher_session');
+        Route::post('session', 'addsession')->name('add_teacher_session');
+        Route::get('delete-session', 'deletesession')->name('delete_teacher_session');
+        Route::get('live-class', 'liveClass')->name('teacher_live_class');
+        Route::post('logout', 'logout')->name('teacher.logout');
+        Route::get('create-meeting', 'createMeeting')->name('start_new_meeting');
+    });
 });

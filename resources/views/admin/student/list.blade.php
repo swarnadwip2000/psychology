@@ -43,20 +43,48 @@
                         <thead>
                             <tr>
                                 <th class="sorting" data-tippy-content="Sort by Name" data-sorting_type="desc"
-                                data-column_name="name" style="cursor: pointer"> Name<span id="name_icon"><i class="ph ph-caret-down"></i></span></th>
+                                    data-column_name="name" style="cursor: pointer">
+                                    Name <span id="name_icon"><i class="ph ph-caret-down"></i></span>
+                                </th>
                                 <th class="sorting" data-tippy-content="Sort by Email" data-sorting_type="desc"
-                                    data-column_name="email" style="cursor: pointer"> Email <span id="email_icon"></span></th>
+                                    data-column_name="email" style="cursor: pointer">
+                                    Email <span id="email_icon"></span>
+                                </th>
                                 <th class="sorting" data-tippy-content="Sort by Phone" data-sorting_type="desc"
-                                    data-column_name="phone" style="cursor: pointer"> Phone <span id="phone_icon"></span></th>
-                                <th class="sorting" data-tippy-content="Sort by City" data-sorting_type="desc"
-                                    data-column_name="city" style="cursor: pointer"> City <span id="city_icon"></span></th>
-                                <th class="sorting" data-tippy-content="Sort by Country" data-sorting_type="desc"
-                                    data-column_name="country" style="cursor: pointer"> Country <span id="country_icon"></span></th>
+                                    data-column_name="phone" style="cursor: pointer">
+                                    Phone <span id="phone_icon"></span>
+                                </th>
+                                <th>
+                                    City
+                                </th>
+                                <th>
+                                    Country
+                                </th>
                                 <th class="sorting" data-tippy-content="Sort by Address" data-sorting_type="desc"
-                                    data-column_name="address" style="cursor: pointer"> Address <span id="address_icon"></span></th>
-                                <th>Status</th>
+                                    data-column_name="address" style="cursor: pointer">
+                                    Address <span id="address_icon"></span>
+                                </th>
+                                <th class="sorting" data-tippy-content="Sort by Age" data-sorting_type="desc"
+                                    data-column_name="student_age" style="cursor: pointer">
+                                    Age <span id="age_icon"></span>
+                                </th>
+                                <th class="sorting" data-tippy-content="Sort by Class" data-sorting_type="desc"
+                                    data-column_name="student_class" style="cursor: pointer">
+                                    Class <span id="class_icon"></span>
+                                </th>
+                                <th>
+                                    Institute Name
+                                </th>
+                                <th class="sorting" data-tippy-content="Sort by Register As" data-sorting_type="desc"
+                                    data-column_name="register_as" style="cursor: pointer">
+                                    Register As <span id="register_as_icon"></span>
+                                </th>
+                                <th>
+                                    Status
+                                </th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @include('admin.student.table')
 
@@ -114,9 +142,10 @@
             });
         });
     </script>
-     <script>
+    <script>
         $(document).ready(function() {
 
+            // Function to clear sorting icons
             function clear_icon() {
                 $('#name_icon').html('');
                 $('#email_icon').html('');
@@ -124,8 +153,11 @@
                 $('#city_icon').html('');
                 $('#country_icon').html('');
                 $('#address_icon').html('');
+                $('#age_icon').html('');
+                $('#class_icon').html('');
             }
 
+            // Function to fetch data with AJAX
             function fetch_data(page, sort_type, sort_by, query) {
                 $.ajax({
                     url: "{{ route('students.fetch-data') }}",
@@ -136,11 +168,12 @@
                         query: query
                     },
                     success: function(data) {
-                        $('tbody').html(data.data);
+                        $('tbody').html(data.data); // Update the table body with new data
                     }
                 });
             }
 
+            // Search functionality (live search)
             $(document).on('keyup', '#search', function() {
                 var query = $('#search').val();
                 var column_name = $('#hidden_column_name').val();
@@ -149,24 +182,25 @@
                 fetch_data(page, sort_type, column_name, query);
             });
 
+            // Sorting functionality
             $(document).on('click', '.sorting', function() {
                 var column_name = $(this).data('column_name');
                 var order_type = $(this).data('sorting_type');
                 var reverse_order = '';
+
                 if (order_type == 'asc') {
                     $(this).data('sorting_type', 'desc');
                     reverse_order = 'desc';
                     clear_icon();
-                    $('#' + column_name + '_icon').html(
-                        '<i class="ph ph-caret-down"></i>');
+                    $('#' + column_name + '_icon').html('<i class="ph ph-caret-down"></i>');
                 }
                 if (order_type == 'desc') {
                     $(this).data('sorting_type', 'asc');
                     reverse_order = 'asc';
                     clear_icon();
-                    $('#' + column_name + '_icon').html(
-                        '<i class="ph ph-caret-up"></i>');
+                    $('#' + column_name + '_icon').html('<i class="ph ph-caret-up"></i>');
                 }
+
                 $('#hidden_column_name').val(column_name);
                 $('#hidden_sort_type').val(reverse_order);
                 var page = $('#hidden_page').val();
@@ -174,13 +208,13 @@
                 fetch_data(page, reverse_order, column_name, query);
             });
 
+            // Pagination functionality
             $(document).on('click', '.pagination a', function(event) {
                 event.preventDefault();
                 var page = $(this).attr('href').split('page=')[1];
                 $('#hidden_page').val(page);
                 var column_name = $('#hidden_column_name').val();
                 var sort_type = $('#hidden_sort_type').val();
-
                 var query = $('#search').val();
 
                 $('li').removeClass('active');
