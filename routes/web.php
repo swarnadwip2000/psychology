@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ForgetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\FacultyController;
 use App\Http\Controllers\Frontend\CmsController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\StudentController;
@@ -58,6 +59,21 @@ Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
     });
     Route::get('/changeCustomerStatus', [CustomerController::class, 'changeCustomersStatus'])->name('students.change-status');
     Route::get('/student-fetch-data', [CustomerController::class, 'fetchData'])->name('students.fetch-data');
+    Route::post('/get-classes', [CustomerController::class, 'getClasses'])->name('get.classes');
+    // Route::get('/get-cities/{country_id}', [CustomerController::class, 'getCities'])->name('get.cities');
+    Route::post('/get-cities', [CustomerController::class, 'getCities'])->name('get.cities');
+
+
+    Route::resources([
+        'faculty' => FacultyController::class,
+    ]);
+    //  Student Routes
+    Route::prefix('faculty')->group(function () {
+        Route::get('/faculty-delete/{id}', [FacultyController::class, 'delete'])->name('faculty.delete');
+    });
+    Route::get('/changeFacultyStatus', [FacultyController::class, 'changeFacultyStatus'])->name('faculty.change-status');
+    Route::get('/faculty-fetch-data', [FacultyController::class, 'fetchData'])->name('faculty.fetch-data');
+
 
 });
 

@@ -11,6 +11,13 @@ return [
     'allow_country' => [
         1 => 'CANADA',
     ],
+    'fuclaty_degree'=>[
+        1=> "Graduate",
+        2=> "Post graduate",
+        3=> "M-phil",
+        4=> "Doctorate",
+
+    ],
     'dropdown_country' => [
         [
             'id' => 1,

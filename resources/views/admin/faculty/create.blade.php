@@ -1,11 +1,11 @@
 @extends('admin.layouts.master')
 @section('title')
-    {{ env('APP_NAME') }} | Create Student
+    {{ env('APP_NAME') }} | Create Faculty
 @endsection
 @push('styles')
 @endpush
 @section('head')
-    Create Student
+    Create Faculty
 @endsection
 
 @section('content')
@@ -16,7 +16,7 @@
                     <div class="form-head">
                         <h4>Login Information</h4>
                     </div>
-                    <form action="{{ route('students.store') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('faculty.store') }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="row justify-content-between">
                             <div class="col-md-6">
@@ -144,7 +144,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                {{--  <div class="col-md-6">
                                     <div class="form-group-div">
                                         <div class="form-group">
                                             <label for="floatingInputValue">School Name*</label>
@@ -158,13 +158,13 @@
                                             @endif
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-xl-6 col-md-6">
+                                </div>  --}}
+                                {{--  <div class="col-xl-6 col-md-6">
                                     <div class="form-group-div">
                                         <div class="form-group">
-                                            <label for="floatingInputValue">Select Age*</label>
+                                            <label for="floatingInputValue">Age*</label>
                                             <select name="student_age" id="student_age" class="form-control">
-                                                <option value="">Select Age</option>
+                                                <option value="">Select</option>
                                                 @for ($i = 20; $i < 45; $i++)
                                                     <option value="{{ $i }}"
                                                         {{ old('student_age') == $i ? 'selected' : '' }}>
@@ -178,7 +178,55 @@
                                             @endif
                                         </div>
                                     </div>
+                                </div>  --}}
+
+
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="form-group-div">
+                                        <div class="form-group">
+                                            <label for="floatingInputValue">Degree*</label>
+                                            <select name="degree" id="degree" class="form-control">
+                                                <option value="">Select Degree</option>
+                                                @foreach (config('class.fuclaty_degree') as $key => $val)
+                                                    <option value="{{ $key }}"
+                                                        {{ old('degree') == $key ? 'selected' : '' }}>
+                                                        {{ $val }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @if ($errors->has('degree'))
+                                                <div class="error" style="color:red;">
+                                                    {{ $errors->first('degree') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
+
+                                {{--  <div class="col-xl-6 col-md-6">
+                                    <div class="form-group-div">
+                                        <div class="form-group">
+                                            <label for="floatingInputValue">Register As*</label>
+                                            <select name="register_as" id="register_as" class="form-control">
+                                                <option value="">Select Status</option>
+                                                <option value="1" {{ old('register_as') == 1 ? 'selected' : '' }}>
+                                                    School
+                                                </option>
+                                                <option value="2" {{ old('register_as') == 2 ? 'selected' : '' }}>
+                                                    Collage
+                                                </option>
+                                                <option value="3" {{ old('register_as') == 2 ? 'selected' : '' }}>
+                                                    Faculty
+                                                </option>
+                                            </select>
+                                            @if ($errors->has('register_as'))
+                                                <div class="error" style="color:red;">
+                                                    {{ $errors->first('register_as') }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>  --}}
+
                                 <div class="col-xl-6 col-md-6">
                                     <div class="form-group-div">
                                         <div class="form-group">
@@ -198,71 +246,6 @@
                                     </div>
                                 </div>
 
-
-                                <div class="col-xl-6 col-md-6">
-                                    <div class="form-group-div">
-                                        <div class="form-group">
-                                            <label for="floatingInputValue">Register As*</label>
-                                            <select name="register_as" id="register_as" class="form-control">
-                                                <option value="">Select Register As</option>
-                                                <option value="1" {{ old('register_as') == 1 ? 'selected' : '' }}>
-                                                    School
-                                                </option>
-                                                <option value="2" {{ old('register_as') == 2 ? 'selected' : '' }}>
-                                                    Collage
-                                                </option>
-                                            </select>
-                                            @if ($errors->has('register_as'))
-                                                <div class="error" style="color:red;">
-                                                    {{ $errors->first('register_as') }}</div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xl-6 col-md-6">
-                                    <div class="form-group-div">
-                                        <div class="form-group">
-                                            <label for="floatingInputValue">Student Class*</label>
-                                            <select name="student_class" id="student_class" class="form-control">
-                                                <option value="">Select Student Class</option>
-                                                {{--  @foreach (config('class.school_class') as $key => $val)
-                                                    <option value="{{ $key }}"
-                                                        {{ old('student_class') == $key ? 'selected' : '' }}>
-                                                        {{ $val }}
-                                                    </option>
-                                                @endforeach  --}}
-                                            </select>
-                                            @if ($errors->has('student_class'))
-                                                <div class="error" style="color:red;">
-                                                    {{ $errors->first('student_class') }}
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                                {{--  <div class="col-xl-6 col-md-6">
-                                    <div class="form-group-div">
-                                        <div class="form-group">
-                                            <label for="floatingInputValue">Student Class*</label>
-                                            <select name="student_class" id="student_class" class="form-control">
-                                                <option value="">Select Status</option>
-                                                @foreach (config('class.school_class') as $key => $val)
-                                                    <option value="{{ $key }}"
-                                                        {{ old('student_class') == $key ? 'selected' : '' }}>
-                                                        {{ $val }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @if ($errors->has('student_class'))
-                                                <div class="error" style="color:red;">
-                                                    {{ $errors->first('student_class') }}
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>  --}}
-
-
                                 <div class="col-xl-12">
                                     <div class="btn-1">
                                         <button type="submit">Create</button>
@@ -278,8 +261,6 @@
 @endsection
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
         $(document).ready(function() {
             $('#eye-button-1').click(function() {
@@ -290,34 +271,6 @@
                 $('#confirm_password').attr('type', $('#confirm_password').is(':password') ? 'text' :
                     'password');
                 $(this).find('i').toggleClass('ph-eye-slash ph-eye');
-            });
-        });
-    </script>
-
-    <script>
-        $('#register_as').on('change', function () {
-            const selectedValue = $(this).val();
-
-            $.ajax({
-                url: '{{ route('get.classes') }}',
-                type: 'POST',
-                data: {
-                    register_as: selectedValue,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function (response) {
-                    $('#error-message').hide(); // Hide error message on success
-                    const classDropdown = $('#student_class');
-                    classDropdown.empty();
-                    classDropdown.append('<option value="">Select Student Class</option>');
-
-                    $.each(response, function (key, value) {
-                        classDropdown.append('<option value="' + key + '">' + value + '</option>');
-                    });
-                },
-                error: function () {
-                    $('#error-message').text('Failed to load classes. Please try again.').show();
-                }
             });
         });
     </script>
@@ -356,5 +309,4 @@
             });
         });
     </script>
-
 @endpush

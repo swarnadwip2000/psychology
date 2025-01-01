@@ -1,11 +1,11 @@
 @extends('admin.layouts.master')
 @section('title')
-    {{ env('APP_NAME') }} | Edit Student Details
+    {{ env('APP_NAME') }} | Edit Faculty Details
 @endsection
 @push('styles')
 @endpush
 @section('head')
-    Edit Student Details
+    Edit Faculty Details
 @endsection
 @section('content')
     <div class="main-content">
@@ -15,7 +15,7 @@
                     <div class="form-head">
                         <h4>Login Information</h4>
                     </div>
-                    <form action="{{ route('students.update', $student->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('faculty.update', $faculty->id) }}" method="POST" enctype="multipart/form-data">
                         @method('PUT')
                         @csrf
                         <div class="row justify-content-between">
@@ -24,7 +24,7 @@
                                     <div class="form-group">
                                         <label for="floatingInputValue">Email Address*</label>
                                         <input type="text" class="form-control" id="floatingInputValue" name="email"
-                                            value="{{ old('email', $student->email) }}" placeholder="Email Address*">
+                                            value="{{ old('email', $faculty->email) }}" placeholder="Email Address*">
                                         @if ($errors->has('email'))
                                             <div class="error" style="color:red;">{{ $errors->first('email') }}</div>
                                         @endif
@@ -36,7 +36,7 @@
                                     <div class="form-group">
                                         <label for="floatingInputValue">Mobile*</label>
                                         <input type="text" class="form-control" id="floatingInputValue" name="phone"
-                                            value="{{ old('phone', $student->phone) }}" placeholder="Mobile*">
+                                            value="{{ old('phone', $faculty->phone) }}" placeholder="Mobile*">
                                         @if ($errors->has('phone'))
                                             <div class="error" style="color:red;">{{ $errors->first('phone') }}</div>
                                         @endif
@@ -87,7 +87,7 @@
                                         <div class="form-group">
                                             <label for="floatingInputValue">Full Name*</label>
                                             <input type="text" class="form-control" id="floatingInputValue"
-                                                name="name" value="{{ old('name', $student->name) }}" placeholder="Full Name*">
+                                                name="name" value="{{ old('name', $faculty->name) }}" placeholder="Full Name*">
                                             @if ($errors->has('name'))
                                                 <div class="error" style="color:red;">{{ $errors->first('name') }}</div>
                                             @endif
@@ -103,7 +103,7 @@
                                             <select id="country_id" name="country_id" class="form-control">
                                                 <option value="">Select Country</option>
                                                 @foreach ($countries as $key => $country)
-                                                    <option value="{{ $country->id }}" {{ old('country_id', $student->country_id) == $country->id ? 'selected' : '' }}>
+                                                    <option value="{{ $country->id }}" {{ old('country_id', $faculty->country_id) == $country->id ? 'selected' : '' }}>
                                                         {{ $country->name }}
                                                     </option>
                                                 @endforeach
@@ -123,7 +123,7 @@
                                             <select id="city_id" name="city_id" class="form-control">
                                                 <option value="">Select City</option>
                                                 {{--  @foreach ($cities as $key => $val)
-                                                    <option value="{{ $val->id }}" {{ old('city_id', $student->city_id) == $val->id ? 'selected' : '' }}>
+                                                    <option value="{{ $val->id }}" {{ old('city_id', $faculty->city_id) == $val->id ? 'selected' : '' }}>
                                                         {{ $val->name }}
                                                     </option>
                                                 @endforeach  --}}
@@ -140,14 +140,14 @@
                             <div class="form-group">
                                 <label for="floatingInputValue">Address*</label>
                                 <input type="text" class="form-control" id="floatingInputValue"
-                                    name="address" value="{{ old('address', $student->address) }}" placeholder="Address*">
+                                    name="address" value="{{ old('address', $faculty->address) }}" placeholder="Address*">
                                 @if ($errors->has('address'))
                                     <div class="error" style="color:red;">{{ $errors->first('address') }}</div>
                                 @endif
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    {{--  <div class="col-md-6">
                         <div class="form-group-div">
                             <div class="form-group">
                                 <label for="floatingInputValue">School Name*</label>
@@ -159,13 +159,13 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
-                    <div class="col-xl-6 col-md-6">
+                    </div>  --}}
+                    {{--  <div class="col-xl-6 col-md-6">
                         <div class="form-group-div">
                             <div class="form-group">
                                 <label for="floatingInputValue">Age*</label>
                                 <select name="student_age" id="student_age" class="form-control">
-                                    <option value="">Select Age</option>
+                                    <option value="">Select</option>
                                     @for ($i = 20; $i < 45; $i++)
                                         <option value="{{ $i }}" {{ old('student_age', $student->student_age) == $i ? 'selected' : '' }}>
                                             {{ $i }}
@@ -177,49 +177,49 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
-
+                    </div>  --}}
                     <div class="col-xl-6 col-md-6">
+                        <div class="form-group-div">
+                            <div class="form-group">
+                                <label for="floatingInputValue">Degree*</label>
+                                <select name="degree" id="degree" class="form-control">
+                                    <option value="">Select Degree</option>
+                                    @foreach (config('class.fuclaty_degree') as $key => $val)
+                                        <option value="{{ $key }}" {{ old('degree', $faculty->degree) == $key ? 'selected' : '' }}>
+                                            {{ $val }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if ($errors->has('degree'))
+                                    <div class="error" style="color:red;">{{ $errors->first('degree') }}</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    {{--  <div class="col-xl-6 col-md-6">
                         <div class="form-group-div">
                             <div class="form-group">
                                 <label for="floatingInputValue">Register As*</label>
                                 <select name="register_as" id="register_as" class="form-control">
-                                    <option value="">Select Register As</option>
-                                    <option value="1" {{ old('register_as', $student->register_as) == 1 ? 'selected' : '' }}>School</option>
-                                    <option value="2" {{ old('register_as', $student->register_as) == 2 ? 'selected' : '' }}>Collage</option>
+                                    <option value="">Select Status</option>
+                                    <option value="1" {{ old('register_as', $faculty->register_as) == 1 ? 'selected' : '' }}>School</option>
+                                    <option value="2" {{ old('register_as', $faculty->register_as) == 2 ? 'selected' : '' }}>Collage</option>
+                                    <option value="3" {{ old('register_as', $faculty->register_as) == 3 ? 'selected' : '' }}>Faculty</option>
                                 </select>
                                 @if ($errors->has('register_as'))
                                     <div class="error" style="color:red;">{{ $errors->first('register_as') }}</div>
                                 @endif
                             </div>
                         </div>
-                    </div>
-                    <div class="col-xl-6 col-md-6">
-                        <div class="form-group-div">
-                            <div class="form-group">
-                                <label for="floatingInputValue">Student Class*</label>
-                                <select name="student_class" id="student_class" class="form-control">
-                                    <option value="">Select Student Class</option>
-                                    @foreach (config('class.school_class') as $key => $val)
-                                        <option value="{{ $key }}" {{ old('student_class', $student->student_class) == $key ? 'selected' : '' }}>
-                                            {{ $val }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @if ($errors->has('student_class'))
-                                    <div class="error" style="color:red;">{{ $errors->first('student_class') }}</div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+                    </div>  --}}
                     <div class="col-xl-6 col-md-6">
                         <div class="form-group-div">
                             <div class="form-group">
                                 <label for="floatingInputValue">Status*</label>
                                 <select name="status" id="status" class="form-control">
                                     <option value="">Select Status</option>
-                                    <option value="1" {{ old('status', $student->status) == 1 ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ old('status', $student->status) == 0 ? 'selected' : '' }}>Inactive</option>
+                                    <option value="1" {{ old('status', $faculty->status) == 1 ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ old('status', $faculty->status) == 0 ? 'selected' : '' }}>Inactive</option>
                                 </select>
                                 @if ($errors->has('status'))
                                     <div class="error" style="color:red;">{{ $errors->first('status') }}</div>
@@ -259,84 +259,49 @@
         });
     </script>
 
-
     <script>
-        $('#register_as').on('change', function () {
-            const selectedValue = $(this).val();
-            const studentClass = "{{ old('student_class', $student->student_class) }}";
+            $(document).ready(function() {
+                // This is to load cities for the selected country when editing
+                var selectedCountryId = '{{ $selectedCountryId ?? '' }}'; // Laravel variable passed to view
+                var selectedCityId = '{{ $selectedCityId ?? '' }}'; // Laravel variable passed to view
 
-            $.ajax({
-                url: '{{ route('get.classes') }}',
-                type: 'POST',
-                data: {
-                    register_as: selectedValue,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function (response) {
-                    $('#error-message').hide(); // Hide error message on success
-                    const classDropdown = $('#student_class');
-                    classDropdown.empty();
-                    classDropdown.append('<option value="">Select Student Class</option>');
-
-                    $.each(response, function (key, value) {
-                        classDropdown.append('<option value="' + key + '">' + value + '</option>');
-                    });
-
-                    // Set the selected class in edit mode
-                    if (studentClass) {
-                        classDropdown.val(studentClass);
-                    }
-                },
-                error: function () {
-                    $('#error-message').text('Failed to load classes. Please try again.').show();
+                if (selectedCountryId) {
+                    loadCities(selectedCountryId, selectedCityId); // Load cities based on the selected country
                 }
-            });
-        });
 
-    </script>
-    <script>
-        $(document).ready(function() {
-            // This is to load cities for the selected country when editing
-            var selectedCountryId = '{{ $selectedCountryId ?? '' }}'; // Laravel variable passed to view
-            var selectedCityId = '{{ $selectedCityId ?? '' }}'; // Laravel variable passed to view
-
-            if (selectedCountryId) {
-                loadCities(selectedCountryId, selectedCityId); // Load cities based on the selected country
-            }
-
-            // When the country is selected
-            $('#country_id').change(function() {
-                var countryId = $(this).val();  // Get the selected country id
-                if (countryId) {
-                    loadCities(countryId); // Load cities when a country is selected
-                } else {
-                    $('#city_id').empty();
-                    $('#city_id').append('<option value="">Select City</option>');
-                }
-            });
-
-            // Function to load cities
-            function loadCities(countryId, selectedCityId = null) {
-                $.ajax({
-                    url: "{{route('get.cities')}}", // Your AJAX route
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',  // CSRF token
-                        country_id: countryId
-                    },
-                    success: function(data) {
+                // When the country is selected
+                $('#country_id').change(function() {
+                    var countryId = $(this).val();  // Get the selected country id
+                    if (countryId) {
+                        loadCities(countryId); // Load cities when a country is selected
+                    } else {
                         $('#city_id').empty();
                         $('#city_id').append('<option value="">Select City</option>');
-                        $.each(data, function(key, city) {
-                            var selected = (selectedCityId && selectedCityId == city.id) ? 'selected' : '';
-                            $('#city_id').append('<option value="' + city.id + '" ' + selected + '>' + city.name + '</option>');
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Error: " + error);  // Handle errors
                     }
                 });
-            }
-        });
+
+                // Function to load cities
+                function loadCities(countryId, selectedCityId = null) {
+                    $.ajax({
+                        url: "{{route('get.cities')}}", // Your AJAX route
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',  // CSRF token
+                            country_id: countryId
+                        },
+                        success: function(data) {
+                            $('#city_id').empty();
+                            $('#city_id').append('<option value="">Select City</option>');
+                            $.each(data, function(key, city) {
+                                var selected = (selectedCityId && selectedCityId == city.id) ? 'selected' : '';
+                                $('#city_id').append('<option value="' + city.id + '" ' + selected + '>' + city.name + '</option>');
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("Error: " + error);  // Handle errors
+                        }
+                    });
+                }
+            });
     </script>
 @endpush
