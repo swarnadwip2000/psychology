@@ -74,6 +74,9 @@ Route::controller(HomeController::class)->group(function(){
         Route::post('faculty', 'faculty_registration_success')->name('front.faculty_registration_success');
 
         Route::post('success', "registrationSuccess")->name('front.registration_success');
+        Route::post('studentRegisterSubmit', "studentRegisterSubmit")->name('front.student_register_submit');
+
+        Route::get('student-personal-details', "studentPersonalDetails")->name('front.student_personal_details');
         Route::get('email-confirmation', 'emailConfirmation')->name('front.email_confirmation');
         Route::get('subscription', 'subscription')->name('front.subscriptions');
         Route::get('payment', 'payment')->name('front.payment');

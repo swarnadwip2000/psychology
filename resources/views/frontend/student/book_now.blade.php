@@ -1,4 +1,4 @@
-@extends('layouts.student_app')
+@extends('frontend.layouts.student_app')
 @section('content')
     <section class="dshboard p-3" style="height: 100%">
         <div class="dshboard-contain">
@@ -71,7 +71,7 @@
                                                 </div>
                                                 <div class="col-md-12">
                                                     <label for="formGroupExampleInput">Available Slot</label>
-                                                    <select name="booking_time" id="booking_time" class="form-control"
+                                                    <select name="booking_time" id="booking_time_{{ $val->id }}" class="form-control booking_time"
                                                         required>
                                                         <option value="">Select</option>
                                                     </select>
@@ -97,15 +97,16 @@
     </section>
 @endsection
 @section('script')
-    @routes
     <script>
         function getbookingTime(option, teacherId) {
             $.ajax({
-                url: route('student.available_slot'),
+                url:"{{route('student.available_slot')}}",
                 cache: false,
                 data: {date: option.value, teacher_id: teacherId},
                 success: function(html) {
-                    $("#booking_time").html(html);
+                    console.log(html);
+
+                    $("#booking_time_" +teacherId).html(html);
                 }
             });
         }

@@ -27,7 +27,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $students = User::Role('STUDENT')->orderBy('name', 'desc')->paginate(1);
+        $students = User::Role('STUDENT')->orderBy('name', 'desc')->paginate(15);
 
         return view('admin.student.list')->with(compact('students'));
     }
@@ -226,7 +226,7 @@ class CustomerController extends Controller
                 })
                 ->orderBy($sort_by, $sort_type)
                 ->Role('STUDENT')
-                ->paginate(1);
+                ->paginate(15);
 
             return response()->json(['data' => view('admin.student.table', compact('students'))->render()]);
         }

@@ -20,6 +20,6 @@ class StudentAuthMiddleware
         if (auth()->check() && auth()->user()->hasRole('STUDENT') && auth()->user()->status == 1) {
             return $next($request);
         }
-        return redirect()->route('home')->with('error', 'You must be logged in to access this page');
+        return redirect()->route('front.home')->with('error', 'You must be logged in to access this page');
     }
 }

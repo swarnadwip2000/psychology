@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use App\Mail\MyTestEmail;
+use App\Models\Country;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -46,7 +47,7 @@ class HomeController extends Controller
         if ($model) {
             if ($model->email_verified_at != null) {
                 if (Auth::guard('web')->attempt(['email' => $emailId, 'password' => $password])) {
-                    if (auth()->user()->hasRole('FACULTY')) {
+                    if (auth()->user()->hasRole('STUDENT')) {
                         if (auth()->user()->status == 1) {
                             return redirect()->route('front.student_dashboard');
                         } else {
@@ -57,7 +58,6 @@ class HomeController extends Controller
                         Auth::logout();
                         return redirect()->back()->with('errmsg', 'You entered wrong password');
                     }
-
                 } else {
                     return redirect()->back()->with('errmsg', 'You entered wrong password');
                 }
@@ -83,6 +83,7 @@ class HomeController extends Controller
         $data['page_description'] = "register as faculty";
         $data['page_keyword'] = "Register as faculty";
         $data['city'] = City::get();
+        $data['countries'] = Country::get();
         return view('frontend.faculty_registration')->with($data);
     }
 
@@ -92,6 +93,7 @@ class HomeController extends Controller
         $data['page_description'] = "register as School";
         $data['page_keyword'] = "Register as School";
         $data['city'] = City::get();
+        $data['countries'] = Country::get();
         return view('frontend.school_registration')->with($data);
     }
 
@@ -101,38 +103,54 @@ class HomeController extends Controller
         $data['page_description'] = "register as College";
         $data['page_keyword'] = "Register as College";
         $data['city'] = City::get();
+        $data['countries'] = Country::get();
         return view('frontend.college_registration')->with($data);
     }
 
     public function registrationSuccess(Request $request)
     {
 
-        $studentAge = $request->student_age ?? null;
-        $studentClass = $request->student_class ?? null;
-        $countryName = $request->country_name ?? null;
-        $cityName = $request->city_name ?? null;
-        $studentName = $request->name ?? null;
-        $password = Hash::make($request->password) ?? null;
-        $emailId = $request->email ?? null;
-        $schoolName = $request->school_name ?? null;
-        $row_id = $request->row_id ?? null;
-        $registerAs = $request->register_as ?? null;
-        $data['page_title'] = "Register as School";
-        $data['page_description'] = "register as School";
-        $data['page_keyword'] = "Register as School";
-        if ($row_id) {
-            $remember_token = Str::random(4);
-            $userDetails = User::where(['id' => $row_id])->update([
-                'name' => $studentName,
-                'email' => $emailId,
-                'password' => $password,
-                'remember_token' => $remember_token,
+        $data = $request->all();
+        session()->put('student_data', $data);
+
+        return redirect()->route('front.student_personal_details');
+    }
+
+    public function studentRegisterSubmit(Request $request)
+    {
+        if (session()->has('student_data')) {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|min:8',
+                'confirm_password' => 'required|same:password',
+            ], [
+                'name.required' => 'The name field is required.',
+                'email.required' => 'The email field is required.',
+                'email.email' => 'The email must be a valid email address.',
+                'email.unique' => 'This email is already taken.',
+                'password.required' => 'The password field is required.',
+                'password.min' => 'The password must be at least 8 characters.',
+                'confirm_password.same' => 'The passwords do not match.',
+                'confirm_password.required' => 'Please confirm your password.',
             ]);
 
-            Mail::to($emailId)->send(new MyTestEmail($remember_token));
-            $data['id'] = $row_id;
-            return view('frontend.email_verification')->with($data);
-        } else {
+            $data = session()->get('student_data');
+            // dd($data);
+            $studentAge = $data['student_age'] ?? null;
+            $studentClass = $data['student_class'] ?? null;
+            $countryName = $data['country_name'] ?? null;
+            $cityName = $data['city_name'] ?? null;
+            $schoolName = $data['school_name'] ?? null;
+
+            $studentName = $request->name ?? null;
+            $password = Hash::make($request->password) ?? null;
+            $emailId = $request->email ?? null;
+            $registerAs = $data['register_as'] ?? null;
+
+
+
+            $remember_token = Str::random(4);
             $userDetails = User::updateOrCreate(['email' => $emailId], [
                 'student_age' => $studentAge,
                 'student_class' => $studentClass,
@@ -143,17 +161,44 @@ class HomeController extends Controller
                 'password' => $password,
                 'institute_name' => $schoolName,
                 'register_as' => $registerAs,
-                'status' => 1
+                'status' => 1,
+                'remember_token' => $remember_token,
             ]);
-            $userDetails->assignRole('STUDENT');
-            $data['id'] = $userDetails->id;
 
-            return view('frontend.personal_details')->with($data);
+            $userDetails->assignRole('STUDENT');
+            Mail::to($emailId)->send(new MyTestEmail($remember_token));
+            session()->forget('student_data');
+            return redirect()->route('front.faculty_login')->with('successmsg', 'Please check your mail for verified your account.');
+        } else {
+            abort(404);
+        }
+    }
+
+    public function studentPersonalDetails()
+    {
+        if (session()->has('student_data')) {
+            $page_title = "Register as School";
+            $data['page_description'] = "register as School";
+            $data['page_keyword'] = "Register as School";
+            return view('frontend.personal_details')->with(compact('page_title'));
+        } else {
+            abort(404);
         }
     }
 
     public function faculty_registration_success(Request $request)
     {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email_id' => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|same:password',
+            'country_name' => 'nullable|string|max:255',
+            'city_name' => 'nullable|string|max:255',
+            'degree' => 'nullable|string|max:255',
+            'register_as' => 'required|in:1,2,3', // Assuming 1, 2, 3 are valid values
+        ]);
+
         $name = $request->name ?? null;
         $emailId = $request->email_id;
         $password = Hash::make($request->password) ?? null;
@@ -182,7 +227,7 @@ class HomeController extends Controller
         $data['page_title'] = "Email Confirmation";
         $data['page_description'] = "Email Confirmation";
         $data['page_keyword'] = "Email Confirmation";
-        return view('frontend.faculty_email_verification')->with($data);
+        return redirect()->route('front.student_login')->with('successmsg', 'Please check your mail for verified your account.');
     }
 
     public function faculty_login_success(Request $request)
@@ -261,17 +306,19 @@ class HomeController extends Controller
 
     public function emailVerification(Request $request)
     {
-        $user = User::where(['remember_token' => $request->toke_code])->first();
-        $teacher = Teacher::where(['remember_token' => $request->toke_code])->first();
-
+        $user = User::role('STUDENT')->where(['remember_token' => $request->toke_code])->first();
+        $teacher = User::role('FACULTY')->where(['remember_token' => $request->toke_code])->first();
+        $page_title = "Email confirmation";
         if ($user) {
+            $type = "student";
             User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s')]);
-            echo "Email id verified successfully!!";
+            return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
         } else if ($teacher) {
-            Teacher::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s')]);
-            echo "Email id verified successfully!!";
+            $type = "teacher";
+            User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s')]);
+            return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
         } else {
-            echo "Token does not match. Please try again";
+            return redirect()->route('front.home')->with('errmsg', 'Token does not match. Please try again');
         }
     }
 }

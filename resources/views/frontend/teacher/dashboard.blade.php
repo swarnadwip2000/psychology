@@ -1,4 +1,4 @@
-@extends('layouts.teacher_app')
+@extends('frontend.layouts.teacher_app')
 @section('title')
     {{ ucwords(str_replace('_', ' ', env('APP_NAME'))) }}
 @endsection
@@ -65,7 +65,7 @@
     <script>
         function getbookingTime(bookingId) {
             $.ajax({
-                url: route('start_new_meeting'),
+                url: "{{route('start_new_meeting')}}",
                 cache: false,
                 data: {booking_id: bookingId},
                 success: function(html) {

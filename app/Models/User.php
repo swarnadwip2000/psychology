@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
@@ -20,8 +21,17 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'phone',
         'password',
+        'student_age',
+        'student_class',
+        'institute_name',
+        'country_id',
+        'degree',
+        'remember_token',
+        'city_id',
+        'register_as',
+        'status',
+        'degree'
     ];
 
     /**
@@ -43,11 +53,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function city(){
+    public function city()
+    {
         return $this->hasOne(City::class, 'id', 'city_id');
     }
 
-    public function country(){
+    public function country()
+    {
         return $this->hasOne(Country::class, 'id', 'country_id');
+    }
+
+    public function slot()
+    {
+        return $this->hasMany(Slot::class, 'teacher_id', 'id');
     }
 }

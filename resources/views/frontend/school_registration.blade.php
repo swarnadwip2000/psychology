@@ -34,15 +34,18 @@
                                     <label for="country_name">Country Name</label>
                                     <select id="country_name" name="country_name" class="form-control">
                                         <option selected>Select</option>
-                                        @foreach (config('class.allow_country') as $key => $val)
-                                            <option value="{{ $key }}">{{ $val }}</option>
+                                        <option value="">Select</option>
+                                        @foreach ($countries as $key => $val)
+                                            <option value="{{ $val->id }}"
+                                                {{ old('country_name') == $val->id ? 'selected' : '' }}>{{ $val->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
 
                                 <div class="form-group col-md-6">
                                     <label for="city_name">City</label>
-                                    <select id="city_id" name="city_id" class="form-control">
+                                    <select id="city_name" name="city_name" class="form-control">
                                         <option selected>Select</option>
                                         @foreach ($city as $key => $val)
                                             <option value="{{ $val->id }}">{{ $val->name }}</option>

@@ -31,7 +31,7 @@ class MyTestEmail extends Mailable
      */
     public function build()
     {
-        
-        return $this->view('email.email_verification')->with(['token_code' => $this->token_code]);
+
+        return $this->view('frontend.email.email_verification')->with(['token_code' => $this->token_code]);
     }
 }

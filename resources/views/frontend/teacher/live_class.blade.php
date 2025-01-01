@@ -1,4 +1,4 @@
-@extends('layouts.teacher_app')
+@extends('frontend.layouts.teacher_app')
 @section('content')
 
   <section class="dshboard" style="height: 750px">
@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col-md-12">
           <h5 class="video-heading">Live Video Tutorial</h5>
-          
+
             <iframe src="{{ "https://zoom.us/wc/".$meeting->zoom_id."/join?pwd=".$meeting->password."&un='sankar Bera'&prefer=1" }}"   allowfullscreen="false"
                 frameborder="0" width="100%" height="500px"></iframe>
 
