@@ -9,51 +9,59 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
-                          <div class="card-header d-flex justify-content-between">
-                              <div class="header-title">
-                                <h4 class="card-title">Booking History</h4>
-                              </div>
-                          </div>
-                          <div class="card-body table-fixed p-0">
-                            <div class="table-responsive mt-4">
-                                <table id="basic-table" class="table table-striped mb-0" role="grid">
-                                  <thead>
-                                      <tr>
-                                        <th>Student Name</th>
-                                        <th>Date</th>
-                                        <th>Time</th>
-                                        <th>Metting Id</th>
-                                        <th>Action</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                    @foreach($booking_slot as $booking)
-                                      <tr>
-                                        <td>
-                                           {{ $booking->student->name }}
-                                        </td>
-                                        <td>
-                                            {{ date('d-m-Y', strtotime($booking->date)) }}
-                                        </td>
-                                        <td> {{ $booking->time }}</td>
-
-                                        <td>{{ $booking ->zoom_id??'N/A' }}</td>
-                                        <td>
-                                         @if($booking ->zoom_id)
-                                           <a href="{{ route('teacher_live_class', ['meeting_id' => $booking ->zoom_id]) }}" class="btn btn-success">Join Now</a>
-                                         @else
-                                         <a href="javascript:void(0)" onclick="getbookingTime({{ $booking->id }})" class="btn btn-success">Start Call</a>
-                                         @endif
-                                        </td>
-                                      </tr>
-                                      @endforeach
-                                  </tbody>
-                                </table>
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="header-title">
+                                    <h4 class="card-title">Booking History</h4>
+                                </div>
                             </div>
-                          </div>
+                            <div class="card-body table-fixed p-0">
+                                <div class="table-responsive mt-4">
+                                    <table id="basic-table" class="table table-striped mb-0" role="grid">
+                                        <thead>
+                                            <tr>
+                                                <th>Student Name</th>
+                                                <th>Date (mm-dd-yyy)</th>
+                                                <th>Time</th>
+                                                <th>Metting Id</th>
+                                                <th>Metting Password</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($booking_slot as $booking)
+                                                <tr>
+                                                    <td>
+                                                        {{ $booking->student->name }}
+                                                    </td>
+                                                    <td>
+                                                        {{ date('m-d-Y', strtotime($booking->date)) }}
+                                                    </td>
+                                                    <td> {{ date('H:i A', strtotime($booking->time)) }}</td>
+
+                                                    <td>{{ $booking->zoom_id ?? 'N/A' }}</td>
+
+                                                    <td>
+                                                        {{ json_decode($booking->zoom_response)->password ?? 'N/A' }}
+                                                    </td>
+                                                    <td>
+                                                        @if ($booking->zoom_id)
+                                                            <a href="{{ route('teacher_live_class', ['meeting_id' => $booking->zoom_id]) }}"
+                                                                class="btn btn-success">Join Now</a>
+                                                        @else
+                                                            <a href="javascript:void(0)"
+                                                                onclick="getbookingTime({{ $booking->id }})"
+                                                                class="btn btn-success">Start Call</a>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                  </div>
+                </div>
             </div>
         </div>
         </div>
@@ -65,9 +73,11 @@
     <script>
         function getbookingTime(bookingId) {
             $.ajax({
-                url: "{{route('start_new_meeting')}}",
+                url: "{{ route('start_new_meeting') }}",
                 cache: false,
-                data: {booking_id: bookingId},
+                data: {
+                    booking_id: bookingId
+                },
                 success: function(html) {
                     $("#booking_time").html(html);
                 }

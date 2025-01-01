@@ -54,14 +54,14 @@ class TeacherController extends Controller
             $slot = Slot::create($data);
         }
 
-        return redirect()->route('auth_teacher_session');
+        return redirect()->route('auth_teacher_session')->with('successmsg', 'Session create successfully');
 
     }
 
     public function deletesession(Request $request){
         $slotId = $request->id;
         Slot::where('id', $slotId)->delete();
-        return redirect()->route('auth_teacher_session');
+        return redirect()->route('auth_teacher_session')->with('errmsg', 'Session create successfully');
     }
 
     public function createMeeting(Request $request){
@@ -91,8 +91,11 @@ class TeacherController extends Controller
                 $meetingResponse = json_decode($items->zoom_response);
                 $items->password = $meetingResponse->password;
                 $items->full_name = "Sankar Bera";
+                $items->start_url = $meetingResponse->start_url;
                 return $items;
             })->first();
+
+            // dd($data);
             return view('frontend.teacher.live_class')->with($data);
     }
 

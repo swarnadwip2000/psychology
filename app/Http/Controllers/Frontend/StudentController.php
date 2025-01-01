@@ -21,17 +21,18 @@ class StudentController extends Controller
         $data['page_keyword'] = "Dashboard";
 
         $data['teacher'] = BookingSlot::where('student_id', Auth::user()->id)
-        ->whereDate('date', '>=', date('Y-m-d'))
-        ->with(['teacher', 'student'])->get()->map(function($items){
-           $items->teacher_name = $items->teacher->name;
-            return $items;
-        });
+            ->whereDate('date', '>=', date('Y-m-d'))
+            ->with(['teacher', 'student'])->get()->map(function ($items) {
+                $items->teacher_name = $items->teacher->name;
+                return $items;
+            });
 
         return view('frontend.student.dashboard')->with($data);
     }
 
 
-    public function facultyBooking(Request $request){
+    public function facultyBooking(Request $request)
+    {
         $slot_id = $request->booking_time;
         $slot = Slot::findOrFail($slot_id);
 
@@ -45,34 +46,36 @@ class StudentController extends Controller
         return redirect()->route('front.student_dashboard');
     }
 
-    public function bookTeacher(Request $request){
-        $date = $request->date??null;
+    public function bookTeacher(Request $request)
+    {
+        $date = $request->date ?? null;
         $data['page_title'] = "Dashboard";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
 
-        $data['teacher'] = User::role('FACULTY')->with(['slot' => function($q) {
+        $data['teacher'] = User::role('FACULTY')->with(['slot' => function ($q) {
             $q->select('teacher_id', 'slot_date') // Select only necessary columns
-              ->whereDate('slot_date', '>=', date('Y-m-d'))
-              ->groupBy('teacher_id', 'slot_date'); // Group by relevant columns
+                ->whereDate('slot_date', '>=', date('Y-m-d'))
+                ->groupBy('teacher_id', 'slot_date'); // Group by relevant columns
         }])->get();
 
         return view('frontend.student.book_now')->with($data);
     }
 
-    public function getAvailableSlot(Request $request){
-        $date = $request->date??null;
-        $teacher = $request->teacher_id??null;
-
+    public function getAvailableSlot(Request $request)
+    {
+        $date = $request->date ?? null;
+        $teacher = $request->teacher_id ?? null;
+    //    dd( date('H:i'));
         $slot = Slot::whereDate('slot_date', $date)
-        ->where('slot_time', '>', date('H:i'))
-        ->where('teacher_id', $teacher)
-        ->whereDoesntHave('bookingSlot') // Exclude slots with a bookingSlot
-        ->get();
-        
+            ->where('slot_time', '>', date('H:i:s')) // Use 24-hour format for time comparison
+            ->where('teacher_id', $teacher)
+            ->whereDoesntHave('bookingSlot') // Exclude slots with a bookingSlot
+            ->get();
+
         $option = "<option>Select</option>";
-        foreach($slot as $val){
-            $option .= "<option value='".$val->id."'>".date('H:i', strtotime($val->slot_time))."</option>";
+        foreach ($slot as $val) {
+            $option .= "<option value='" . $val->id . "'>" . date('H:i A', strtotime($val->slot_time)) . "</option>";
         }
         return response()->json($option);
     }
@@ -84,7 +87,7 @@ class StudentController extends Controller
             $data['page_description'] = "Live class";
             $data['page_keyword'] = "Live class";
 
-            $data['meeting'] = BookingSlot::where('zoom_id', $request->meeting_id)->get()->map(function($items){
+            $data['meeting'] = BookingSlot::where('zoom_id', $request->meeting_id)->get()->map(function ($items) {
                 $meetingResponse = json_decode($items->zoom_response);
                 $items->password = $meetingResponse?->password;
                 $items->full_name = "Sankar Bera";
@@ -92,10 +95,9 @@ class StudentController extends Controller
             })->first();
             // dd($data);
             return view('frontend.student.live_class')->with($data);
-        }else{
+        } else {
             return redirect()->route('front.student_login');
         }
-
     }
 
     public function renderStudent(Request $request)
@@ -118,10 +120,9 @@ class StudentController extends Controller
             $countryId = $request->country_id ?? null;
             $cityId = $request->city_id ?? null;
 
-            $model = User::
-                when($countryId, function ($q) use ($countryId) {
-                $q->where('country_id', $countryId);
-            })
+            $model = User::when($countryId, function ($q) use ($countryId) {
+                    $q->where('country_id', $countryId);
+                })
                 ->when($cityId, function ($q) use ($cityId) {
                     $q->where('city_id', $cityId);
                 })
@@ -130,27 +131,22 @@ class StudentController extends Controller
                 })
                 ->whereIn('register_as', [1, 2])
                 ->with('cities')->get()->map(function ($items, $key) use ($countryName, $className) {
-                $items->country_name = $countryName[$items->country_id];
-                $items->class_name = $className[$items->student_class];
-                $items->city_name = $items->cities?->name;
-                $items->serial_no = ++$key;
-                return $items;
-            });
+                    $items->country_name = $countryName[$items->country_id];
+                    $items->class_name = $className[$items->student_class];
+                    $items->city_name = $items->cities?->name;
+                    $items->serial_no = ++$key;
+                    return $items;
+                });
 
             $data['totalCount'] = $model->count();
             $data['data'] = $model;
             return response()->json($data, 200);
-
         } catch (\Exception $error) {
             return response()->json(['error' => $error->getMessage()], 500);
         }
-
     }
 
-    public function addStudent(Request $request)
-    {
-
-    }
+    public function addStudent(Request $request) {}
 
     public function updateStudent(Request $request)
     {
@@ -169,7 +165,6 @@ class StudentController extends Controller
             $data['success'] = true;
             $data['message'] = "Data has been added successfully";
             return response()->json($data, 200);
-
         } catch (\Exception $error) {
             return response()->json(['error' => $error->getMessage()], 500);
         }
@@ -184,11 +179,11 @@ class StudentController extends Controller
         return response()->json($data, 200);
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('front.student_login');
     }
-
 }

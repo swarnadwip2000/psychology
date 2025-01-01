@@ -64,7 +64,7 @@
                                                         required onchange="getbookingTime(this, {{ $val->id }})">
                                                         <option value="">Select</option>
                                                         @foreach ($val->slot as $slot)
-                                                            <option value="{{ $slot->slot_date }}">{{ $slot->slot_date }}
+                                                            <option value="{{ $slot->slot_date }}">{{ date('m-d-Y', strtotime($slot->slot_date)) }}
                                                             </option>
                                                         @endforeach
                                                     </select>

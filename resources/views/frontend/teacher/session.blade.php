@@ -26,7 +26,7 @@
                                 <table id="basic-table" class="table table-striped mb-0" role="grid">
                                   <thead>
                                       <tr>
-                                        <th>Date</th>
+                                        <th>Date (mm-dd-yyy)</th>
                                         <th>Slot</th>
                                         <th>Action</th>
                                       </tr>
@@ -35,11 +35,10 @@
                                     @foreach($slots as $val)
                                       <tr>
                                         <td>
-                                            {{ $val -> slot_date}}
+                                            {{ date('m-d-Y', strtotime($val->slot_date)) }}
                                         </td>
-                                        <td>
-                                            {{ $val -> slot_time }}
-                                        </td>
+                                        <td> {{ date('H:i A', strtotime($val->slot_time))  }}</td>
+
                                         <td><a href="{{ route('delete_teacher_session', ['id'=> $val->id]) }}">Delete</a></td>
 
                                       </tr>

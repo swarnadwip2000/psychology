@@ -41,4 +41,13 @@
     </section>
 @endsection
 @section('script')
+<script>
+    setTimeout(() => {
+        $(document).on('click', '.leave-meeting-options__btn', function() {
+            alert('Button clicked!');
+        });
+    }, 1500);
+        // Use event delegation to listen for clicks on dynamically added elements
+
+</script>
 @endsection
