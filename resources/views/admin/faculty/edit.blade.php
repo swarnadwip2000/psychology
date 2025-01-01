@@ -167,7 +167,7 @@
                                 <select name="student_age" id="student_age" class="form-control">
                                     <option value="">Select</option>
                                     @for ($i = 20; $i < 45; $i++)
-                                        <option value="{{ $i }}" {{ old('student_age', $student->student_age) == $i ? 'selected' : '' }}>
+                                         <option value="{{ $i }}" {{ old('student_age', $student->student_age) == $i ? 'selected' : '' }}>
                                             {{ $i }}
                                         </option>
                                     @endfor
