@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RegistrationMail;
+use App\Models\BookingSlot;
 use App\Models\City;
 use App\Models\Country;
 use App\Traits\ImageTrait;
@@ -103,7 +104,20 @@ class FacultyController extends Controller
      */
     public function show($id)
     {
-        //
+        $data['booking_slot'] = BookingSlot::whereDate('date', '>=', date("Y-m-d"))
+        ->where('teacher_id', $id)
+        ->whereIn('meeting_status', [0, 1])  // Filter by meeting_status being null or 1 (in-progress)
+        ->with(['student', 'teacher'])
+        ->latest()
+        ->get();
+
+        $data['booking_history'] = BookingSlot::where('teacher_id', $id)
+        ->whereIn('meeting_status', [2])  // Filter by meeting_status being null or 1 (in-progress)
+        ->with(['student', 'teacher'])
+        ->latest()
+        ->paginate(10);
+
+        return view('admin.faculty.view')->with($data);
     }
 
     /**

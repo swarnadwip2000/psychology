@@ -8,26 +8,36 @@ use App\Models\City;
 use App\Models\Slot;
 use App\Models\Teacher;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TeacherController extends Controller
 {
-    public function dashboard(Request $request){
+    public function dashboard(Request $request)
+    {
 
         $data['page_title'] = "Dashboard";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
         $data['booking_slot'] = BookingSlot::whereDate('date', '>=', date("Y-m-d"))
-        ->where('teacher_id', Auth::user()->id )
+        ->where('teacher_id', Auth::user()->id)
+        ->whereIn('meeting_status', [0, 1])  // Filter by meeting_status being null or 1 (in-progress)
         ->with(['student', 'teacher'])
         ->latest()
         ->get();
-        return view('frontend.teacher.dashboard')->with($data);
 
+        $data['booking_history'] = BookingSlot::where('teacher_id', Auth::user()->id)
+        ->whereIn('meeting_status', [2])  // Filter by meeting_status being null or 1 (in-progress)
+        ->with(['student', 'teacher'])
+        ->latest()
+        ->paginate(10);
+
+        return view('frontend.teacher.dashboard')->with($data);
     }
 
-    public function session(Request $request){
+    public function session(Request $request)
+    {
         $data['page_title'] = "Dashboard";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
@@ -35,19 +45,21 @@ class TeacherController extends Controller
         return view('frontend.teacher.session')->with($data);
     }
 
-    public function addsession(Request $request){
+    public function addsession(Request $request)
+    {
         $date = date('Y-m-d', strtotime($request->slot_date));
         $time = date('H:i', strtotime($request->slot_time));
         $data =  [
             'teacher_id' => Auth::user()->id,
             'slot_date' => $date,
             'slot_time' => $time,
+            'topic' => $request->topic
         ];
 
 
         $isDuplicate = Slot::where($data)->count();
 
-        if($isDuplicate == 0){
+        if ($isDuplicate == 0) {
             $data = array_merge($data, [
                 'created_at' => date('Y-m-d H:i:s')
             ]);
@@ -55,27 +67,62 @@ class TeacherController extends Controller
         }
 
         return redirect()->route('auth_teacher_session')->with('successmsg', 'Session create successfully');
-
     }
 
-    public function deletesession(Request $request){
+    public function deletesession(Request $request)
+    {
         $slotId = $request->id;
         Slot::where('id', $slotId)->delete();
         return redirect()->route('auth_teacher_session')->with('errmsg', 'Session create successfully');
     }
 
-    public function createMeeting(Request $request){
-            $meeting = new MeetingController();
-            $requestObj = new Request([
-                'agenda' => "Start New Class",
-                'booking_id'  => $request->booking_id
+    public function createMeeting(Request $request)
+    {
+        $meeting = new MeetingController();
+        $booking = BookingSlot::findOrFail($request->booking_id);
+        if ($booking->zoom_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Meeting has been start please reload the page for join now.'  // Assuming this is the correct key
             ]);
-            $meeting->createMeeting($requestObj);
-            return redirect()->route('auth_teacher_dashboard');
+        }
+        $requestObj = new Request([
+            'booking_id'  => $request->booking_id,
+            'topic' => $booking->slot->topic,
+            'start_time' => $booking->time,
+            'start_date' => $booking->date
+
+        ]);
+        $booking->meeting_status = 1;
+        $booking->meeting_start_time = Carbon::now();  // Store the meeting end time
+        $booking->save();
+
+        $meeting->createMeeting($requestObj);
+        $start_url = json_decode($booking->zoom_response)->start_url ?? '';
+        // dd( json_decode($booking->zoom_response)->start_url);
+        return response()->json([
+            'start_url' => $start_url,  // Assuming this is the correct key
+            'status' => true
+        ]);
     }
 
-    public function logout(Request $request){
-        Auth::guard('teacher')->logout();
+    public function endMeeting(Request $request)
+    {
+        $booking = BookingSlot::findOrFail($request->booking_id);
+
+        // Set the meeting status to ended (2)
+        $booking->meeting_status = 2;
+        $booking->meeting_end_time = Carbon::now();  // Store the meeting end time
+        $booking->save();
+
+        return response()->json(['status' => true]);
+        // Proceed with your logic to end the Zoom call or finalize the meeting
+    }
+
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('front.faculty_login');
@@ -83,23 +130,24 @@ class TeacherController extends Controller
 
     public function liveClass(Request $request)
     {
-            $data['page_title'] = "Live class";
-            $data['page_description'] = "Live class";
-            $data['page_keyword'] = "Live class";
+        $data['page_title'] = "Live class";
+        $data['page_description'] = "Live class";
+        $data['page_keyword'] = "Live class";
 
-            $data['meeting'] = BookingSlot::where('zoom_id', $request->meeting_id)->get()->map(function($items){
-                $meetingResponse = json_decode($items->zoom_response);
-                $items->password = $meetingResponse->password;
-                $items->full_name = "Sankar Bera";
-                $items->start_url = $meetingResponse->start_url;
-                return $items;
-            })->first();
+        $data['meeting'] = BookingSlot::where('zoom_id', $request->meeting_id)->get()->map(function ($items) {
+            $meetingResponse = json_decode($items->zoom_response);
+            $items->password = $meetingResponse->password;
+            $items->full_name = "Sankar Bera";
+            $items->start_url = $meetingResponse->start_url;
+            return $items;
+        })->first();
 
-            // dd($data);
-            return view('frontend.teacher.live_class')->with($data);
+        // dd($data);
+        return view('frontend.teacher.live_class')->with($data);
     }
 
-    public function renderFaculity(){
+    public function renderFaculity()
+    {
         $data['page_title'] = "Dashboard";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
@@ -107,46 +155,41 @@ class TeacherController extends Controller
         $data['city_name']  = City::get();
         $data['degree']  = collect(config('class.dropdown_fuclaty_degree'));
         return view('admin.faculity.list')->with($data);
-
     }
 
     public function getFaculity(Request $request)
     {
         try {
             $countryName = config('class.allow_country');
-            $studentName = $request->name??null;
-            $countryId = $request->country_id??null;
-            $cityId = $request->city_id??null;
+            $studentName = $request->name ?? null;
+            $countryId = $request->country_id ?? null;
+            $cityId = $request->city_id ?? null;
             $degree = collect(config('class.dropdown_fuclaty_degree'))->pluck('name', 'id');
 
-            $model = Teacher::
-                when($countryId, function($q) use($countryId){
+            $model = Teacher::when($countryId, function ($q) use ($countryId) {
                     $q->where('country_id', $countryId);
                 })
-                ->when($cityId, function($q) use($cityId){
+                ->when($cityId, function ($q) use ($cityId) {
                     $q->where('city_id', $cityId);
                 })
-                ->when($studentName, function($q) use($studentName){
+                ->when($studentName, function ($q) use ($studentName) {
                     $q->where('name', $studentName);
                 })
                 ->whereIn('register_as', [3])
-                ->with('cities')->get()->map(function ($items, $key) use($countryName, $degree) {
+                ->with('cities')->get()->map(function ($items, $key) use ($countryName, $degree) {
 
-                $items->country_name = $countryName[$items->country_id];
-                $items->degree_name = $degree[$items->degree];
-                $items->city_name = $items->cities?->name;
-                $items->serial_no = ++$key;
-                return $items;
-            });
+                    $items->country_name = $countryName[$items->country_id];
+                    $items->degree_name = $degree[$items->degree];
+                    $items->city_name = $items->cities?->name;
+                    $items->serial_no = ++$key;
+                    return $items;
+                });
 
             $data['totalCount'] = $model->count();
             $data['data'] = $model;
             return response()->json($data, 200);
-
         } catch (\Exception $error) {
             return response()->json(['error' => $error->getMessage()], 500);
         }
-
     }
-
 }

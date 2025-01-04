@@ -29,6 +29,10 @@
             </td>
             <td>
                 <div class="edit-1 d-flex align-items-center justify-content-center">
+                    <a title="View Faculty" href="{{ route('faculty.show', $faculties->id) }}">
+                        <span class="edit-icon"><i class="ph ph-eye"></i></span>
+                    </a>
+
                     <a title="Edit Faculty" href="{{ route('faculty.edit', $faculties->id) }}">
                         <span class="edit-icon"><i class="ph ph-pencil-simple"></i></span>
                     </a>

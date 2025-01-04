@@ -26,6 +26,7 @@
                                 <table id="basic-table" class="table table-striped mb-0" role="grid">
                                   <thead>
                                       <tr>
+                                        <th>Topic</th>
                                         <th>Date (mm-dd-yyy)</th>
                                         <th>Slot</th>
                                         <th>Action</th>
@@ -34,6 +35,9 @@
                                   <tbody>
                                     @foreach($slots as $val)
                                       <tr>
+                                        <td>
+                                            {{$val->topic ?? ''}}
+                                        </td>
                                         <td>
                                             {{ date('m-d-Y', strtotime($val->slot_date)) }}
                                         </td>
@@ -69,10 +73,21 @@
                 <form method="post" action="{{ route('add_teacher_session') }}">
                     @csrf
                     <div class="row">
-                      <div class="col">
-                        <label for="formGroupExampleInput">Date</label>
-                        <input type="date" name="slot_date" id="slot_date" class="form-control" required/>
-                      </div>
+                        <div class="col-md-12">
+                            <label for="formGroupExampleInput">Topic</label>
+                            <input type="text" name="topic" id="topic" class="form-control" required/>
+                          </div>
+                          <div class="col">
+                            <label for="formGroupExampleInput">Date</label>
+                            <input
+                                type="date"
+                                name="slot_date"
+                                id="slot_date"
+                                class="form-control"
+                                required
+                                min="{{ date('Y-m-d') }}"
+                            />
+                        </div>
                       <div class="col">
                         <label for="formGroupExampleInput">Time</label>
                         <input type="time" name="slot_time" id="slot_time" class="form-control" required/>

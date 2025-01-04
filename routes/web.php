@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\FacultyController;
 use App\Http\Controllers\Frontend\CmsController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\MeetingController;
 use App\Http\Controllers\Frontend\StudentController;
 use App\Http\Controllers\Frontend\TeacherController;
 use Illuminate\Support\Facades\Artisan;
@@ -135,5 +136,9 @@ Route::controller(TeacherController::class)->middleware('teacher.auth')->group(f
         Route::get('live-class', 'liveClass')->name('teacher_live_class');
         Route::post('logout', 'logout')->name('teacher.logout');
         Route::get('create-meeting', 'createMeeting')->name('start_new_meeting');
+        Route::post('/end-meeting', 'endMeeting')->name('end_new_meeting');
     });
 });
+
+
+Route::get('/zoom/callback', [MeetingController::class, 'handleCallback']);

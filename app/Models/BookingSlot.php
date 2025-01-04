@@ -9,7 +9,7 @@ class BookingSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ "teacher_id", "student_id", "date", 'time', "zoom_id", "zoom_response", 'slot_id'];
+    protected $fillable = [ "teacher_id", "student_id", "date", 'time', "zoom_id", "zoom_response", 'slot_id', 'meeting_status'];
 
     public function teacher()
     {

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Zoom;
 use Illuminate\Support\Facades\Auth;
+
 class MeetingController extends Controller
 {
     // public function createMeeting(Request $request){
@@ -74,74 +75,110 @@ class MeetingController extends Controller
     public function createMeeting(Request $request)
     {
         // Validate input
+        // dd($request->all());  // For debugging purposes, remove after testing
 
-        $agenda = $request->agenda??'Online Tutorial';
-        $topic  = $request->topic??"Chapter 11";
-        $password  = $request->password??null;
-        $startTime  = date('Y-m-d H:i:s', strtotime($request->start_time))??date("Y-m-d H:i:s");
-        $startTime  = "2024-12-17 23:55:00";
+        $agenda = $request['topic'] ?? 'Online Tutorial';
+        $topic = $request['topic'] ?? "Chapter 11";
+        $password = $request['password'] ?? null;
+        // dd( $request['topic']);
+        // Combine start_date and start_time to create a proper datetime string
+        $startDate = $request['start_date'];  // e.g., 2025-01-10
+        $startTime = $request['start_time'];  // e.g., 23:43:00
 
-        $bookingId  = $request->booking_id;
+        // Create datetime string in the required format (YYYY-MM-DD HH:mm:ss)
+        $startDateTime = $startDate . ' ' . $startTime;
+        $startTimeFormatted = date('Y-m-d H:i:s', strtotime($startDateTime));
 
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' .self::generateToken(),
-                'Content-Type' => 'application/json',
-            ])->post("https://api.zoom.us/v2/users/me/meetings", [
-                'topic' => $topic,
-                "agenda" => $agenda,
-               // 'type' => 2, // 2 for scheduled meeting
-                'start_time' => $startTime,
-                'duration' => 30,
-                //"password" => $password,
-                "settings" => [
-                    'show_share_button' => false,
-                    'join_before_host' => true, // if you want to join before host set true otherwise set false
-                    'host_video' => true, // if you want to start video when host join set true otherwise set false
-                    'participant_video' => false, // if you want to start video when participants join set true otherwise set false
-                    'mute_upon_entry' => false, // if you want to mute participants when they join the meeting set true otherwise set false
-                    'waiting_room' => false, // if you want to use waiting room for participants set true otherwise set false
-                    'audio' => 'both', // values are 'both', 'telephony', 'voip'. default is both.
-                    'auto_recording' => 'none', // values are 'none', 'local', 'cloud'. default is none.
-                    'approval_type' => 1, // 0 => Automatically Approve, 1 => Manually Approve, 2 => No Registration Required
-                    'registration_type' => 2,
-                    'enforce_login' => false,
-                ],
-            ]);
+        $bookingId = $request->booking_id;
 
-            $meetingResponse = $response->json();
+        // Make the API request to Zoom
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . self::generateToken(),
+            'Content-Type' => 'application/json',
+        ])->post("https://api.zoom.us/v2/users/me/meetings", [
+            'topic' => $topic,
+            'agenda' => $agenda,
+            'start_time' => $startTimeFormatted,  // Use the formatted datetime string
+            'duration' => 30,  // Set a default duration
+            'password' => $password,
+            'settings' => [
+                'show_share_button' => false,
+                'join_before_host' => true,
+                'host_video' => true,
+                'participant_video' => false,
+                'mute_upon_entry' => false,
+                'waiting_room' => false,
+                'audio' => 'both',
+                'auto_recording' => 'none',
+                'approval_type' => 1,
+                'registration_type' => 2,
+                'enforce_login' => false,
+            ],
+        ]);
 
-            BookingSlot::where([
-                'id' => $bookingId,
-             ])->update([
-                'zoom_id' => $meetingResponse['id'],
-                'zoom_response' => $meetingResponse
-             ]);
+        $meetingResponse = $response->json();
+        // dd($meetingResponse);  // For debugging purposes, remove after testing
 
-             $data['success'] = true;
-             $data['message'] = "Meeting has been created successfully";
-             return response()->json($data, 200);
+        // Update the booking slot with the Zoom meeting details
+        BookingSlot::where('id', $bookingId)->update([
+            'zoom_id' => $meetingResponse['id'],
+            'zoom_response' => $meetingResponse
+        ]);
 
+        // Return response
+        return response()->json([
+            'success' => true,
+            'message' => 'Meeting has been created successfully',
+            'data' => $meetingResponse,
+        ], 200);
     }
+
 
     public function generateToken()
     {
 
-            $base64String = base64_encode(env('ZOOM_CLIENT_ID') . ':' . env('ZOOM_CLIENT_SECRET'));
-            $accountId = env('ZOOM_ACCOUNT_ID');
+        $base64String = base64_encode(env('ZOOM_CLIENT_ID') . ':' . env('ZOOM_CLIENT_SECRET'));
+        $accountId = env('ZOOM_ACCOUNT_ID');
 
-            $responseToken = Http::withHeaders([
-                "Content-Type"=> "application/x-www-form-urlencoded",
-                "Authorization"=> "Basic {$base64String}"
-            ])->post("https://zoom.us/oauth/token?grant_type=account_credentials&account_id={$accountId}");
-
-
-
-            return $responseToken->json()['access_token'];
+        $responseToken = Http::withHeaders([
+            "Content-Type" => "application/x-www-form-urlencoded",
+            "Authorization" => "Basic {$base64String}"
+        ])->post("https://zoom.us/oauth/token?grant_type=account_credentials&account_id={$accountId}");
 
 
+
+        return $responseToken->json()['access_token'];
     }
 
-    public function getMeeting(Request $request){
+    // Generate ZAK Token using OAuth Access Token
+    public function generateZAKToken($accessToken, $userId)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken, // Use OAuth Access Token
+        ])->get("https://api.zoom.us/v2/users/{$userId}/token?type=zak");
+
+        // Debugging the full response to see what the API returns
+        // dd($response->json()); // Dump the entire response to inspect it
+
+        if ($response->successful()) {
+            return $response->json()['token'] ?? ''; // ZAK Token
+        } else {
+            return response()->json(['error' => 'Failed to generate ZAK token', 'details' => $response->json()], 400);
+        }
+    }
+
+
+    // Full method to get both OAuth token and ZAK token
+    public function getHostZAKToken($userId)
+    {
+        $accessToken = $this->generateToken(); // Get OAuth Access Token
+        $zakToken = $this->generateZAKToken($accessToken, $userId); // Get ZAK Token for host
+
+        return $zakToken;
+    }
+
+    public function getMeeting(Request $request)
+    {
         $data['page_title'] = "Dashboard";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
@@ -149,37 +186,36 @@ class MeetingController extends Controller
         return view('meeting.meeting_list')->with($data);
     }
 
-    public function fetchMeeting(Request $request){
+    public function fetchMeeting(Request $request)
+    {
 
-        $studentId = $request->student_id??null;
-        $teacherId = $request->teacher_id??null;
-        $createdBy = $request->created_by??null;
+        $studentId = $request->student_id ?? null;
+        $teacherId = $request->teacher_id ?? null;
+        $createdBy = $request->created_by ?? null;
 
         $responseData = MeetingHistory::with(['student', 'teacher', 'createdBy'])
-        ->when($studentId, function($q) use ($studentId){
-            $q->where('student_id', $studentId);
-        })
-        ->when($teacherId, function($q) use ($teacherId){
-            $q->where('teacher_id', $teacherId);
-        })
-        ->when($createdBy, function($q) use ($createdBy){
-            $q->where('created_by', $createdBy);
-        })
-        ->latest()
-        ->get()->map(function($items, $key){
-            $items->serial_no = ++$key;
-            $items->student_name = $items->student->name;
-            $items->email = $items->student->email;
-            $items->created_by_name = $items->createdBy->name;
-            $items->join_link = $items->join_link;
-            $items->start_link = $items->start_link;
-            return $items;
-        });
+            ->when($studentId, function ($q) use ($studentId) {
+                $q->where('student_id', $studentId);
+            })
+            ->when($teacherId, function ($q) use ($teacherId) {
+                $q->where('teacher_id', $teacherId);
+            })
+            ->when($createdBy, function ($q) use ($createdBy) {
+                $q->where('created_by', $createdBy);
+            })
+            ->latest()
+            ->get()->map(function ($items, $key) {
+                $items->serial_no = ++$key;
+                $items->student_name = $items->student->name;
+                $items->email = $items->student->email;
+                $items->created_by_name = $items->createdBy->name;
+                $items->join_link = $items->join_link;
+                $items->start_link = $items->start_link;
+                return $items;
+            });
 
         $data['totalCount'] = $responseData->count();
         $data['data'] = $responseData;
         return response()->json($data, 200);
-
-
     }
 }

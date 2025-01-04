@@ -8,8 +8,8 @@
                         <div class="col-md-4">
                             <div class="calender" style="margin-top: 11px">
                                 <div class="form-group">
-                                    <label for="formGroupExampleInput">Check availability of the faculty ? </label>
-                                    <input type="date" id="date" name="date" class="form-control" required>
+                                    <label for="formGroupExampleInput">Search faculty?</label>
+                                    <input type="text" id="faculty_name" name="faculty_name" class="form-control" value="{{ request('faculty_name') }}" required>
                                 </div>
                             </div>
                         </div>
@@ -17,8 +17,7 @@
                         <div class="col-md-4">
                             <div class="calender" style="margin-top: 11px">
                                 <div class="form-group pt-3">
-                                    <input type="submit" name="book_now" class="btn ton-btn w-100 mt-3" id="book_now"
-                                        value="Search" />
+                                    <input type="submit" name="book_now" class="btn ton-btn w-100 mt-3" id="book_now" value="Search" />
                                 </div>
                             </div>
                         </div>
@@ -111,4 +110,5 @@
             });
         }
     </script>
+
 @endsection

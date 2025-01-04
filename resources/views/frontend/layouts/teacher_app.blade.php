@@ -20,6 +20,9 @@
 </head>
 
 <body>
+    <section id="loading">
+        <div id="loading-content"></div>
+    </section>
     <header class="ton_header dashboard">
         <div class="container-ton">
              <nav class="navbar navbar-expand-lg ">
@@ -37,9 +40,9 @@
                           <li class="nav-item">
                             <a class="nav-link" href="{{ route('auth_teacher_session') }}">My Session</a>
                           </li>
-                          <li class="nav-item">
+                          {{-- <li class="nav-item">
                             <a class="nav-link" href="#">Live Class</a>
-                          </li>
+                          </li> --}}
                           <li class="nav-item">
                             <form method="POST" action="{{ route('teacher.logout') }}">
                                 @csrf

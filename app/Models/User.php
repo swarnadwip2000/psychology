@@ -31,7 +31,8 @@ class User extends Authenticatable
         'city_id',
         'register_as',
         'status',
-        'degree'
+        'degree',
+        'phone'
     ];
 
     /**

@@ -12,7 +12,13 @@
     "devDependencies": {
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
-        "lodash": "^4.17.19",
+        "lodash": "^4.17.21",
         "postcss": "^8.1.14"
+    },
+    "dependencies": {
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "redux": "^5.0.1",
+        "redux-thunk": "^3.1.0"
     }
 }

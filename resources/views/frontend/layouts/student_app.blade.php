@@ -20,6 +20,9 @@
 </head>
 
 <body>
+    <section id="loading">
+        <div id="loading-content"></div>
+    </section>
     <header class="ton_header dashboard">
         <div class="container-ton">
              <nav class="navbar navbar-expand-lg ">
@@ -37,17 +40,17 @@
                           <li class="nav-item">
                             <a class="nav-link" href="{{ route('student.book_now') }}">Book Faculty</a>
                           </li>
-                          <li class="nav-item">
+                          {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('front.live_class') }}">Live Class</a>
+                          </li> --}}
+                          <li class="nav-item">
+                            <a class="nav-link" href="javascript:void(0);"> Tutorials </a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="dashboard-video.html"> Tutorials </a>
+                            <a class="nav-link" href="javascript:void(0);">Counseling</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="dashboard-Counseling.html">Counseling</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="dashboard-review.html">Reviews</a>
+                            <a class="nav-link" href="javascript:void(0);">Reviews</a>
                           </li>
                           <li class="nav-item">
                             <form method="POST" action="{{ route('student.logout') }}">

@@ -9,7 +9,7 @@ class Slot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["id", "teacher_id", "slot_date", "slot_time"];
+    protected $fillable = ["id", "teacher_id", "slot_date", "slot_time", 'topic'];
 
     public function teacher()
     {
