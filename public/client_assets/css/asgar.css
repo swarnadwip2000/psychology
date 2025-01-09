@@ -123,18 +123,18 @@ input.School_nm{
 
 /*Styling Selectbox*/
 .dropdown {
-  width: 350px;
+  /* width: 350px; */
   display: inline-block;
-  background-color: #fff;
-  border-radius: 2px;
-  box-shadow: 0 0 2px rgb(204, 204, 204);
+  background-color: #1f801f;
+  /* border-radius: 2px; */
+  /* box-shadow: 0 0 2px rgb(204, 204, 204); */
   transition: all .5s ease;
   position: relative;
   font-size: 14px;
-  color: #474747;
+  color: #fff;
   margin: 0 14px;
   text-align: left;
-  border:1px solid #000;
+  /* border:1px solid #1f801f; */
 }
 .dropdown .select {
     cursor: pointer;
@@ -319,3 +319,31 @@ ul.dropdown-menu{
 }
 
 /* end loader */
+
+.nav-item .dropdown-menu {
+    border-radius: 8px;
+    padding: 10px 0;
+    background-color: #f8f9fa; /* Light background */
+}
+
+.nav-item .dropdown-menu .dropdown-item {
+    padding: 10px 20px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-item .dropdown-menu .dropdown-item:hover {
+    background-color: #e9ecef; /* Light hover effect */
+}
+
+.nav-item .dropdown-toggle {
+    cursor: pointer;
+}
+
+.nav-item img {
+    transition: transform 0.3s ease;
+}
+
+.nav-item img:hover {
+    transform: scale(1.1); /* Slight zoom on hover */
+}

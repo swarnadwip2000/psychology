@@ -12,11 +12,19 @@
     <link rel="stylesheet" href="{{ asset('client_assets/css/owl.carousel.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('client_assets/css/owl.transitions.css') }}" type="text/css">
     <link href="{{ asset('client_assets/css/font-awesome.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
     <script src="{{ asset('client_assets/js/jquery.min.js') }}"></script>
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
     <link href="{{ asset('client_assets/css/custom.css') }}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ asset('client_assets/css/asgar.css') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 </head>
 
 <body>
@@ -25,36 +33,53 @@
     </section>
     <header class="ton_header dashboard">
         <div class="container-ton">
-             <nav class="navbar navbar-expand-lg ">
-                      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                      </button>
-                      <a class="navbar-brand" href="index.html"><span class="logo-img"><img src="{{ asset('client_assets/img/logo/logo.png') }}" alt=""></span> e-Psychology</a>
+            <nav class="navbar navbar-expand-lg ">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
+                    aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" href="{{ route('auth_teacher_dashboard') }}"><span class="logo-img"><img
+                            src="{{ asset('client_assets/img/logo/logo.png') }}" alt=""></span> e-Psychology</a>
 
-                      <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-                        <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                          <li class="nav-item">
-                            <a class="nav-link" href="{{ route('auth_teacher_dashboard') }}"><i class="fa fa-home" aria-hidden="true"></i></a>
-                          </li>
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('auth_teacher_dashboard') }}"><i class="fa fa-home"
+                                    aria-hidden="true"></i></a>
+                        </li>
 
-                          <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('auth_teacher_session') }}">My Session</a>
-                          </li>
-                          {{-- <li class="nav-item">
+                        </li>
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="#">Live Class</a>
                           </li> --}}
-                          <li class="nav-item">
-                            <form method="POST" action="{{ route('teacher.logout') }}">
-                                @csrf
-                                <button type="submit" class="btn btn-light">Logout</button>
-                            </form>
-                          </li>
+                          <li class="nav-item dropdown mr-2">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="text-decoration: none;">
+                                <img src="{{ asset('client_assets/img/images.png') }}" alt="Profile"
+                                    style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd;">
+                                <span class="ml-2 font-weight-bold">{{auth()->user()->name}}</span> <!-- Replace 'John Doe' dynamically -->
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow" aria-labelledby="profileDropdown">
+                                <a class="dropdown-item d-flex align-items-center ml-3" href="javascript:void(0);">
+                                    <i class="fa fa-user-circle mr-2 text-primary"></i> Profile
+                                </a>
+                                <form method="POST" action="{{ route('teacher.logout') }}" class="m-0">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item d-flex align-items-center">
+                                        <i class="fa fa-sign-out-alt mr-2 text-danger"></i> Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
 
-                        </ul>
-                      </div>
+
+                    </ul>
+                </div>
             </nav>
-          </div>
-      </header>
+        </div>
+    </header>
 
     @yield('content')
 
@@ -88,9 +113,18 @@
                             <li>
                                 <a href="blog.html">Blog</a>
                             </li>|
+                            @if (auth()->check())
+                                @if (auth()->user()->hasRole('STUDENT') || auth()->user()->hasRole('FACULTY'))
+                                @else
+                                <li>
+                                    <a href="{{ route('front.faculty_login') }}">Faculty Login</a>
+                                </li>|
+                                @endif
+                            @else
                             <li>
                                 <a href="{{ route('front.faculty_login') }}">Faculty Login</a>
                             </li>|
+                            @endif
                             <li>
                                 <a href="subscription.html">Subscriptions</a>
                             </li>|

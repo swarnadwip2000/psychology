@@ -17,7 +17,7 @@
                         <div class="col-md-4">
                             <div class="calender" style="margin-top: 11px">
                                 <div class="form-group pt-3">
-                                    <input type="submit" name="book_now" class="btn ton-btn w-100 mt-3" id="book_now" value="Search" />
+                                    <input type="submit" name="book_now" class=" ton-btn w-100 mt-3" id="book_now" value="Search" />
                                 </div>
                             </div>
                         </div>
@@ -28,7 +28,7 @@
                     @foreach ($teacher as $index => $val)
                         <div class="col-md-4">
                             <div class="card" style="width: 18rem;">
-                                <img src="{{ asset('user.jpeg') }}" class="card-img-top" alt="...">
+                                <img src="{{ asset('client_assets/img/images.png') }}" class="card-img-top" alt="...">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $val->name }}</h5>
                                     <p class="card-text">Some quick example text to build on the card title and make up the

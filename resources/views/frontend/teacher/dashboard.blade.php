@@ -6,6 +6,14 @@
     <section class="dshboard p-3" style="height: 700px">
         <div class="dshboard-contain">
             <div class="container">
+                <p
+                    style="    font-weight: bold;
+                background: #bff37e45;
+                font-size: 19px;
+            }">
+
+                    <span>Note: Each session is currently limited to a maximum of 40 minutes.</span>
+                </p>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
@@ -23,8 +31,8 @@
                                                 <th>Student Name</th>
                                                 <th>Date (mm-dd-yyy)</th>
                                                 <th>Time</th>
-                                                <th>Metting Id</th>
-                                                <th>Metting Password</th>
+                                                <th>Meeting Id</th>
+                                                {{-- <th>Meeting Password</th> --}}
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -40,36 +48,29 @@
                                                     <td>
                                                         {{ date('m-d-Y', strtotime($booking->date)) }}
                                                     </td>
-                                                    <td> {{ date('H:i A', strtotime($booking->time)) }}</td>
+                                                    <td> {{ date('H:i', strtotime($booking->time)) }}</td>
 
                                                     <td>{{ $booking->zoom_id ?? 'N/A' }}</td>
 
-                                                    <td>
+                                                    {{-- <td>
                                                         {{ json_decode($booking->zoom_response)->password ?? 'N/A' }}
-                                                    </td>
-                                                    <td>
+                                                    </td> --}}
+                                                    <td id="booking-row-{{ $booking->id }}">
                                                         @if ($booking->zoom_id && $booking->meeting_status != 2)
-                                                            <!-- If the meeting is ongoing (meeting_status != 2), show 'End Call' -->
-                                                            <a href="{{json_decode($booking->zoom_response)->join_url ?? 'N/A'}}"
-                                                            class="btn btn-success" target="_blank">Join Now</a>
+                                                            <a href="{{ json_decode($booking->zoom_response)->join_url ?? 'N/A' }}"
+                                                                class="btn btn-success" target="_blank">Rejoin</a>
                                                             <a href="javascript:void(0)"
                                                                 onclick="endMeeting({{ $booking->id }})"
-                                                                class="btn btn-danger">
-
-                                                                End Call
-                                                            </a>
+                                                                class="btn btn-danger">End Call</a>
                                                         @elseif ($booking->zoom_id && $booking->meeting_status == 2)
-                                                            <!-- If the meeting is ended (meeting_status == 2), show 'Meeting Ended' or something else -->
                                                             <span class="btn btn-secondary" disabled>Meeting Ended</span>
                                                         @else
-                                                            <!-- If there's no Zoom meeting yet (no zoom_id), show 'Start Call' -->
                                                             <a href="javascript:void(0)"
                                                                 onclick="getbookingTime({{ $booking->id }})"
-                                                                class="btn btn-success">
-                                                                Start Call
-                                                            </a>
+                                                                class="btn btn-success start-call-btn">Start Call</a>
                                                         @endif
                                                     </td>
+
 
                                                 </tr>
                                             @endforeach
@@ -103,20 +104,23 @@
                                         <tbody>
                                             @foreach ($booking_history as $meeting)
                                                 <tr>
-                                                    <td>{{ $meeting->slot->topic ?? ''}}</td>
-                                                    <td>{{ $meeting->student->name ?? ''}}</td>
+                                                    <td>{{ $meeting->slot->topic ?? '' }}</td>
+                                                    <td>{{ $meeting->student->name ?? '' }}</td>
                                                     <td>{{ date('m-d-Y', strtotime($meeting->date)) }}</td>
-                                                    <td>{{ $meeting->meeting_start_time ? date('H:i A', strtotime($meeting->meeting_start_time)) : 'N/A' }}</td>
-                                                    <td>{{ $meeting->meeting_end_time ? date('H:i A', strtotime($meeting->meeting_end_time)) : 'N/A' }}</td>
+                                                    <td>{{ $meeting->meeting_start_time ? date('H:i', strtotime($meeting->meeting_start_time)) : 'N/A' }}
+                                                    </td>
+                                                    <td>{{ $meeting->meeting_end_time ? date('H:i', strtotime($meeting->meeting_end_time)) : 'N/A' }}
+                                                    </td>
                                                     <td>
-                                                        @if($meeting->meeting_start_time && $meeting->meeting_end_time)
+                                                        @if ($meeting->meeting_start_time && $meeting->meeting_end_time)
                                                             <?php
-                                                                // Calculate duration using Carbon
-                                                                $start = \Carbon\Carbon::parse($meeting->meeting_start_time);
-                                                                $end = \Carbon\Carbon::parse($meeting->meeting_end_time);
-                                                                $duration = $start->diff($end); // Get the difference between start and end times
+                                                            // Calculate duration using Carbon
+                                                            $start = \Carbon\Carbon::parse($meeting->meeting_start_time);
+                                                            $end = \Carbon\Carbon::parse($meeting->meeting_end_time);
+                                                            $duration = $start->diff($end); // Get the difference between start and end times
                                                             ?>
-                                                            {{ $duration->format('%h hours %i minutes') }} <!-- Format the duration as hours and minutes -->
+                                                            {{ $duration->format('%h hours %i minutes') }}
+                                                            <!-- Format the duration as hours and minutes -->
                                                         @else
                                                             N/A
                                                         @endif
@@ -148,6 +152,7 @@
         function getbookingTime(bookingId) {
             $('#loading').addClass('loading');
             $('#loading-content').addClass('loading-content');
+
             $.ajax({
                 url: "{{ route('start_new_meeting') }}",
                 cache: false,
@@ -155,20 +160,31 @@
                     booking_id: bookingId
                 },
                 success: function(data) {
-                    // console.log();
-                    if (data.status == false) {
-                        $('#loading').removeClass('loading');
-                        $('#loading-content').removeClass('loading-content');
+                    $('#loading').removeClass('loading');
+                    $('#loading-content').removeClass('loading-content');
+
+                    if (data.status === false) {
                         toastr.error(data.message);
                     } else {
-                        $('#loading').removeClass('loading');
-                        $('#loading-content').removeClass('loading-content');
+                        // Open the meeting in a new tab
                         window.open(data.start_url, '_blank');
-                    }
 
+                        // Update the buttons dynamically
+                        const bookingRow = $(`#booking-row-${bookingId}`);
+                        bookingRow.html(`
+                    <a href="${data.start_url}" class="btn btn-success" target="_blank">Rejoin</a>
+                    <a href="javascript:void(0)" onclick="endMeeting(${bookingId})" class="btn btn-danger">End Call</a>
+                `);
+                    }
+                },
+                error: function() {
+                    $('#loading').removeClass('loading');
+                    $('#loading-content').removeClass('loading-content');
+                    toastr.error('An error occurred while starting the meeting.');
                 }
             });
         }
+
 
         function endMeeting(bookingId) {
             $('#loading').addClass('loading');

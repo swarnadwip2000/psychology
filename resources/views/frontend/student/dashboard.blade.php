@@ -3,6 +3,13 @@
     <section class="dshboard p-3" style="height: 700px">
         <div class="dshboard-contain">
             <div class="container">
+                <p style="    font-weight: bold;
+    background: #bff37e45;
+    font-size: 19px;
+}">
+
+                    <span>Note: Each session is currently limited to a maximum of 40 minutes.</span>
+                </p>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
@@ -33,21 +40,22 @@
                                                     <td>
                                                         {{ $var->teacher_name }}
                                                     </td>
-                                                    <td>
-                                                        {{ $var->date }}
+                                                    <td>{{ date('m-d-Y', strtotime($var->date)) }}</td>
+                                              
+                                                    <td>{{ $var->time ? date('H:i', strtotime($var->time)) : 'N/A' }}
                                                     </td>
-                                                    <td> {{ $var->time }}</td>
                                                     <td> {{ $var->zoom_id ?? 'N/A' }} </td>
-                                                    @if ($var->zoom_id)
-                                                        <td><a href="{{ json_decode($var->zoom_response)->join_url ?? 'N/A' }}"
-                                                                target="_blank"
-                                                                class="btn btn-success">{{ $var->zoom_id ? 'Join Now' : 'Not Started' }}</a>
-                                                        </td>
-                                                    @else
-                                                        <td><a href="javascript:void(0);"
-                                                                class="btn btn-success">{{ $var->zoom_id ? 'Join Now' : 'Not Started' }}</a>
-                                                        </td>
-                                                    @endif
+                                                    <td id="booking-row-{{ $var['id'] }}">
+                                                        @if ($var->zoom_id && $var->meeting_status != 2)
+                                                            <a href="{{ json_decode($var->zoom_response)->join_url ?? 'javascript:void(0);' }}"
+                                                                class="btn btn-success">{{ $var->zoom_id ? 'Rejoin' : 'Rejoin' }}</a>
+                                                        @else
+                                                            <a href="javascript:void(0)"
+                                                                onclick="getbookingTime({{ $var->id }})"
+                                                                class="btn btn-success start-call-btn">Join Now</a>
+                                                        @endif
+                                                    </td>
+
 
                                                 </tr>
                                             @endforeach
@@ -83,11 +91,11 @@
                                             @foreach ($booking_history as $meeting)
                                                 <tr>
                                                     <td>{{ $meeting->slot->topic ?? '' }}</td>
-                                                    <td> {{ $meeting->teacher_name ?? ''}}</td>
+                                                    <td> {{ $meeting->teacher_name ?? '' }}</td>
                                                     <td>{{ date('m-d-Y', strtotime($meeting->date)) }}</td>
-                                                    <td>{{ $meeting->meeting_start_time ? date('H:i A', strtotime($meeting->meeting_start_time)) : 'N/A' }}
+                                                    <td>{{ $meeting->meeting_start_time ? date('H:i', strtotime($meeting->meeting_start_time)) : 'N/A' }}
                                                     </td>
-                                                    <td>{{ $meeting->meeting_end_time ? date('H:i A', strtotime($meeting->meeting_end_time)) : 'N/A' }}
+                                                    <td>{{ $meeting->meeting_end_time ? date('H:i', strtotime($meeting->meeting_end_time)) : 'N/A' }}
                                                     </td>
                                                     <td>
                                                         @if ($meeting->meeting_start_time && $meeting->meeting_end_time)
@@ -124,4 +132,40 @@
     </section>
 @endsection
 @section('script')
+    <script>
+        function getbookingTime(bookingId) {
+            $('#loading').addClass('loading');
+            $('#loading-content').addClass('loading-content');
+
+            $.ajax({
+                url: "{{ route('student.start_new_meeting') }}",
+                cache: false,
+                data: {
+                    booking_id: bookingId
+                },
+                success: function(data) {
+                    $('#loading').removeClass('loading');
+                    $('#loading-content').removeClass('loading-content');
+
+                    if (data.status === false) {
+                        toastr.error(data.message);
+                    } else {
+                        // Open the meeting in a new tab
+                        window.open(data.start_url, '_blank');
+
+                        // Update the buttons dynamically
+                        const bookingRow = $(`#booking-row-${bookingId}`);
+                        bookingRow.html(`
+                <a href="${data.start_url}" class="btn btn-success" target="_blank">Rejoin</a>
+            `);
+                    }
+                },
+                error: function() {
+                    $('#loading').removeClass('loading');
+                    $('#loading-content').removeClass('loading-content');
+                    toastr.error('An error occurred while starting the meeting.');
+                }
+            });
+        }
+    </script>
 @endsection

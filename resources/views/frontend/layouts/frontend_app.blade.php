@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="{{ asset('client_assets/css/owl.carousel.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('client_assets/css/owl.transitions.css') }}" type="text/css">
     <link href="{{ asset('client_assets/css/font-awesome.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script src="{{ asset('client_assets/js/jquery.min.js') }}"></script>
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
     <link href="{{ asset('client_assets/css/custom.css') }}" rel="stylesheet">
@@ -32,12 +33,33 @@
 
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
                     <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('front.student_login') }}">LogIn</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('front.home') }}">Register</a>
-                        </li>
+                        @if (auth()->check())
+                            @if (auth()->user()->hasRole('STUDENT'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('front.student_dashboard') }}">Dashboard</a>
+                                </li>
+                            @elseif (auth()->user()->hasRole('FACULTY'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('auth_teacher_dashboard') }}">Dashboard</a>
+                                </li>
+                            @else
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('front.student_login') }}">LogIn</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('front.home') }}">Register</a>
+                                </li>
+                            @endif
+                        @else
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('front.student_login') }}">LogIn</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('front.home') }}">Register</a>
+                            </li>
+                        @endif
+
+
 
                     </ul>
                 </div>
@@ -78,9 +100,18 @@
                             <li>
                                 <a href="blog.html">Blog</a>
                             </li>|
-                            <li>
-                                <a href="{{ route('front.faculty_login') }}">Faculty Login</a>
-                            </li>|
+                            @if (auth()->check())
+                                @if (auth()->user()->hasRole('STUDENT') || auth()->user()->hasRole('FACULTY'))
+                                @else
+                                    <li>
+                                        <a href="{{ route('front.faculty_login') }}">Faculty Login</a>
+                                    </li>|
+                                @endif
+                            @else
+                                <li>
+                                    <a href="{{ route('front.faculty_login') }}">Faculty Login</a>
+                                </li>|
+                            @endif
                             <li>
                                 <a href="subscription.html">Subscriptions</a>
                             </li>|

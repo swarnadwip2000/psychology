@@ -21,17 +21,18 @@ class TeacherController extends Controller
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
         $data['booking_slot'] = BookingSlot::whereDate('date', '>=', date("Y-m-d"))
-        ->where('teacher_id', Auth::user()->id)
-        ->whereIn('meeting_status', [0, 1])  // Filter by meeting_status being null or 1 (in-progress)
-        ->with(['student', 'teacher'])
-        ->latest()
-        ->get();
+            ->where('teacher_id', Auth::user()->id)
+            ->whereIn('meeting_status', [0, 1])  // Filter by meeting_status being null or 1 (in-progress)
+            ->with(['student', 'teacher'])
+            ->latest()
+            ->get();
 
         $data['booking_history'] = BookingSlot::where('teacher_id', Auth::user()->id)
-        ->whereIn('meeting_status', [2])  // Filter by meeting_status being null or 1 (in-progress)
-        ->with(['student', 'teacher'])
-        ->latest()
-        ->paginate(10);
+            // ->whereDate('date', '<', date('Y-m-d'))->orderBy('id', 'desc')
+            ->whereIn('meeting_status', [2])  // Filter by meeting_status being null or 1 (in-progress)
+            ->with(['student', 'teacher'])
+            ->latest()
+            ->paginate(10);
 
         return view('frontend.teacher.dashboard')->with($data);
     }
@@ -80,31 +81,49 @@ class TeacherController extends Controller
     {
         $meeting = new MeetingController();
         $booking = BookingSlot::findOrFail($request->booking_id);
+
+        // Check if the meeting has already been started
         if ($booking->zoom_id) {
             return response()->json([
                 'status' => false,
-                'message' => 'Meeting has been start please reload the page for join now.'  // Assuming this is the correct key
+                'message' => 'Meeting has already started. Please reload the page to join now.'
             ]);
         }
+
+        // Combine the date and time to create a full start datetime
+        $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time);
+        // dd(now());
+        // Check if the current time is before the scheduled start time
+        if (Carbon::now()->lt($scheduledStart)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cannot start the session before the scheduled time and date.'
+            ]);
+        }
+
+        // Prepare the request object for creating a meeting
         $requestObj = new Request([
             'booking_id'  => $request->booking_id,
-            'topic' => $booking->slot->topic,
-            'start_time' => $booking->time,
-            'start_date' => $booking->date
-
+            'topic'       => $booking->slot->topic,
+            'start_time'  => $booking->time,
+            'start_date'  => $booking->date,
         ]);
-        $booking->meeting_status = 1;
-        $booking->meeting_start_time = Carbon::now();  // Store the meeting end time
-        $booking->save();
 
-        $meeting->createMeeting($requestObj);
-        $start_url = json_decode($booking->zoom_response)->start_url ?? '';
-        // dd( json_decode($booking->zoom_response)->start_url);
+        // Create the meeting
+        $meeting_json = $meeting->createMeeting($requestObj);
+        $start_url = $meeting_json['start_url'] ?? '';
+
+         $booking->update([
+            'meeting_status' => 1,
+            'meeting_start_time' => Carbon::now(),
+        ]);
+
         return response()->json([
-            'start_url' => $start_url,  // Assuming this is the correct key
-            'status' => true
+            'start_url' => $start_url,
+            'status'    => true
         ]);
     }
+
 
     public function endMeeting(Request $request)
     {
@@ -167,8 +186,8 @@ class TeacherController extends Controller
             $degree = collect(config('class.dropdown_fuclaty_degree'))->pluck('name', 'id');
 
             $model = Teacher::when($countryId, function ($q) use ($countryId) {
-                    $q->where('country_id', $countryId);
-                })
+                $q->where('country_id', $countryId);
+            })
                 ->when($cityId, function ($q) use ($cityId) {
                     $q->where('city_id', $cityId);
                 })

@@ -33,7 +33,6 @@
                                 <div class="form-group col-md-6">
                                     <label for="country_name">Country Name</label>
                                     <select id="country_name" name="country_name" class="form-control">
-                                        <option selected>Select</option>
                                         <option value="">Select</option>
                                         @foreach ($countries as $key => $val)
                                         <option value="{{ $val->id }}" {{ old('country_name') == $val->id ? 'selected' : '' }}>{{ $val->name }}</option>

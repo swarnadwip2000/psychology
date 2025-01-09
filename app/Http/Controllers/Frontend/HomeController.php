@@ -168,7 +168,7 @@ class HomeController extends Controller
             $userDetails->assignRole('STUDENT');
             Mail::to($emailId)->send(new MyTestEmail($remember_token));
             session()->forget('student_data');
-            return redirect()->route('front.faculty_login')->with('successmsg', 'Please check your mail for verified your account.');
+            return redirect()->route('front.student_login')->with('successmsg', 'Please check your mail for verified your account.');
         } else {
             abort(404);
         }
@@ -227,7 +227,7 @@ class HomeController extends Controller
         $data['page_title'] = "Email Confirmation";
         $data['page_description'] = "Email Confirmation";
         $data['page_keyword'] = "Email Confirmation";
-        return redirect()->route('front.student_login')->with('successmsg', 'Please check your mail for verified your account.');
+        return redirect()->route('front.faculty_login')->with('successmsg', 'Please check your mail for verified your account.');
     }
 
     public function faculty_login_success(Request $request)

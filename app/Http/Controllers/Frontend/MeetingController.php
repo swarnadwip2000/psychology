@@ -126,11 +126,7 @@ class MeetingController extends Controller
         ]);
 
         // Return response
-        return response()->json([
-            'success' => true,
-            'message' => 'Meeting has been created successfully',
-            'data' => $meetingResponse,
-        ], 200);
+        return  $meetingResponse;
     }
 
 

@@ -41,7 +41,7 @@
                                         <td>
                                             {{ date('m-d-Y', strtotime($val->slot_date)) }}
                                         </td>
-                                        <td> {{ date('H:i A', strtotime($val->slot_time))  }}</td>
+                                        <td> {{ date('H:i', strtotime($val->slot_time))  }}</td>
 
                                         <td><a href="{{ route('delete_teacher_session', ['id'=> $val->id]) }}">Delete</a></td>
 

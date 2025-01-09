@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BookingNotification;
 use App\Models\BookingSlot;
 use App\Models\City;
 use App\Models\MeetingHistory;
@@ -12,6 +13,7 @@ use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class StudentController extends Controller
 {
@@ -23,7 +25,7 @@ class StudentController extends Controller
         $data['page_keyword'] = "Dashboard";
 
         $data['teacher'] = BookingSlot::where('student_id', Auth::user()->id)->whereIn('meeting_status', [0, 1])
-            ->whereDate('date', '>=', date('Y-m-d'))
+            ->whereDate('date', '>=', date('Y-m-d'))->orderBy('id', 'desc')
             ->with(['teacher', 'student'])->get()->map(function ($items) {
                 $items->teacher_name = $items->teacher->name;
                 return $items;
@@ -31,6 +33,7 @@ class StudentController extends Controller
 
         $data['booking_history'] = BookingSlot::where('student_id', Auth::user()->id)
             ->where('meeting_status', 2) // Filter by meeting_status = 2
+            // ->whereDate('date', '<', date('Y-m-d'))->orderBy('id', 'desc')
             ->with(['teacher', 'student']) // Eager load related models
             ->paginate(10) // Paginate results first
             ->through(function ($item) { // Use through for transformation
@@ -45,19 +48,98 @@ class StudentController extends Controller
 
     public function facultyBooking(Request $request)
     {
-        $slot_id = $request->booking_time;
-        $slot = Slot::findOrFail($slot_id);
+        // Find the slot
+        $slot = Slot::findOrFail($request->booking_time);
 
-        BookingSlot::create([
-            'slot_id'  => $slot_id,
+        // Create the booking
+        $booking = BookingSlot::create([
+            'slot_id' => $slot->id,
             'teacher_id' => $request->teacher_id,
-            'student_id' => Auth::guard('web')->user()->id,
+            'student_id' => Auth::guard('web')->id(),
             'date' => $request->booking_date,
             'time' => $slot->slot_time,
             'meeting_status' => 0,
         ]);
-        return redirect()->route('front.student_dashboard');
+
+        // Get teacher and student information
+        $teacher = User::findOrFail($request->teacher_id);
+        $student = Auth::guard('web')->user();
+
+        // Email data
+        $emailData = [
+            'date' => $request->booking_date,
+            'time' => $slot->slot_time,
+            'teacher_name' => $teacher->name,
+            'student_name' => $student->name,
+        ];
+
+        // Send email to the teacher
+        Mail::to($teacher->email)->send(new BookingNotification($emailData, 'teacher'));
+
+        // Send email to the student
+        Mail::to($student->email)->send(new BookingNotification($emailData, 'student'));
+
+        return redirect()->route('front.student_dashboard')->with('successmsg', 'Booking created successfully!');
     }
+
+
+    // public function facultyBooking(Request $request)
+    // {
+
+    //     // Find the slot
+    //     $slot = Slot::findOrFail($request->booking_time);
+
+    //     // Create the booking
+    //     $booking = BookingSlot::create([
+    //         'slot_id' => $slot->id,
+    //         'teacher_id' => $request->teacher_id,
+    //         'student_id' => Auth::guard('web')->id(),
+    //         'date' => $request->booking_date,
+    //         'time' => $slot->slot_time,
+    //         'meeting_status' => 0,
+    //     ]);
+
+    //     // Prepare data for meeting creation
+    //     $meetingData = [
+    //         'booking_id' => $booking->id,
+    //         'topic' => $slot->topic ?? 'Default Topic',
+    //         'start_time' => $booking->time,
+    //         'start_date' => $booking->date,
+    //     ];
+
+    //     // Create the meeting
+    //     $meeting = new MeetingController();
+    //     $response = $meeting->createMeeting(new Request($meetingData));
+
+    //     // // Handle the meeting response
+    //     $zoomResponse = json_decode($response, true);
+
+    //     // Extract the start_url or provide a fallback
+    //     $start_url = $zoomResponse['start_url'] ?? null;
+
+    //     if (!$start_url) {
+    //         // Log the issue or notify the admin if start_url is missing
+    //         \Log::error('Zoom meeting creation failed or start_url missing', [
+    //             'response' => $zoomResponse,
+    //             'booking_id' => $booking->id,
+    //         ]);
+
+    //         // Provide a fallback message to the user
+    //         return redirect()->route('front.student_dashboard')->with('errmsg', 'Booking created, but meeting link is unavailable. Please contact support.');
+    //     }
+
+    //     // Update booking with meeting details
+    //     $booking->update([
+    //         'meeting_status' => 1,
+    //         'meeting_start_time' => $booking->time,
+    //         'zoom_response' => $response, // Save the raw Zoom response if needed
+    //     ]);
+
+    //     // Redirect to student dashboard
+
+    //     return redirect()->route('front.student_dashboard')->with('successmsg', 'Booking created successfully!');
+    // }
+
 
     public function bookTeacher(Request $request)
     {
@@ -107,7 +189,7 @@ class StudentController extends Controller
 
         $option = "<option>Select</option>";
         foreach ($slot as $val) {
-            $option .= "<option value='" . $val->id . "'>" . date('H:i A', strtotime($val->slot_time)) . "</option>";
+            $option .= "<option value='" . $val->id . "'>" . date('H:i', strtotime($val->slot_time)) . "</option>";
         }
         return response()->json($option);
     }
@@ -261,4 +343,36 @@ class StudentController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('front.student_login');
     }
+
+    public function checkMeeting(Request $request)
+    {
+        $booking = BookingSlot::findOrFail($request->booking_id);
+
+        // Combine the date and time to create a full start datetime
+        $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time);
+
+        // Check if the current time is before the scheduled start time
+        if (Carbon::now()->lt($scheduledStart)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cannot start the session before the scheduled time and date.'
+            ]);
+        }
+
+        // Check if the meeting start URL is available
+        $zoomResponse = json_decode($booking->zoom_response);
+        if (isset($zoomResponse->start_url) && !empty($zoomResponse->start_url)) {
+            return response()->json([
+                'start_url' => $zoomResponse->start_url,
+                'status'    => true
+            ]);
+        }
+
+        // If the start URL is not available
+        return response()->json([
+            'status' => false,
+            'message' => 'Faculty not available to start call. Please try again later.'
+        ]);
+    }
+
 }

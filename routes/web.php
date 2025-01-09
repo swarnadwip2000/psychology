@@ -118,7 +118,7 @@ Route::controller(StudentController::class)->middleware('student.auth')->group(f
         Route::get('get-slot', 'getAvailableSlot')->name('student.available_slot');
         Route::get('live-class', 'liveClass')->name('front.live_class');
         Route::post('logout', 'logout')->name('student.logout');
-
+        Route::get('check-meeting', 'checkMeeting')->name('student.start_new_meeting');
         Route::prefix('booking')->group(function(){
             Route::post('/', 'facultyBooking')->name('student.faculity_booking');
 

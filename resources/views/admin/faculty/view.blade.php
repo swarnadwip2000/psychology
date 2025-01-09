@@ -37,9 +37,8 @@
                                                 <th>Student Name</th>
                                                 <th>Date (mm-dd-yyy)</th>
                                                 <th>Time</th>
-                                                <th>Metting Id</th>
-                                                <th>Metting Password</th>
-                                                <th>Action</th>
+                                                <th>Meeting Id</th>
+                                                {{-- <th>Meeting Password</th> --}}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -54,36 +53,14 @@
                                                     <td>
                                                         {{ date('m-d-Y', strtotime($booking->date)) }}
                                                     </td>
-                                                    <td> {{ date('H:i A', strtotime($booking->time)) }}</td>
+                                                    <td> {{ date('H:i', strtotime($booking->time)) }}</td>
 
                                                     <td>{{ $booking->zoom_id ?? 'N/A' }}</td>
 
-                                                    <td>
+                                                    {{-- <td>
                                                         {{ json_decode($booking->zoom_response)->password ?? 'N/A' }}
-                                                    </td>
-                                                    <td>
-                                                        @if ($booking->zoom_id && $booking->meeting_status != 2)
-                                                            <!-- If the meeting is ongoing (meeting_status != 2), show 'End Call' -->
-                                                            <a href="{{json_decode($booking->zoom_response)->join_url ?? 'N/A'}}"
-                                                            class="btn btn-success" target="_blank">Join Now</a>
-                                                            <a href="javascript:void(0)"
-                                                                onclick="endMeeting({{ $booking->id }})"
-                                                                class="btn btn-danger">
+                                                    </td> --}}
 
-                                                                End Call
-                                                            </a>
-                                                        @elseif ($booking->zoom_id && $booking->meeting_status == 2)
-                                                            <!-- If the meeting is ended (meeting_status == 2), show 'Meeting Ended' or something else -->
-                                                            <span class="btn btn-secondary" disabled>Meeting Ended</span>
-                                                        @else
-                                                            <!-- If there's no Zoom meeting yet (no zoom_id), show 'Start Call' -->
-                                                            <a href="javascript:void(0)"
-                                                                onclick="getbookingTime({{ $booking->id }})"
-                                                                class="btn btn-success">
-                                                                Start Call
-                                                            </a>
-                                                        @endif
-                                                    </td>
 
                                                 </tr>
                                             @endforeach
@@ -120,8 +97,8 @@
                                                     <td>{{ $meeting->slot->topic ?? ''}}</td>
                                                     <td>{{ $meeting->student->name ?? ''}}</td>
                                                     <td>{{ date('m-d-Y', strtotime($meeting->date)) }}</td>
-                                                    <td>{{ $meeting->meeting_start_time ? date('H:i A', strtotime($meeting->meeting_start_time)) : 'N/A' }}</td>
-                                                    <td>{{ $meeting->meeting_end_time ? date('H:i A', strtotime($meeting->meeting_end_time)) : 'N/A' }}</td>
+                                                    <td>{{ $meeting->meeting_start_time ? date('H:i', strtotime($meeting->meeting_start_time)) : 'N/A' }}</td>
+                                                    <td>{{ $meeting->meeting_end_time ? date('H:i', strtotime($meeting->meeting_end_time)) : 'N/A' }}</td>
                                                     <td>
                                                         @if($meeting->meeting_start_time && $meeting->meeting_end_time)
                                                             <?php
