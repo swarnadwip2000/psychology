@@ -117,7 +117,20 @@ class MeetingController extends Controller
         ]);
 
         $meetingResponse = $response->json();
-        // dd($meetingResponse);  // For debugging purposes, remove after testing
+
+        // Step 2: Extract the meeting ID from the response
+        $meetingId = $response->json()['id'];
+
+        // Step 3: Add a participant (registrant)
+        $registrantResponse = Http::withHeaders([
+            'Authorization' => 'Bearer ' . self::generateToken(),
+            'Content-Type' => 'application/json',
+        ])->post("https://api.zoom.us/v2/meetings/{$meetingId}/registrants", [
+            'email' => auth()->user()->email,
+            'first_name' => auth()->user()->name,
+            'last_name' => '',
+        ]);
+        // dd($registrantResponse);  // For debugging purposes, remove after testing
 
         // Update the booking slot with the Zoom meeting details
         BookingSlot::where('id', $bookingId)->update([

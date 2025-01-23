@@ -363,7 +363,7 @@ class StudentController extends Controller
         $zoomResponse = json_decode($booking->zoom_response);
         if (isset($zoomResponse->start_url) && !empty($zoomResponse->start_url)) {
             return response()->json([
-                'start_url' => $zoomResponse->start_url,
+                'start_url' => $zoomResponse->join_url,
                 'status'    => true
             ]);
         }

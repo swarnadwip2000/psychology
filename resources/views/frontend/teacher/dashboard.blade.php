@@ -19,7 +19,7 @@
                         <div class="card">
                             <div class="card-header d-flex justify-content-between">
                                 <div class="header-title">
-                                    <h4 class="card-title">Upcoming Meeting</h4>
+                                    <h4 class="card-title">Upcoming Meeting</h4><span>EST time zone</span>
                                 </div>
                             </div>
                             <div class="card-body table-fixed p-0">

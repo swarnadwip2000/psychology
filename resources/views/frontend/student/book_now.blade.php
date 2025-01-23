@@ -47,7 +47,7 @@
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Book Faculty</h5>
+                                        <h5 class="modal-title" id="exampleModalLabel">Book Faculty (EST time zone)</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -59,14 +59,15 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <label for="formGroupExampleInput">Booking Date</label>
-                                                    <select name="booking_date" id="booking_date" class="form-control"
-                                                        required onchange="getbookingTime(this, {{ $val->id }})">
+                                                    <select name="booking_date" id="booking_date" class="form-control" required onchange="getbookingTime(this, {{ $val->id }})">
                                                         <option value="">Select</option>
                                                         @foreach ($val->slot as $slot)
-                                                            <option value="{{ $slot->slot_date }}">{{ date('m-d-Y', strtotime($slot->slot_date)) }}
-                                                            </option>
+                                                            @if (\App\Helpers\SlotHelper::hasAvailableSlots($slot->slot_date, $val->id))
+                                                                <option value="{{ $slot->slot_date }}">{{ date('m-d-Y', strtotime($slot->slot_date)) }}</option>
+                                                            @endif
                                                         @endforeach
                                                     </select>
+
                                                 </div>
                                                 <div class="col-md-12">
                                                     <label for="formGroupExampleInput">Available Slot</label>

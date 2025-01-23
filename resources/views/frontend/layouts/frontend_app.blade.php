@@ -77,31 +77,32 @@
                     <div class="menu text-center">
                         <ul>
                             <li>
-                                <a href="about.html">About us</a>
+                                <a href="{{ route('about.us') }}">About us</a>
                             </li>|
                             <li>
-                                <a href="article.html">Articles</a>
+                                <a href="{{ route('articles') }}">Articles</a>
                             </li>|
                             <li>
-                                <a href="career.html">Career</a>
+                                <a href="{{ route('career') }}">Career</a>
                             </li>|
                             <li>
-                                <a href="help.html">Help</a>
+                                <a href="{{ route('help') }}">Help</a>
                             </li>|
                             <li>
-                                <a href="Faq.html">FAQ</a>
+                                <a href="{{ route('faq') }}">FAQ</a>
                             </li>|
                             <li>
-                                <a href="contact.html">Contact us</a>
+                                <a href="{{ route('contact.us') }}">Contact us</a>
                             </li>
                         </ul>
 
                         <ul class="mb-3">
                             <li>
-                                <a href="blog.html">Blog</a>
+                                <a href="{{ route('blog') }}">Blog</a>
                             </li>|
                             @if (auth()->check())
                                 @if (auth()->user()->hasRole('STUDENT') || auth()->user()->hasRole('FACULTY'))
+                                    <!-- No additional links -->
                                 @else
                                     <li>
                                         <a href="{{ route('front.faculty_login') }}">Faculty Login</a>
@@ -113,15 +114,16 @@
                                 </li>|
                             @endif
                             <li>
-                                <a href="subscription.html">Subscriptions</a>
+                                <a href="{{ route('subscriptions') }}">Subscriptions</a>
                             </li>|
                             <li>
-                                <a href="terms.html">Terms & Conditions</a>
+                                <a href="{{ route('terms.conditions') }}">Terms & Conditions</a>
                             </li>|
                             <li>
-                                <a href="privacy.html">Privacy Policy</a>
+                                <a href="{{ route('privacy.policy') }}">Privacy Policy</a>
                             </li>
                         </ul>
+
                         <p>Powered By Canaeroit</p>
                     </div>
                 </div>

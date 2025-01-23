@@ -15,7 +15,7 @@
                         <div class="card">
                             <div class="card-header d-flex justify-content-between">
                                 <div class="header-title">
-                                    <h4 class="card-title">Upcoming Meeting</h4>
+                                    <h4 class="card-title">Upcoming Meeting</h4> <span>(EST time zone)</span>
                                 </div>
                             </div>
                             <div class="card-body table-fixed p-0">
@@ -41,14 +41,14 @@
                                                         {{ $var->teacher_name }}
                                                     </td>
                                                     <td>{{ date('m-d-Y', strtotime($var->date)) }}</td>
-                                              
+
                                                     <td>{{ $var->time ? date('H:i', strtotime($var->time)) : 'N/A' }}
                                                     </td>
                                                     <td> {{ $var->zoom_id ?? 'N/A' }} </td>
                                                     <td id="booking-row-{{ $var['id'] }}">
                                                         @if ($var->zoom_id && $var->meeting_status != 2)
                                                             <a href="{{ json_decode($var->zoom_response)->join_url ?? 'javascript:void(0);' }}"
-                                                                class="btn btn-success">{{ $var->zoom_id ? 'Rejoin' : 'Rejoin' }}</a>
+                                                                class="btn btn-success" target="_blank">{{ $var->zoom_id ? 'Rejoin' : 'Rejoin' }}</a>
                                                         @else
                                                             <a href="javascript:void(0)"
                                                                 onclick="getbookingTime({{ $var->id }})"

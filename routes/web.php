@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\FacultyController;
 use App\Http\Controllers\Frontend\CmsController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\MeetingController;
+use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\StudentController;
 use App\Http\Controllers\Frontend\TeacherController;
 use Illuminate\Support\Facades\Artisan;
@@ -79,6 +80,18 @@ Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
 });
 
 
+
+
+Route::get('/about-us', [PageController::class, 'aboutUs'])->name('about.us');
+Route::get('/articles', [PageController::class, 'articles'])->name('articles');
+Route::get('/career', [PageController::class, 'career'])->name('career');
+Route::get('/help', [PageController::class, 'help'])->name('help');
+Route::get('/faq', [PageController::class, 'faq'])->name('faq');
+Route::get('/contact-us', [PageController::class, 'contactUs'])->name('contact.us');
+Route::get('/blog', [PageController::class, 'blog'])->name('blog');
+Route::get('/subscriptions', [PageController::class, 'subscriptions'])->name('subscriptions');
+Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'])->name('terms.conditions');
+Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy.policy');
 
 
 Route::controller(HomeController::class)->group(function(){

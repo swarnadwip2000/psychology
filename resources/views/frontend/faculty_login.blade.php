@@ -25,6 +25,8 @@
                             <div class="col-md-12 text-center">
                                 <span>Create a New Account <a href="{{ route('front.faculty_registration') }}">Click Here</a></span>
                                 <br/>
+                                <span>Are you want to login as a student? <a href="{{ route('front.student_login') }}">Click Here</a></span>
+                                <br/>
                                 <input type="submit" class="btn btn-info" value="Login" />
                             </div>
                         </form>
