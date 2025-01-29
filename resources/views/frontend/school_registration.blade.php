@@ -32,7 +32,7 @@
 
                                 <div class="form-group col-md-6">
                                     <label for="country_name">Country Name</label>
-                                    <select id="country_name" name="country_name" class="form-control">
+                                    <select id="country_id" name="country_name" class="form-control">
                                         <option selected>Select</option>
                                         @foreach ($countries as $key => $val)
                                             <option value="{{ $val->id }}"
@@ -43,12 +43,10 @@
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="city_name">City</label>
-                                    <select id="city_name" name="city_name" class="form-control">
+                                    <label for="city_name">State</label>
+                                    <select id="city_id" name="city_name" class="form-control">
                                         <option selected>Select</option>
-                                        @foreach ($city as $key => $val)
-                                            <option value="{{ $val->id }}">{{ $val->name }}</option>
-                                        @endforeach
+
                                     </select>
                                 </div>
                             </div>
@@ -92,4 +90,39 @@
 
         }
     </script>
+
+<script>
+    $(document).ready(function() {
+        // When the country is selected
+        $('#country_id').change(function() {
+            var countryId = $(this).val();  // Get the selected country id
+            if (countryId) {
+                // Make an Ajax POST request to fetch cities based on country id
+                $.ajax({
+                    url: "{{route('get.cities')}}", // The URL where the POST request will be sent
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',  // CSRF token for Laravel
+                        country_id: countryId
+                    },
+                    success: function(data) {
+                        // If cities are returned, populate the city dropdown
+                        $('#city_id').empty();  // Clear previous options
+                        $('#city_id').append('<option value="">Select State</option>');  // Default option
+                        $.each(data, function(key, city) {
+                            $('#city_id').append('<option value="' + city.id + '">' + city.name + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error: " + error);  // Handle error
+                    }
+                });
+            } else {
+                // If no country is selected, clear the city dropdown
+                $('#city_id').empty();
+                $('#city_id').append('<option value="">Select State</option>');
+            }
+        });
+    });
+</script>
 @endsection

@@ -1,5 +1,8 @@
 @extends('frontend.layouts.student_app')
 @section('content')
+    @php
+        use App\Helpers\SlotHelper;
+    @endphp
     <section class="dshboard p-3" style="height: 700px">
         <div class="dshboard-contain">
             <div class="container">
@@ -15,7 +18,7 @@
                         <div class="card">
                             <div class="card-header d-flex justify-content-between">
                                 <div class="header-title">
-                                    <h4 class="card-title">Upcoming Meeting</h4> <span>(EST time zone)</span>
+                                    <h4 class="card-title">Upcoming Meeting</h4> <span></span>
                                 </div>
                             </div>
                             <div class="card-body table-fixed p-0">
@@ -40,15 +43,21 @@
                                                     <td>
                                                         {{ $var->teacher_name }}
                                                     </td>
-                                                    <td>{{ date('m-d-Y', strtotime($var->date)) }}</td>
-
-                                                    <td>{{ $var->time ? date('H:i', strtotime($var->time)) : 'N/A' }}
+                                                    <td>
+                                                        {{ $var->date ? \App\Helpers\TimeHelper::convertToUserDate($var->date . ' ' . $var->time, auth()->user()->time_zone) : 'N/A' }}
                                                     </td>
+
+                                                    <td>
+                                                        {{ $var->time ? \App\Helpers\TimeHelper::convertToUserTime($var->date . ' ' . $var->time, auth()->user()->time_zone) : 'N/A' }}
+                                                    </td>
+
+
                                                     <td> {{ $var->zoom_id ?? 'N/A' }} </td>
                                                     <td id="booking-row-{{ $var['id'] }}">
                                                         @if ($var->zoom_id && $var->meeting_status != 2)
                                                             <a href="{{ json_decode($var->zoom_response)->join_url ?? 'javascript:void(0);' }}"
-                                                                class="btn btn-success" target="_blank">{{ $var->zoom_id ? 'Rejoin' : 'Rejoin' }}</a>
+                                                                class="btn btn-success"
+                                                                target="_blank">{{ $var->zoom_id ? 'Rejoin' : 'Rejoin' }}</a>
                                                         @else
                                                             <a href="javascript:void(0)"
                                                                 onclick="getbookingTime({{ $var->id }})"
@@ -92,11 +101,18 @@
                                                 <tr>
                                                     <td>{{ $meeting->slot->topic ?? '' }}</td>
                                                     <td> {{ $meeting->teacher_name ?? '' }}</td>
-                                                    <td>{{ date('m-d-Y', strtotime($meeting->date)) }}</td>
-                                                    <td>{{ $meeting->meeting_start_time ? date('H:i', strtotime($meeting->meeting_start_time)) : 'N/A' }}
+                                                    <td>
+                                                        {{ $meeting->date ? \App\Helpers\TimeHelper::convertToUserDate($meeting->date . ' ' . $meeting->time, auth()->user()->time_zone) : 'N/A' }}
                                                     </td>
-                                                    <td>{{ $meeting->meeting_end_time ? date('H:i', strtotime($meeting->meeting_end_time)) : 'N/A' }}
+
+                                                    <td>
+                                                        {{ $meeting->meeting_start_time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->meeting_start_time, auth()->user()->time_zone) : 'N/A' }}
                                                     </td>
+
+                                                    <td>
+                                                        {{ $meeting->meeting_end_time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->meeting_end_time, auth()->user()->time_zone) : 'N/A' }}
+                                                    </td>
+
                                                     <td>
                                                         @if ($meeting->meeting_start_time && $meeting->meeting_end_time)
                                                             <?php

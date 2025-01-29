@@ -34,9 +34,9 @@
                             <div class="col-md-6">
                                 <div class="form-group-div">
                                     <div class="form-group">
-                                        <label for="floatingInputValue">Mobile*</label>
+                                        <label for="floatingInputValue">Mobile</label>
                                         <input type="text" class="form-control" id="floatingInputValue" name="phone"
-                                            value="{{ old('phone') }}" placeholder="Mobile*">
+                                            value="{{ old('phone') }}" placeholder="Mobile">
                                         @if ($errors->has('phone'))
                                             <div class="error" style="color:red;">{{ $errors->first('phone') }}</div>
                                         @endif
@@ -117,9 +117,9 @@
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group-div">
                                         <div class="form-group">
-                                            <label for="floatingInputValue">City*</label>
+                                            <label for="floatingInputValue">State*</label>
                                             <select id="city_id" name="city_id" class="form-control">
-                                                <option value="">Select City</option>
+                                                <option value="">Select State</option>
                                                 {{--  @foreach ($cities as $key => $val)
                                                     <option value="{{ $val->id }}">{{ $val->name }}</option>
                                                 @endforeach  --}}
@@ -134,9 +134,9 @@
                                 <div class="col-md-6">
                                     <div class="form-group-div">
                                         <div class="form-group">
-                                            <label for="floatingInputValue">Address*</label>
+                                            <label for="floatingInputValue">Address</label>
                                             <input type="text" class="form-control" id="floatingInputValue"
-                                                name="address" value="{{ old('address') }}" placeholder="Address*">
+                                                name="address" value="{{ old('address') }}" placeholder="Address">
                                             @if ($errors->has('address'))
                                                 <div class="error" style="color:red;">{{ $errors->first('address') }}
                                                 </div>
@@ -292,7 +292,7 @@
                         success: function(data) {
                             // If cities are returned, populate the city dropdown
                             $('#city_id').empty();  // Clear previous options
-                            $('#city_id').append('<option value="">Select City</option>');  // Default option
+                            $('#city_id').append('<option value="">Select State</option>');  // Default option
                             $.each(data, function(key, city) {
                                 $('#city_id').append('<option value="' + city.id + '">' + city.name + '</option>');
                             });
@@ -304,7 +304,7 @@
                 } else {
                     // If no country is selected, clear the city dropdown
                     $('#city_id').empty();
-                    $('#city_id').append('<option value="">Select City</option>');
+                    $('#city_id').append('<option value="">Select State</option>');
                 }
             });
         });

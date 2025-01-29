@@ -56,11 +56,11 @@ class FacultyController extends Controller
             // 'register_as' => 'required|in:1,2,3', // Must match enum values
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:15',
+            'phone' => 'nullable|string|max:15',
             'password' => 'required|min:8',
             'confirm_password' => 'required|min:8|same:password',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048', // If profile picture is uploaded
-            'address' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:255',
             'country_id' => 'required|string|max:255',
             'degree'=>'required|string|max:255',
@@ -131,7 +131,9 @@ class FacultyController extends Controller
         $countries = Country::get();
         $cities = City::get();
         $faculty = User::findOrFail($id);
-        return view('admin.faculty.edit')->with(compact('faculty', 'countries', 'cities'));
+        $selectedCountryId = $faculty->country_id;
+        $selectedCityId = $faculty->city_id;
+        return view('admin.faculty.edit')->with(compact('faculty', 'countries', 'cities', 'selectedCountryId','selectedCityId'));
     }
 
     /**
@@ -151,11 +153,11 @@ class FacultyController extends Controller
             ],
 
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
+            'phone' => 'nullable|string|max:15',
             'password' => 'nullable|min:8',
             'confirm_password' => 'nullable|min:8|same:password',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048', // If profile picture is uploaded
-            'address' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:255',
             'country_id' => 'required|string|max:255',
             'degree'=> 'required|string|max:255',
@@ -201,6 +203,7 @@ class FacultyController extends Controller
     {
         $user = User::find($request->user_id);
         $user->status = $request->status;
+        $user->status = date('Y-m-d H:i:s');
         $user->save();
         return response()->json(['success' => 'Status change successfully.']);
     }

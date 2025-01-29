@@ -20,12 +20,29 @@ class TeacherController extends Controller
         $data['page_title'] = "Dashboard";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
-        $data['booking_slot'] = BookingSlot::whereDate('date', '>=', date("Y-m-d"))
-            ->where('teacher_id', Auth::user()->id)
+
+        $my_time_zone = auth()->user()->time_zone; // User's timezone
+
+
+        $today_date = Carbon::now($my_time_zone)->format('Y-m-d H:i'); // Today's date in user's timezone
+
+        $data['booking_slot'] = BookingSlot::where('teacher_id', Auth::user()->id)
+            // ->whereDate('date', '>=', date("Y-m-d"))
             ->whereIn('meeting_status', [0, 1])  // Filter by meeting_status being null or 1 (in-progress)
             ->with(['student', 'teacher'])
-            ->latest()
-            ->get();
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($items) use ($my_time_zone, $today_date) {
+                // Convert slot time from teacher's timezone to user's timezone
+                $slot_date_time_in_user_timezone = Carbon::parse($items->date . ' ' . $items->time)
+                    ->setTimezone($my_time_zone)->addMinutes(40)
+                    ->format('Y-m-d H:i'); // Format as 24-hour time
+
+                if ($slot_date_time_in_user_timezone >= $today_date) {
+                    $items->teacher_name = $items->teacher->name;
+                    return $items;
+                }
+            })->filter(); // Remove null values from the collection
 
         $data['booking_history'] = BookingSlot::where('teacher_id', Auth::user()->id)
             // ->whereDate('date', '<', date('Y-m-d'))->orderBy('id', 'desc')
@@ -33,6 +50,33 @@ class TeacherController extends Controller
             ->with(['student', 'teacher'])
             ->latest()
             ->paginate(10);
+
+            $bookings = BookingSlot::where('teacher_id', Auth::user()->id)
+            ->whereIn('meeting_status', [0, 1])
+            ->with(['teacher', 'student'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+            foreach ($bookings as $booking) {
+                // Convert slot time from teacher's timezone to user's timezone
+                $slot_date_time_in_user_timezone = Carbon::parse($booking->date . ' ' . $booking->time)
+                    ->setTimezone($my_time_zone)->addMinutes(40)
+                    ->format('Y-m-d H:i'); // Format as 24-hour time
+
+                if ($slot_date_time_in_user_timezone < $today_date) {
+                    // dd($slot_date_time_in_user_timezone, $current_date_time_plus_40);
+                    $booking->update(['meeting_status' => 2]);
+
+                    // If meeting_start_time is not null, update meeting_end_time
+                    if ($booking->meeting_start_time) {
+                        $meeting_end_time = Carbon::parse($booking->meeting_start_time)
+                            ->addMinutes(40) // Add 40 minutes
+                            ->format('Y-m-d H:i'); // Format as full datetime
+
+                        $booking->update(['meeting_end_time' => $meeting_end_time]);
+                    }
+                }
+            }
 
         return view('frontend.teacher.dashboard')->with($data);
     }
@@ -81,7 +125,7 @@ class TeacherController extends Controller
     {
         $meeting = new MeetingController();
         $booking = BookingSlot::findOrFail($request->booking_id);
-
+        $my_timezone = auth()->user()->time_zone;
         // Check if the meeting has already been started
         if ($booking->zoom_id) {
             return response()->json([
@@ -94,7 +138,7 @@ class TeacherController extends Controller
         $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time);
         // dd(now());
         // Check if the current time is before the scheduled start time
-        if (Carbon::now()->lt($scheduledStart)) {
+        if (Carbon::now($my_timezone)->lt($scheduledStart)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Cannot start the session before the scheduled time and date.'
@@ -113,7 +157,7 @@ class TeacherController extends Controller
         $meeting_json = $meeting->createMeeting($requestObj);
         $start_url = $meeting_json['start_url'] ?? '';
 
-         $booking->update([
+        $booking->update([
             'meeting_status' => 1,
             'meeting_start_time' => Carbon::now(),
         ]);

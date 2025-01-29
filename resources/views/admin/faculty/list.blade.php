@@ -55,7 +55,7 @@
                                     Phone <span id="phone_icon"></span>
                                 </th>
                                 <th>
-                                    City
+                                    State
                                 </th>
                                 <th>
                                     Country

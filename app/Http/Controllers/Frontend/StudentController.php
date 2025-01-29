@@ -24,22 +24,72 @@ class StudentController extends Controller
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
 
-        $data['teacher'] = BookingSlot::where('student_id', Auth::user()->id)->whereIn('meeting_status', [0, 1])
-            ->whereDate('date', '>=', date('Y-m-d'))->orderBy('id', 'desc')
-            ->with(['teacher', 'student'])->get()->map(function ($items) {
-                $items->teacher_name = $items->teacher->name;
-                return $items;
-            });
+        $my_time_zone = auth()->user()->time_zone; // User's timezone
+
+
+        $today_date = Carbon::now($my_time_zone)->format('Y-m-d H:i'); // Today's date in user's timezone
+
+        $data['teacher'] = BookingSlot::where('student_id', Auth::user()->id)
+            ->whereIn('meeting_status', [0, 1])
+            // ->whereDate('date', '>=', $today_date) // Slot date is today or future
+            ->orderBy('id', 'desc')
+            ->with(['teacher', 'student'])
+            ->get()
+            ->map(function ($items) use ($my_time_zone, $today_date) {
+                // Convert slot time from teacher's timezone to user's timezone
+                $slot_date_time_in_user_timezone = Carbon::parse($items->date . ' ' . $items->time)
+                    ->setTimezone($my_time_zone)->addMinutes(40)
+                    ->format('Y-m-d H:i'); // Format as 24-hour time
+
+                if ($slot_date_time_in_user_timezone >= $today_date) {
+                    $items->teacher_name = $items->teacher->name;
+                    return $items;
+                }
+            })->filter(); // Remove null values from the collection
+
 
         $data['booking_history'] = BookingSlot::where('student_id', Auth::user()->id)
             ->where('meeting_status', 2) // Filter by meeting_status = 2
             // ->whereDate('date', '<', date('Y-m-d'))->orderBy('id', 'desc')
             ->with(['teacher', 'student']) // Eager load related models
+            ->orderBy('id', 'desc')
             ->paginate(10) // Paginate results first
             ->through(function ($item) { // Use through for transformation
                 $item->teacher_name = $item->teacher->name; // Add teacher_name attribute
                 return $item;
             });
+
+
+
+        // Get all relevant booking slots
+        $bookings = BookingSlot::where('student_id', Auth::user()->id)
+            ->whereIn('meeting_status', [0, 1])
+            ->with(['teacher', 'student'])
+            ->orderBy('id', 'desc')
+            ->get();
+        // dd($bookings->toArray());
+        // Loop through each booking slot and update status
+        foreach ($bookings as $booking) {
+            // Convert slot time from teacher's timezone to user's timezone
+            $slot_date_time_in_user_timezone = Carbon::parse($booking->date . ' ' . $booking->time)
+                ->setTimezone($my_time_zone)->addMinutes(40)
+                ->format('Y-m-d H:i'); // Format as 24-hour time
+
+            if ($slot_date_time_in_user_timezone < $today_date) {
+                // dd($slot_date_time_in_user_timezone, $current_date_time_plus_40);
+                $booking->update(['meeting_status' => 2]);
+
+                // If meeting_start_time is not null, update meeting_end_time
+                if ($booking->meeting_start_time) {
+                    $meeting_end_time = Carbon::parse($booking->meeting_start_time)
+                        ->addMinutes(40) // Add 40 minutes
+                        ->format('Y-m-d H:i'); // Format as full datetime
+
+                    $booking->update(['meeting_end_time' => $meeting_end_time]);
+                }
+            }
+        }
+
 
 
         return view('frontend.student.dashboard')->with($data);
@@ -145,12 +195,12 @@ class StudentController extends Controller
     {
         $date = $request->date ?? null;
         $facultyName = $request->faculty_name; // Get the faculty name from the form
-        $data['page_title'] = "Dashboard";
+        $data['page_title'] = "Book Faculty";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
 
         // If a faculty name is provided, filter the teachers based on the name
-        $data['teacher'] = User::role('FACULTY')
+        $data['teacher'] = User::role('FACULTY')->where('status', 1)
             ->when($facultyName, function ($query) use ($facultyName) {
                 return $query->where('name', 'like', '%' . $facultyName . '%');
             })
@@ -165,34 +215,53 @@ class StudentController extends Controller
     }
 
 
+
     public function getAvailableSlot(Request $request)
     {
         $date = date('Y-m-d', strtotime($request->date)) ?? null;
         $teacher = $request->teacher_id ?? null;
-        $time = Carbon::now()->format('H:i');  // Get current time in 24-hour format
         $now_date = date('Y-m-d');
-        //    dd( date('H:i'));
-        // If there are bookings from previous dates, show only future slots for today
+        $current_time_in_user_tz = Carbon::now(auth()->user()->time_zone)->format('H:i'); // Current time in user's timezone
+
+        $my_timezone = auth()->user()->time_zone; // User's timezone
+        $teacher_data = User::find($teacher);
+        $teacher_time_zone = $teacher_data->time_zone; // Teacher's timezone
+
         if ($date == $now_date) {
-            $slot = Slot::whereDate('slot_date', $date)  // For the current date
-                ->where('slot_time', '>', $time)  // Only show future times for today
+            // Convert current user's time to the teacher's timezone for accurate filtering
+            $current_time_in_teacher_tz = Carbon::now($my_timezone)
+                ->setTimezone($teacher_time_zone)
+                ->format('H:i');
+
+            $slot = Slot::whereDate('slot_date', $date)
+                ->whereTime('slot_time', '>', $current_time_in_teacher_tz) // Use converted time
                 ->where('teacher_id', $teacher)
-                ->whereDoesntHave('bookingSlot')  // Ensure no bookings exist for this slot
+                ->whereDoesntHave('bookingSlot')
                 ->get();
         } else {
-            // If no previous bookings exist, show all slots for the day
-            $slot = Slot::whereDate('slot_date', $date)  // For the current date
+            $slot = Slot::whereDate('slot_date', $date)
                 ->where('teacher_id', $teacher)
-                ->whereDoesntHave('bookingSlot')  // Ensure no bookings exist for this slot
+                ->whereDoesntHave('bookingSlot')
                 ->get();
         }
 
         $option = "<option>Select</option>";
         foreach ($slot as $val) {
-            $option .= "<option value='" . $val->id . "'>" . date('H:i', strtotime($val->slot_time)) . "</option>";
+            // Convert slot time from teacher's timezone to user's timezone for display
+            $slot_time_in_user_timezone = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                $val->slot_date . ' ' . $val->slot_time, // Combine date and time
+                $teacher_time_zone // Assuming the slot times are stored in the teacher's timezone
+            )->setTimezone($my_timezone); // Convert to user's timezone
+
+            $option .= "<option value='" . $val->id . "'>" . $slot_time_in_user_timezone->format('H:i') . "</option>";
         }
+
         return response()->json($option);
     }
+
+
+
 
     public function liveClass(Request $request)
     {
@@ -374,5 +443,4 @@ class StudentController extends Controller
             'message' => 'Faculty not available to start call. Please try again later.'
         ]);
     }
-
 }

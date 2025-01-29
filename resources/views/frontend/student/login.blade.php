@@ -8,6 +8,7 @@
                     <div class="row justify-content-center">
                         <form action="{{ route('front.student_login_success') }}" method="POST" onsubmit="return valid()">
                             @csrf()
+                            <input type="hidden" name="timezone" id="timezone">
                             <div class="row">
                                 <div class="form-group col-md-12">
                                 <span class="text-success">{{ Session::get('successmsg') }}</span>
@@ -48,5 +49,12 @@
                 return false;
             }
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('timezone').value = timezone;
+    });
+
     </script>
 @endsection

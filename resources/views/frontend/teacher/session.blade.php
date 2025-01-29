@@ -11,7 +11,7 @@
                         <div class="card">
                           <div class="card-header d-flex justify-content-between">
                               <div class="header-title">
-                                <h4 class="card-title">My upcoming Slots (EST time zone)</h4>
+                                <h4 class="card-title">My upcoming Slots</h4>
                               </div>
 
                               <div><span class="">

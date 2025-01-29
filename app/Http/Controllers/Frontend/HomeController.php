@@ -49,6 +49,7 @@ class HomeController extends Controller
                 if (Auth::guard('web')->attempt(['email' => $emailId, 'password' => $password])) {
                     if (auth()->user()->hasRole('STUDENT')) {
                         if (auth()->user()->status == 1) {
+                            User::where(['email' => $emailId])->whereIn('register_as', [1, 2])->update(['time_zone' => $request->timezone]);
                             return redirect()->route('front.student_dashboard');
                         } else {
                             auth()->logout();
@@ -161,7 +162,7 @@ class HomeController extends Controller
                 'password' => $password,
                 'institute_name' => $schoolName,
                 'register_as' => $registerAs,
-                'status' => 1,
+                'status' => 0,
                 'remember_token' => $remember_token,
             ]);
 
@@ -196,7 +197,7 @@ class HomeController extends Controller
             'country_name' => 'nullable|string|max:255',
             'city_name' => 'nullable|string|max:255',
             'degree' => 'nullable|string|max:255',
-            'register_as' => 'required|in:1,2,3', // Assuming 1, 2, 3 are valid values
+            'register_as' => 'required|in:1,2,3',
         ]);
 
         $name = $request->name ?? null;
@@ -217,7 +218,7 @@ class HomeController extends Controller
             'register_as' => $registerAs,
             'degree' => $degree,
             'remember_token' => $remember_token,
-            'status' => 1
+            'status' => 0,
 
         ]);
 
@@ -244,6 +245,7 @@ class HomeController extends Controller
                 if (Auth::attempt(['email' => $emailId, 'password' => $password])) {
                     if (auth()->user()->hasRole('FACULTY')) {
                         if (auth()->user()->status == 1) {
+                            User::where(['email' => $emailId])->whereIn('register_as', [3])->update(['time_zone' => $request->timezone]);
                             return redirect()->route('auth_teacher_dashboard');
                         } else {
                             auth()->logout();
@@ -311,11 +313,11 @@ class HomeController extends Controller
         $page_title = "Email confirmation";
         if ($user) {
             $type = "student";
-            User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s')]);
+            User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s'), 'status' => 1]);
             return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
         } else if ($teacher) {
             $type = "teacher";
-            User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s')]);
+            User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s'), 'status' => 1]);
             return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
         } else {
             return redirect()->route('front.home')->with('errmsg', 'Token does not match. Please try again');

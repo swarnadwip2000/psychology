@@ -56,11 +56,11 @@ class CustomerController extends Controller
             'register_as' => 'required|in:1,2,3', // Must match enum values
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:15',
+            'phone' => 'nullable|string|max:15',
             'password' => 'required|min:8',
             'confirm_password' => 'required|min:8|same:password',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048', // If profile picture is uploaded
-            'address' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:255',
             'country_id' => 'required|string|max:255',
             'student_age' => 'required|integer|min:1|max:120',
@@ -118,7 +118,9 @@ class CustomerController extends Controller
         $countries = Country::get();
         $cities = City::get();
         $student = User::findOrFail($id);
-        return view('admin.student.edit')->with(compact('student', 'countries', 'cities'));
+        $selectedCountryId = $student->country_id;
+        $selectedCityId = $student->city_id;
+        return view('admin.student.edit')->with(compact('student', 'countries', 'cities', 'selectedCountryId','selectedCityId'));
     }
 
     /**
@@ -139,11 +141,11 @@ class CustomerController extends Controller
             ],
             'register_as' => 'required|in:1,2,3', // Must match enum values
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
+            'phone' => 'nullable|string|max:15',
             'password' => 'nullable|min:8',
             'confirm_password' => 'nullable|min:8|same:password',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048', // If profile picture is uploaded
-            'address' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:255',
             'country_id' => 'required|string|max:255',
             'student_age' => 'required|integer|min:1|max:120',
@@ -192,6 +194,7 @@ class CustomerController extends Controller
     {
         $user = User::find($request->user_id);
         $user->status = $request->status;
+        $user->status = date('Y-m-d H:i:s');
         $user->save();
         return response()->json(['success' => 'Status change successfully.']);
     }

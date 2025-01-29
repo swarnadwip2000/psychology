@@ -14,6 +14,8 @@ use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\StudentController;
 use App\Http\Controllers\Frontend\TeacherController;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\Admin\StateController;
+use App\Http\Controllers\Admin\CountryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +42,7 @@ Route::post('change-password', [ForgetPasswordController::class, 'changePassword
 Route::get('forget-password/show', [ForgetPasswordController::class, 'forgetPasswordShow'])->name('admin.forget.password.show');
 Route::get('reset-password/{id}/{token}', [ForgetPasswordController::class, 'resetPassword'])->name('admin.reset.password');
 Route::post('change-password', [ForgetPasswordController::class, 'changePassword'])->name('admin.change.password');
+Route::post('/get-cities', [CustomerController::class, 'getCities'])->name('get.cities');
 
 Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
@@ -50,6 +53,22 @@ Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
     Route::prefix('password')->group(function () {
         Route::get('/', [ProfileController::class, 'password'])->name('admin.password'); // password change
         Route::post('/update', [ProfileController::class, 'passwordUpdate'])->name('admin.password.update'); // password update
+    });
+
+    Route::prefix('state')->group(function () {
+        Route::get('/', [StateController::class, 'index'])->name('state.index');
+        Route::post('/store', [StateController::class, 'store'])->name('state.store');
+        Route::post('/edit/{id}', [StateController::class, 'edit'])->name('state.edit');
+        Route::get('/delete/{id}', [StateController::class, 'delete'])->name('state.delete');
+        Route::post('/update', [StateController::class, 'update'])->name('state.update');
+    });
+
+    Route::prefix('country')->group(function () {
+        Route::get('/', [CountryController::class, 'index'])->name('country.index');
+        Route::post('/store', [CountryController::class, 'store'])->name('country.store');
+        Route::post('/edit/{id}', [CountryController::class, 'edit'])->name('country.edit');
+        Route::get('/delete/{id}', [CountryController::class, 'delete'])->name('country.delete');
+        Route::post('/update', [CountryController::class, 'update'])->name('country.update');
     });
 
     Route::resources([
@@ -63,7 +82,7 @@ Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
     Route::get('/student-fetch-data', [CustomerController::class, 'fetchData'])->name('students.fetch-data');
     Route::post('/get-classes', [CustomerController::class, 'getClasses'])->name('get.classes');
     // Route::get('/get-cities/{country_id}', [CustomerController::class, 'getCities'])->name('get.cities');
-    Route::post('/get-cities', [CustomerController::class, 'getCities'])->name('get.cities');
+
 
 
     Route::resources([

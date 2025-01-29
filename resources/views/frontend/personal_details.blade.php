@@ -8,6 +8,7 @@
                     <div class="row justify-content-center">
                         <form action="{{ route('front.student_register_submit') }}" method="POST">
                             @csrf
+                            <input type="hidden" name="timezone" id="timezone">
                             <div class="row">
                                 <div class="form-group col-md-6">
                                     <label for="name">What's Your Name?</label>
@@ -57,5 +58,11 @@
 @endsection
 
 @section('script')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    document.getElementById('timezone').value = timezone;
+});
 
+</script>
 @endsection

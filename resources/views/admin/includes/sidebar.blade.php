@@ -42,7 +42,19 @@
                     <li class="{{ Request::is('admin/faculty') ? 'active' : ' ' }}"><a class="nav-link" href="{{ route('faculty.index') }}"> User List</a></li>
                 </ul>
             </li>
+            <li class="dropdown {{ Request::is('admin/country*') ? 'active' : ' ' }}">
+                <a href="{{ route('country.index') }}">
+                    <i class="ph ph-map-pin"></i>
+                    <span>Country</span>
+                </a>
+            </li>
 
+            <li class="dropdown {{ Request::is('admin/state*') ? 'active' : ' ' }}">
+                <a href="{{ route('state.index') }}">
+                    <i class="ph ph-compass"></i>
+                    <span>State</span>
+                </a>
+            </li>
             {{-- <li class="dropdown">
                 <a href="" class="menu-toggle nav-link has-dropdown">
                     <i class="ph-file"></i>

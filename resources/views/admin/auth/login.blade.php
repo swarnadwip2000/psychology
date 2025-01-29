@@ -31,7 +31,7 @@
             <div class="container">
 
                 <div class="account-logo">
-                    <a href="admin-dashboard.html"><img src="{{ asset('client_assets/img/logo/logo.jpg') }}"
+                    <a href="{{route('front.home')}}"><img src="{{ asset('client_assets/img/logo/logo.jpg') }}"
                             alt="Dreamguy's Technologies"></a>
                 </div>
 

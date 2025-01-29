@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Slot;
+use Carbon\Carbon;
 
 class SlotHelper
 {
@@ -30,5 +31,21 @@ class SlotHelper
 
         // Return true if available slots exist, false otherwise
         return $query->count();
+    }
+
+    public static function formatDateTimeForUser($dateTime, $userTimeZone, $dateFormat = 'm-d-Y', $timeFormat = 'H:i')
+    {
+        if (!$dateTime) {
+            return 'N/A'; // If no datetime, return 'N/A'
+        }
+
+        // Convert the datetime to the user's timezone
+        $dateInUserTimezone = Carbon::parse($dateTime)->setTimezone($userTimeZone);
+
+        // Format the date and time
+        $formattedDate = $dateInUserTimezone->format($dateFormat);
+        $formattedTime = $dateInUserTimezone->format($timeFormat);
+
+        return $formattedDate . ' ' . $formattedTime;
     }
 }
