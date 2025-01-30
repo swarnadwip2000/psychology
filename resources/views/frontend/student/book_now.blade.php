@@ -61,11 +61,22 @@
                                                     <label for="formGroupExampleInput">Booking Date</label>
                                                     <select name="booking_date" id="booking_date" class="form-control" required onchange="getbookingTime(this, {{ $val->id }})">
                                                         <option value="">Select</option>
-                                                        @foreach ($val->slot as $slot)
-                                                            @if (\App\Helpers\SlotHelper::hasAvailableSlots($slot->slot_date, $val->id))
-                                                                <option value="{{ $slot->slot_date }}">{{ date('m-d-Y', strtotime($slot->slot_date)) }}</option>
-                                                            @endif
-                                                        @endforeach
+                                                        @php
+                                                        $uniqueDates = []; // Store unique dates
+                                                    @endphp
+
+                                                    @foreach ($val->slot as $slot)
+                                                        @php
+                                                            $formattedDate = date('Y-m-d', strtotime($slot->slot_date_time));
+                                                        @endphp
+
+                                                        @if (!in_array($formattedDate, $uniqueDates) && \App\Helpers\SlotHelper::hasAvailableSlots($slot->slot_date_time, $val->id))
+                                                            <option value="{{ $slot->slot_date_time }}">{{ $formattedDate }}</option>
+                                                            @php
+                                                                $uniqueDates[] = $formattedDate; // Add date to array to prevent repetition
+                                                            @endphp
+                                                        @endif
+                                                    @endforeach
                                                     </select>
 
                                                 </div>

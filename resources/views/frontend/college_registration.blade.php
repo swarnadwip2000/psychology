@@ -14,7 +14,7 @@
                                     <label for="student_age">Age</label>
                                     <select id="student_age" name="student_age" class="form-control">
                                         <option value="">Select</option>
-                                        @for ($i = 20; $i < 45; $i++)
+                                        @for ($i = 15; $i < 35; $i++)
                                             <option value="{{ $i }}">{{ $i }}</option>
                                         @endfor
                                     </select>
@@ -24,7 +24,7 @@
                                     <label for="student_class">Class</label>
                                     <select id="student_class" name="student_class" class="form-control">
                                         <option value="">Select</option>
-                                        @foreach (config('class.school_class') as $key => $val)
+                                        @foreach (config('class.college_class') as $key => $val)
                                             <option value="{{ $key }}">{{ $val }}</option>
                                         @endforeach
                                     </select>

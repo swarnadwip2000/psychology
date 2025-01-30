@@ -1,21 +1,39 @@
 <?php
 return [
     'school_class' => [
-        1 => 'Grade XI',
-        2 => 'Grade XII',
+        4 => 'Grade IV',
+        5 => 'Grade V',
+        6 => 'Grade VI',
+        7 => 'Grade VII',
+        8 => 'Grade VIII',
+        9 => 'Grade IX',
+        10 => 'Grade X',
+        11 => 'Grade XI',
+        12 => 'Grade XII',
     ],
-    'college_class' => [
-        1 => 'Grade XI',
-        2 => 'Grade XII',
-    ],
+
+   'college_class' => [
+    3 => 'Bachelor Year 1',
+    4 => 'Bachelor Year 2',
+    5 => 'Bachelor Year 3',
+    6 => 'Master Year 1',
+    7 => 'Master Year 2',
+    8 => 'PHD Year 1',
+    9 => 'PHD Year 2',
+    10 => 'PHD Year 3',
+    10 => 'PHD Year 4',
+    10 => 'Certificate',
+],
+
+
     'allow_country' => [
         1 => 'CANADA',
     ],
-    'fuclaty_degree'=>[
-        1=> "Graduate",
-        2=> "Post graduate",
-        3=> "M-phil",
-        4=> "Doctorate",
+    'fuclaty_degree' => [
+        1 => "Graduate",
+        2 => "Post graduate",
+        3 => "M-phil",
+        4 => "Doctorate",
 
     ],
     'dropdown_country' => [

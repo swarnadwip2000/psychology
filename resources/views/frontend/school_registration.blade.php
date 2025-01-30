@@ -14,7 +14,7 @@
                                     <label for="student_age">Age</label>
                                     <select id="student_age" name="student_age" class="form-control">
                                         <option value="">Select</option>
-                                        @for ($i = 20; $i < 45; $i++)
+                                        @for ($i = 10; $i < 20; $i++)
                                             <option value="{{ $i }}">{{ $i }}</option>
                                         @endfor
                                     </select>

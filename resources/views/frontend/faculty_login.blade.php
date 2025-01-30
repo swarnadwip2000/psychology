@@ -24,10 +24,11 @@
                                 </div>
                             </div>
                             <div class="col-md-12 text-center">
-                                <span>Create a New Account <a href="{{ route('front.faculty_registration') }}">Click Here</a></span>
+                                <span>New Register <a href="{{ route('front.faculty_registration') }}">here</a> | <a href="{{ route('front.student_login') }}">Student Login</a></span>
                                 <br/>
-                                <span>Are you want to login as a student? <a href="{{ route('front.student_login') }}">Click Here</a></span>
-                                <br/>
+                                {{-- <span>Are you want to login as a student? <a href="{{ route('front.student_login') }}">Click Here</a></span>
+                                <br/> --}}
+                                <br>
                                 <input type="submit" class="btn btn-info" value="Login" />
                             </div>
                         </form>

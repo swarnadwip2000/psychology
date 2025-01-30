@@ -203,7 +203,7 @@ class FacultyController extends Controller
     {
         $user = User::find($request->user_id);
         $user->status = $request->status;
-        $user->status = date('Y-m-d H:i:s');
+        $user->email_verified_at = date('Y-m-d H:i:s');
         $user->save();
         return response()->json(['success' => 'Status change successfully.']);
     }

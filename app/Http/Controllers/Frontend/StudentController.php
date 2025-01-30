@@ -37,7 +37,7 @@ class StudentController extends Controller
             ->get()
             ->map(function ($items) use ($my_time_zone, $today_date) {
                 // Convert slot time from teacher's timezone to user's timezone
-                $slot_date_time_in_user_timezone = Carbon::parse($items->date . ' ' . $items->time)
+                $slot_date_time_in_user_timezone = Carbon::parse($items->date . ' ' . $items->time, $items->teacher->time_zone)
                     ->setTimezone($my_time_zone)->addMinutes(40)
                     ->format('Y-m-d H:i'); // Format as 24-hour time
 
@@ -71,7 +71,7 @@ class StudentController extends Controller
         // Loop through each booking slot and update status
         foreach ($bookings as $booking) {
             // Convert slot time from teacher's timezone to user's timezone
-            $slot_date_time_in_user_timezone = Carbon::parse($booking->date . ' ' . $booking->time)
+            $slot_date_time_in_user_timezone = Carbon::parse($booking->date . ' ' . $booking->time, $booking->teacher->time_zone)
                 ->setTimezone($my_time_zone)->addMinutes(40)
                 ->format('Y-m-d H:i'); // Format as 24-hour time
 
@@ -106,7 +106,7 @@ class StudentController extends Controller
             'slot_id' => $slot->id,
             'teacher_id' => $request->teacher_id,
             'student_id' => Auth::guard('web')->id(),
-            'date' => $request->booking_date,
+            'date' => $slot->slot_date,
             'time' => $slot->slot_time,
             'meeting_status' => 0,
         ]);
@@ -116,18 +116,29 @@ class StudentController extends Controller
         $student = Auth::guard('web')->user();
 
         // Email data
-        $emailData = [
-            'date' => $request->booking_date,
+        $emailDataTeacher = [
+            'date' => $slot->slot_date,
             'time' => $slot->slot_time,
+            'teacher_name' => $teacher->name,
+            'student_name' => $student->name,
+        ];
+        $my_time_zone = auth()->user()->time_zone;
+       $date_time = Carbon::parse($slot->date . ' ' . $slot->time, $slot->teacher->time_zone)
+        ->setTimezone($my_time_zone)
+        ->format('Y-m-d H:i');
+
+        $emailDataStudent = [
+            'date' => date('Y-m-d', strtotime($date_time)),
+            'time' => date('H:i', strtotime($date_time)),
             'teacher_name' => $teacher->name,
             'student_name' => $student->name,
         ];
 
         // Send email to the teacher
-        Mail::to($teacher->email)->send(new BookingNotification($emailData, 'teacher'));
+        Mail::to($teacher->email)->send(new BookingNotification($emailDataTeacher, 'teacher'));
 
         // Send email to the student
-        Mail::to($student->email)->send(new BookingNotification($emailData, 'student'));
+        Mail::to($student->email)->send(new BookingNotification($emailDataStudent, 'student'));
 
         return redirect()->route('front.student_dashboard')->with('successmsg', 'Booking created successfully!');
     }
@@ -199,60 +210,119 @@ class StudentController extends Controller
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
 
-        // If a faculty name is provided, filter the teachers based on the name
+        $my_time_zone = auth()->user()->time_zone; // User's timezone
+
         $data['teacher'] = User::role('FACULTY')->where('status', 1)
             ->when($facultyName, function ($query) use ($facultyName) {
                 return $query->where('name', 'like', '%' . $facultyName . '%');
             })
-            ->with(['slot' => function ($q) {
-                $q->select('teacher_id', 'slot_date')
-                    ->whereDate('slot_date', '>=', date('Y-m-d'))
-                    ->groupBy('teacher_id', 'slot_date');
+            ->with(['slot' => function ($q) use ($my_time_zone) {
+                $q->select('teacher_id', 'slot_date', 'slot_time') // Ensure you select time_zone
+                    ->whereDate('slot_date', '>=', Carbon::now()->toDateString())
+                    ->groupBy('teacher_id', 'slot_date', 'slot_time');
             }])
-            ->get();
+            ->get()
+            ->map(function ($teacher) use ($my_time_zone) {
+                // Convert each slot date/time to the authenticated user's timezone
+                $teacher->slot = $teacher->slot->map(function ($slot) use ($my_time_zone) {
+                    $slot->slot_date_time = Carbon::parse($slot->slot_date . ' ' . $slot->slot_time, $slot->teacher->time_zone)
+                        ->setTimezone($my_time_zone)
+                        ->format('Y-m-d'); // Convert to user's timezone
+                    return $slot;
+                });
+                return $teacher;
+            });
 
+        // dd($data['teacher']->toArray());
         return view('frontend.student.book_now')->with($data);
     }
 
+
+
+    // public function getAvailableSlot(Request $request)
+    // {
+    //     $date = date('Y-m-d', strtotime($request->date)) ?? null;
+    //     $teacher = $request->teacher_id ?? null;
+    //     $now_date = date('Y-m-d');
+    //     $current_time_in_user_tz = Carbon::now(auth()->user()->time_zone)->format('H:i'); // Current time in user's timezone
+
+    //     $my_timezone = auth()->user()->time_zone; // User's timezone
+    //     $teacher_data = User::find($teacher);
+    //     $teacher_time_zone = $teacher_data->time_zone; // Teacher's timezone
+
+    //     if ($date == $now_date) {
+    //         // Convert current user's time to the teacher's timezone for accurate filtering
+    //         $current_time_in_teacher_tz = Carbon::now($my_timezone)
+    //             ->setTimezone($teacher_time_zone)
+    //             ->format('H:i');
+
+    //         $slot = Slot::whereDate('slot_date', $date)
+    //             ->whereTime('slot_time', '>', $current_time_in_teacher_tz) // Use converted time
+    //             ->where('teacher_id', $teacher)
+    //             ->whereDoesntHave('bookingSlot')
+    //             ->get();
+    //     } else {
+    //         $slot = Slot::whereDate('slot_date', $date)
+    //             ->where('teacher_id', $teacher)
+    //             ->whereDoesntHave('bookingSlot')
+    //             ->get();
+    //     }
+
+    //     $option = "<option>Select</option>";
+    //     foreach ($slot as $val) {
+    //         // Convert slot time from teacher's timezone to user's timezone for display
+    //         $slot_time_in_user_timezone = Carbon::createFromFormat(
+    //             'Y-m-d H:i:s',
+    //             $val->slot_date . ' ' . $val->slot_time, // Combine date and time
+    //             $teacher_time_zone // Assuming the slot times are stored in the teacher's timezone
+    //         )->setTimezone($my_timezone); // Convert to user's timezone
+
+    //         $option .= "<option value='" . $val->id . "'>" . $slot_time_in_user_timezone->format('H:i') . "</option>";
+    //     }
+
+    //     return response()->json($option);
+    // }
 
 
     public function getAvailableSlot(Request $request)
     {
         $date = date('Y-m-d', strtotime($request->date)) ?? null;
         $teacher = $request->teacher_id ?? null;
-        $now_date = date('Y-m-d');
-        $current_time_in_user_tz = Carbon::now(auth()->user()->time_zone)->format('H:i'); // Current time in user's timezone
 
-        $my_timezone = auth()->user()->time_zone; // User's timezone
+        $my_time_zone = auth()->user()->time_zone; // User's timezone
         $teacher_data = User::find($teacher);
         $teacher_time_zone = $teacher_data->time_zone; // Teacher's timezone
+        $current_time_in_user_timezone = Carbon::now($my_time_zone)->format('H:i'); // Current time in user's timezone
+        $current_date_in_user_timezone = Carbon::now($my_time_zone)->format('Y-m-d');
+        $slots = Slot::where('teacher_id', $teacher)
+            ->whereDoesntHave('bookingSlot') // Exclude booked slots
+            ->get();
 
-        if ($date == $now_date) {
-            // Convert current user's time to the teacher's timezone for accurate filtering
-            $current_time_in_teacher_tz = Carbon::now($my_timezone)
-                ->setTimezone($teacher_time_zone)
-                ->format('H:i');
+        $available_slots = $slots->filter(function ($slot) use ($my_time_zone, $current_time_in_user_timezone, $current_date_in_user_timezone, $date) {
+            // Convert slot date and time from UTC to user's timezone
+            $slot_date_time = Carbon::parse($slot->slot_date . ' ' . $slot->slot_time, $slot->teacher->time_zone)
+                ->setTimezone($my_time_zone);
 
-            $slot = Slot::whereDate('slot_date', $date)
-                ->whereTime('slot_time', '>', $current_time_in_teacher_tz) // Use converted time
-                ->where('teacher_id', $teacher)
-                ->whereDoesntHave('bookingSlot')
-                ->get();
-        } else {
-            $slot = Slot::whereDate('slot_date', $date)
-                ->where('teacher_id', $teacher)
-                ->whereDoesntHave('bookingSlot')
-                ->get();
-        }
+            // If checking today's date, only include future slots
+            if ($slot_date_time->format('Y-m-d') == $date) {
+
+                if ($slot_date_time->format('Y-m-d') == $current_date_in_user_timezone) {
+                    return $slot_date_time->format('H:i') > $current_time_in_user_timezone;
+                }
+                return true;
+            }
+
+            // If future date, always available
+        });
 
         $option = "<option>Select</option>";
-        foreach ($slot as $val) {
+        foreach ($available_slots as $val) {
             // Convert slot time from teacher's timezone to user's timezone for display
             $slot_time_in_user_timezone = Carbon::createFromFormat(
                 'Y-m-d H:i:s',
                 $val->slot_date . ' ' . $val->slot_time, // Combine date and time
                 $teacher_time_zone // Assuming the slot times are stored in the teacher's timezone
-            )->setTimezone($my_timezone); // Convert to user's timezone
+            )->setTimezone($my_time_zone); // Convert to user's timezone
 
             $option .= "<option value='" . $val->id . "'>" . $slot_time_in_user_timezone->format('H:i') . "</option>";
         }

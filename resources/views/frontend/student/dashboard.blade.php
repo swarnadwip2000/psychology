@@ -44,11 +44,11 @@
                                                         {{ $var->teacher_name }}
                                                     </td>
                                                     <td>
-                                                        {{ $var->date ? \App\Helpers\TimeHelper::convertToUserDate($var->date . ' ' . $var->time, auth()->user()->time_zone) : 'N/A' }}
+                                                        {{ $var->date ? \App\Helpers\TimeHelper::convertToUserDate($var->date . ' ' . $var->time, auth()->user()->time_zone, $var->teacher->time_zone) : 'N/A' }}
                                                     </td>
 
                                                     <td>
-                                                        {{ $var->time ? \App\Helpers\TimeHelper::convertToUserTime($var->date . ' ' . $var->time, auth()->user()->time_zone) : 'N/A' }}
+                                                        {{ $var->time ? \App\Helpers\TimeHelper::convertToUserTime($var->date . ' ' . $var->time, auth()->user()->time_zone, $var->teacher->time_zone) : 'N/A' }}
                                                     </td>
 
 
@@ -102,15 +102,15 @@
                                                     <td>{{ $meeting->slot->topic ?? '' }}</td>
                                                     <td> {{ $meeting->teacher_name ?? '' }}</td>
                                                     <td>
-                                                        {{ $meeting->date ? \App\Helpers\TimeHelper::convertToUserDate($meeting->date . ' ' . $meeting->time, auth()->user()->time_zone) : 'N/A' }}
+                                                        {{ $meeting->date ? \App\Helpers\TimeHelper::convertToUserDate($meeting->date . ' ' . $meeting->time, auth()->user()->time_zone, $meeting->teacher->time_zone) : 'N/A' }}
                                                     </td>
 
                                                     <td>
-                                                        {{ $meeting->meeting_start_time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->meeting_start_time, auth()->user()->time_zone) : 'N/A' }}
+                                                        {{ $meeting->meeting_start_time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->meeting_start_time, auth()->user()->time_zone, $meeting->teacher->time_zone) : 'N/A' }}
                                                     </td>
 
                                                     <td>
-                                                        {{ $meeting->meeting_end_time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->meeting_end_time, auth()->user()->time_zone) : 'N/A' }}
+                                                        {{ $meeting->meeting_end_time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->meeting_end_time, auth()->user()->time_zone, $meeting->teacher->time_zone) : 'N/A' }}
                                                     </td>
 
                                                     <td>

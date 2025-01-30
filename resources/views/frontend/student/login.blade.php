@@ -24,9 +24,9 @@
                                 </div>
                             </div>
                             <div class="col-md-12 text-center">
-                                <span>Create a New Account <a href="{{ route('front.home') }}">Click Here</a></span>
+                                <span>New resgister <a href="{{ route('front.home') }}">Here</a> | <a href="{{ route('front.faculty_login') }}">Faculty Login</a></span>
                                 <br/>
-                                <span>Are you want to login as a faculty? <a href="{{ route('front.faculty_login') }}">Click Here</a></span>
+                                {{-- <span></span> --}}
                                 <br/>
                                 <input type="submit" class="btn btn-info" value="Login" />
                             </div>
