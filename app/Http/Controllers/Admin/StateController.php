@@ -11,7 +11,7 @@ class StateController extends Controller
 {
     public function index()
     {
-        $states = City::get();
+        $states = City::paginate(20);
         $countries = Country::get();
         return view('admin.state.list')->with(compact('states', 'countries'));
     }

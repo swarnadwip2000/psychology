@@ -18,8 +18,7 @@
     State
 @endsection
 @section('create_button')
-    <a href="javascript:void(0)" id="create-state" class="btn btn-primary" data-bs-toggle="modal"
-        data-bs-target="#add_admin">Add
+    <a href="javascript:void(0)" id="create-state" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_admin">Add
         State</a>
 @endsection
 
@@ -37,8 +36,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('state.store') }}" method="POST" id="createForm"
-                        enctype="multipart/form-data">
+                    <form action="{{ route('state.store') }}" method="POST" id="createForm" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-12">
@@ -49,7 +47,7 @@
                                             <label>Country<span class="text-danger">*</span></label>
                                             <select class="select2 form-control" name="country_id" id="country_id">
                                                 <option value="">Select Country</option>
-                                                @foreach ($countries as $country)
+                                                @foreach ($states as $country)
                                                     <option value="{{ $country->id }}">{{ $country->name }}</option>
                                                 @endforeach
                                             </select>
@@ -123,31 +121,47 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($states as $key => $state)
+                            @if (count($states) > 0)
+                                @foreach ($states as $key => $state)
+                                    <tr>
+                                        <td>
+                                            {{ $key + 1 }}
+                                        </td>
+                                        <td>{{ $state->name }}</td>
+                                        <td>{{ $state->country->name }}</td>
+                                        <td>{{ date('d M Y', strtotime($state->created_at)) }}</td>
+                                        <td align="center">
+                                            <div class="edit-1 d-flex align-items-center justify-content-center">
+
+                                                <a class="edit-states edit-icon" href="#" data-bs-toggle="modal"
+                                                    data-bs-target="#edit_state" data-id="{{ $state->id }}"
+                                                    data-route="{{ route('state.edit', $state->id) }}"> <span
+                                                        class="edit-icon"><i class="ph ph-pencil-simple"></i></span></a>
+
+
+                                                <a href="{{ route('state.delete', $state->id) }}"
+                                                    onclick="return confirm('Are you sure to delete this state?')"> <span
+                                                        class="trash-icon"><i class="ph ph-trash"></i></span></a>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @if ($states->hasPages())
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="d-flex justify-content-center">
+                                                {!! $states->links() !!}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+                            @else
                                 <tr>
-                                    <td>
-                                        {{ $key + 1 }}
-                                    </td>
-                                    <td>{{ $state->name }}</td>
-                                    <td>{{ $state->country->name }}</td>
-                                    <td>{{ date('d M Y', strtotime($state->created_at)) }}</td>
-                                    <td align="center">
-                                        <div class="edit-1 d-flex align-items-center justify-content-center">
-
-                                            <a class="edit-states edit-icon" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#edit_state" data-id="{{ $state->id }}"
-                                                data-route="{{ route('state.edit', $state->id) }}"> <span
-                                                    class="edit-icon"><i class="ph ph-pencil-simple"></i></span></a>
-
-
-                                            <a href="{{ route('state.delete', $state->id) }}"
-                                                onclick="return confirm('Are you sure to delete this state?')"> <span
-                                                    class="trash-icon"><i class="ph ph-trash"></i></span></a>
-                                        </div>
-
-                                    </td>
+                                    <td colspan="5" class="text-center">No Data Found</td>
                                 </tr>
-                            @endforeach
+                            @endif
+
                         </tbody>
 
                     </table>

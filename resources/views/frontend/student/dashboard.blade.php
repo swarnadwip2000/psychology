@@ -3,7 +3,7 @@
     @php
         use App\Helpers\SlotHelper;
     @endphp
-    <section class="dshboard p-3" style="height: 700px">
+    <section class="dshboard p-3" style="">
         <div class="dshboard-contain">
             <div class="container">
                 <p style="    font-weight: bold;
@@ -90,7 +90,8 @@
                                             <tr>
                                                 <th>Topic</th>
                                                 <th>Faculty Name</th>
-                                                <th>Date (mm-dd-yyyy)</th>
+                                                <th>Meeting Date (mm-dd-yyyy)</th>
+                                                <th>Meeting Time</th>
                                                 <th>Start Time</th>
                                                 <th>End Time</th>
                                                 <th>Duration</th> <!-- New column for meeting duration -->
@@ -104,7 +105,9 @@
                                                     <td>
                                                         {{ $meeting->date ? \App\Helpers\TimeHelper::convertToUserDate($meeting->date . ' ' . $meeting->time, auth()->user()->time_zone, $meeting->teacher->time_zone) : 'N/A' }}
                                                     </td>
-
+                                                    <td>
+                                                        {{ $meeting->time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->date . ' ' . $meeting->time, auth()->user()->time_zone, $meeting->teacher->time_zone) : 'N/A' }}
+                                                    </td>
                                                     <td>
                                                         {{ $meeting->meeting_start_time ? \App\Helpers\TimeHelper::convertToUserTime($meeting->meeting_start_time, auth()->user()->time_zone, $meeting->teacher->time_zone) : 'N/A' }}
                                                     </td>

@@ -85,7 +85,8 @@
                                             <tr>
                                                 <th>Topic</th>
                                                 <th>Student Name</th>
-                                                <th>Date (mm-dd-yyyy)</th>
+                                                <th>Meeting Date (mm-dd-yyyy)</th>
+                                                <th>Meeting Time</th>
                                                 <th>Start Time</th>
                                                 <th>End Time</th>
                                                 <th>Duration</th> <!-- New column for meeting duration -->
@@ -97,6 +98,7 @@
                                                     <td>{{ $meeting->slot->topic ?? ''}}</td>
                                                     <td>{{ $meeting->student->name ?? ''}}</td>
                                                     <td>{{ date('m-d-Y', strtotime($meeting->date)) }}</td>
+                                                    <td> {{ date('H:i', strtotime($meeting->time)) }}</td>
                                                     <td>{{ $meeting->meeting_start_time ? date('H:i', strtotime($meeting->meeting_start_time)) : 'N/A' }}</td>
                                                     <td>{{ $meeting->meeting_end_time ? date('H:i', strtotime($meeting->meeting_end_time)) : 'N/A' }}</td>
                                                     <td>

@@ -3,7 +3,7 @@
     {{ ucwords(str_replace('_', ' ', env('APP_NAME'))) }}
 @endsection
 @section('content')
-    <section class="dshboard p-3"  style="height: 700px">
+    <section class="dshboard p-3"  style="height: ">
         <div class="dshboard-contain">
             <div class="container">
                 <div class="row">

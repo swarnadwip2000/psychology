@@ -109,6 +109,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @if (count($countries) > 0)
                             @foreach ($countries as $key => $country)
                                 <tr>
                                     <td>
@@ -133,6 +134,21 @@
                                     </td>
                                 </tr>
                             @endforeach
+                            @if ($countries->hasPages())
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="d-flex justify-content-center">
+                                            {!! $countries->links() !!}
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        @else
+                            <tr>
+                                <td colspan="4" class="text-center">No Data Found</td>
+                            </tr>
+                            @endif
+
                         </tbody>
 
                     </table>

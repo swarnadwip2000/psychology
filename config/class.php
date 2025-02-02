@@ -18,10 +18,7 @@ return [
     5 => 'Bachelor Year 3',
     6 => 'Master Year 1',
     7 => 'Master Year 2',
-    8 => 'PHD Year 1',
-    9 => 'PHD Year 2',
-    10 => 'PHD Year 3',
-    10 => 'PHD Year 4',
+    8 => 'PHD',
     10 => 'Certificate',
 ],
 

@@ -24,7 +24,7 @@
                                 </div>
                             </div>
                             <div class="col-md-12 text-center">
-                                <span>New resgister <a href="{{ route('front.home') }}">Here</a> | <a href="{{ route('front.faculty_login') }}">Faculty Login</a></span>
+                                <span>New register <a href="{{ route('front.home') }}">Here</a> | <a href="{{ route('front.faculty_login') }}">Faculty Login</a></span>
                                 <br/>
                                 {{-- <span></span> --}}
                                 <br/>
