@@ -166,7 +166,6 @@ class FacultyController extends Controller
 
 
         $data = User::findOrFail($id);
-        $data->register_as = $request->register_as;
         $data->name = $request->name;
         $data->email = $request->email;
         $data->phone = $request->phone;

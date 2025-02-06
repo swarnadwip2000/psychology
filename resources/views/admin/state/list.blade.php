@@ -47,7 +47,7 @@
                                             <label>Country<span class="text-danger">*</span></label>
                                             <select class="select2 form-control" name="country_id" id="country_id">
                                                 <option value="">Select Country</option>
-                                                @foreach ($states as $country)
+                                                @foreach ($countries as $country)
                                                     <option value="{{ $country->id }}">{{ $country->name }}</option>
                                                 @endforeach
                                             </select>

@@ -5,7 +5,7 @@
             <a href="{{ route('admin.dashboard') }}"><span class="logo-fm"><img src="{{asset('client_assets/img/logo/logo.jpg')}}" /></span> </a>
         </div>
         <ul class="sidebar-menu">
-            <li class="menu-header"></li>
+            <li class="menu-header">Main</li>
             <li class="dropdown {{ Request::is('admin/dashboard*') ? 'active' : ' ' }}">
                 <a href="{{ route('admin.dashboard') }}">
                     <i class="ph-gauge"></i>
@@ -22,6 +22,7 @@
                     <li class="{{ Request::is('admin/password*') ? 'active' : ' ' }}"><a class="nav-link" href="{{ route('admin.password') }}">Change Password</a></li>
                 </ul>
             </li>
+            <li class="menu-header">User Management</li>
             <li class="dropdown">
                 <a href="javascript:void(0);" class="menu-toggle nav-link has-dropdown {{ Request::is('admin/students*') ? 'active' : ' ' }}">
                     <i class="ph ph-user-list"></i>
@@ -42,6 +43,14 @@
                     <li class="{{ Request::is('admin/faculty') ? 'active' : ' ' }}"><a class="nav-link" href="{{ route('faculty.index') }}"> User List</a></li>
                 </ul>
             </li>
+            <li class="menu-header">Payments</li>
+            <li class="dropdown">
+                <a href="javascript:void(0);">
+                    <i class="ph ph-currency-circle-dollar"></i>
+                    <span>Manage Payments</span>
+                </a>
+            </li>
+            <li class="menu-header">Others</li>
             <li class="dropdown {{ Request::is('admin/country*') ? 'active' : ' ' }}">
                 <a href="{{ route('country.index') }}">
                     <i class="ph ph-map-pin"></i>
@@ -55,6 +64,8 @@
                     <span>State</span>
                 </a>
             </li>
+
+
             {{-- <li class="dropdown">
                 <a href="" class="menu-toggle nav-link has-dropdown">
                     <i class="ph-file"></i>
