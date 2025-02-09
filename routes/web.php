@@ -169,6 +169,8 @@ Route::controller(TeacherController::class)->middleware('teacher.auth')->group(f
         Route::post('logout', 'logout')->name('teacher.logout');
         Route::get('create-meeting', 'createMeeting')->name('start_new_meeting');
         Route::post('/end-meeting', 'endMeeting')->name('end_new_meeting');
+        Route::get('profile', 'profile')->name('teacher.profile');
+        Route::post('profile', 'updateProfile')->name('teacher.update_profile');
     });
 });
 

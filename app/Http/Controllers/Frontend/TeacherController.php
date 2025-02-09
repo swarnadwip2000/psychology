@@ -5,15 +5,19 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\BookingSlot;
 use App\Models\City;
+use App\Models\Country;
 use App\Models\Slot;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Traits\ImageTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TeacherController extends Controller
 {
+    use ImageTrait;
+
     public function dashboard(Request $request)
     {
 
@@ -255,4 +259,40 @@ class TeacherController extends Controller
             return response()->json(['error' => $error->getMessage()], 500);
         }
     }
+
+    public function profile()
+    {
+        $page_title  = "Profile";
+        $countries   = Country::get();
+        return view('frontend.teacher.profile')->with(compact('countries', 'page_title'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:15',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif', // If profile picture is uploaded
+            'address' => 'nullable|string|max:255',
+            'city_id' => 'required|string|max:255',
+            'country_id' => 'required|string|max:255',
+            'degree' => 'required|string|max:255',
+            'bio' => 'required',
+        ]);
+
+        $data = User::find(auth()->user()->id);
+        $data->name = $request->name;
+        $data->phone = $request->phone;
+        $data->address = $request->address;
+        $data->city_id = $request->city_id;
+        $data->country_id = $request->country_id;
+        $data->degree=$request->degree;
+        $data->bio = $request->bio;
+        if ($request->profile_picture) {
+            $data->profile_picture = $this->imageUpload($request->file('profile_picture'), 'profile');
+        }
+        $data->save();
+        return redirect()->back()->with('message', 'Faculty updated successfully.');
+    }
+
 }

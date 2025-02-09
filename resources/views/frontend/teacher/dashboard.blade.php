@@ -149,7 +149,6 @@
 @endsection
 
 @section('script')
-    @routes
     <script>
         function getbookingTime(bookingId) {
             $('#loading').addClass('loading');

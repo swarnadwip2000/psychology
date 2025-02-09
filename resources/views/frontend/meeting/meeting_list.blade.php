@@ -26,7 +26,6 @@
     </div>
 @endsection
 @section('script')
-    @routes
     <script>
         const STUDENTS      = {!! $students !!};
     </script>
