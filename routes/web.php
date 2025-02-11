@@ -16,6 +16,10 @@ use App\Http\Controllers\Frontend\TeacherController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Frontend\SubscriptionController;
+use App\Models\Plan;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +91,7 @@ Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
 
     Route::resources([
         'faculty' => FacultyController::class,
+        'plans' => PlanController::class
     ]);
     //  Student Routes
     Route::prefix('faculty')->group(function () {
@@ -95,7 +100,13 @@ Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
     Route::get('/changeFacultyStatus', [FacultyController::class, 'changeFacultyStatus'])->name('faculty.change-status');
     Route::get('/faculty-fetch-data', [FacultyController::class, 'fetchData'])->name('faculty.fetch-data');
 
+    Route::prefix('plans')->group(function () {
+        Route::get('/plans-delete/{id}', [FacultyController::class, 'delete'])->name('plans.delete');
+    });
 
+    // payments
+    Route::get('/payments', [PaymentController::class, 'payments'])->name('admin.payments');
+    Route::get('/payment-fetch-data', [PaymentController::class, 'paymentFetchData'])->name('admin.payment-fetch-data');
 });
 
 
@@ -127,7 +138,6 @@ Route::controller(HomeController::class)->group(function(){
 
         Route::get('student-personal-details', "studentPersonalDetails")->name('front.student_personal_details');
         Route::get('email-confirmation', 'emailConfirmation')->name('front.email_confirmation');
-        Route::get('subscription', 'subscription')->name('front.subscriptions');
         Route::get('payment', 'payment')->name('front.payment');
 
     });
@@ -143,13 +153,19 @@ Route::controller(HomeController::class)->group(function(){
 
 });
 
+// subscription
+Route::middleware('student.auth')->group(function(){
+    Route::get('/subscription', [SubscriptionController::class, 'subscription'])->name('subscription');
+});
+
+
 Route::controller(StudentController::class)->middleware('student.auth')->group(function(){
     Route::prefix('student')->group(function(){
         Route::get('dashboard', 'dashboard')->name('front.student_dashboard');
         Route::get('book-now', 'bookTeacher')->name('student.book_now');
         Route::get('get-slot', 'getAvailableSlot')->name('student.available_slot');
         Route::get('live-class', 'liveClass')->name('front.live_class');
-        Route::post('logout', 'logout')->name('student.logout');
+        Route::get('logout', 'logout')->name('student.logout');
         Route::get('check-meeting', 'checkMeeting')->name('student.start_new_meeting');
         Route::prefix('booking')->group(function(){
             Route::post('/', 'facultyBooking')->name('student.faculity_booking');
@@ -166,7 +182,7 @@ Route::controller(TeacherController::class)->middleware('teacher.auth')->group(f
         Route::post('session', 'addsession')->name('add_teacher_session');
         Route::get('delete-session', 'deletesession')->name('delete_teacher_session');
         Route::get('live-class', 'liveClass')->name('teacher_live_class');
-        Route::post('logout', 'logout')->name('teacher.logout');
+        Route::get('logout', 'logout')->name('teacher.logout');
         Route::get('create-meeting', 'createMeeting')->name('start_new_meeting');
         Route::post('/end-meeting', 'endMeeting')->name('end_new_meeting');
         Route::get('profile', 'profile')->name('teacher.profile');

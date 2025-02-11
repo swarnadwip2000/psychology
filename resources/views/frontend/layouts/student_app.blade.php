@@ -77,12 +77,11 @@
                                 <a class="dropdown-item d-flex align-items-center ml-3" href="javascript:void(0);">
                                     <i class="fa fa-user-circle mr-2 text-primary"></i> Profile
                                 </a>
-                                <form method="POST" action="{{ route('student.logout') }}" class="m-0">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item d-flex align-items-center">
+                                <a href="{{ route('student.logout') }}" class="m-0">
+                                    <button type="button" class="dropdown-item d-flex align-items-center">
                                         <i class="fa fa-sign-out-alt mr-2 text-danger"></i> Logout
                                     </button>
-                                </form>
+                                </a>
                             </div>
                         </li>
 
@@ -139,7 +138,7 @@
                                 </li>|
                             @endif
                             <li>
-                                <a href="{{ route('subscriptions') }}">Subscriptions</a>
+                                <a href="{{ route('subscription') }}">Subscriptions</a>
                             </li>|
                             <li>
                                 <a href="{{ route('terms.conditions') }}">Terms & Conditions</a>
@@ -191,7 +190,40 @@
     <script src="{{ asset('client_assets/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('client_assets/js/bootstrap-slider.min.js') }}"></script>
     <script src="{{ asset('client_assets/js/owl.carousel.min.js') }}"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+ <script>
+        @if (Session::has('message'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.success("{{ session('message') }}");
+        @endif
+
+        @if (Session::has('error'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.error("{{ session('error') }}");
+        @endif
+
+        @if (Session::has('info'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.info("{{ session('info') }}");
+        @endif
+
+        @if (Session::has('warning'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.warning("{{ session('warning') }}");
+        @endif
+    </script>
     @yield('script')
 </body>
 
