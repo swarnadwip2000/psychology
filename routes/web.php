@@ -139,6 +139,19 @@ Route::controller(HomeController::class)->group(function(){
         Route::post('student', 'student_login_success')->name('front.student_login_success');
         Route::get('faculty', 'faculty_login')->name('front.faculty_login');
         Route::post('faculty', 'faculty_login_success')->name('front.faculty_login_success');
+
+        //student forget password
+        Route::get('student/forget-password/show', 'forget_password')->name('front.forget_password');
+        Route::post('student/forget-password',  'forgetPassword')->name('front.forget.password');
+        Route::get('student/reset-password/{id}/{token}', 'resetPassword')->name('front.reset.password');
+        Route::post('student/change-password', 'changePassword')->name('front.change.password');
+
+        //faculty forget password
+        Route::get('faculty/forget-password/show', 'faculty_forget_password')->name('front.faculty.forget_password');
+        Route::post('faculty/forget-password',  'faculty_forgetPassword')->name('front.faculty.forget.password');
+        Route::get('faculty/reset-password/{id}/{token}', 'faculty_resetPassword')->name('front.faculty.reset.password');
+        Route::post('faculty/change-password', 'faculty_changePassword')->name('front.faculty.change.password');
+        // Route::post('change-password', 'changePassword')->name('front.change.password');
     });
 
 });

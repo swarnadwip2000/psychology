@@ -23,6 +23,9 @@
                                     <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                                 </div>
                             </div>
+                            <div class="text-center">
+                                <a href="{{route('front.faculty.forget_password')}}">Forget Password</a>
+                            </div>
                             <div class="col-md-12 text-center">
                                 <span>New Register <a href="{{ route('front.faculty_registration') }}">here</a> | <a href="{{ route('front.student_login') }}">Student Login</a></span>
                                 <br/>

@@ -14,6 +14,12 @@ use App\Models\Country;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use App\Models\PasswordReset;
+use Illuminate\Support\Facades\Crypt;
+use Carbon\Carbon;
+use App\Mail\SendCodeStudentResetPassword;
+use App\Mail\SendCodeFacultyResetPassword;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -321,6 +327,183 @@ class HomeController extends Controller
             return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
         } else {
             return redirect()->route('front.home')->with('errmsg', 'Token does not match. Please try again');
+        }
+    }
+    // student forget password
+    public function forget_password()
+    {
+        $data['page_title'] = "Psychology";
+        $data['page_description'] = "E-learning platform";
+        $data['page_keyword'] = "Psychology";
+        return view('frontend.student.auth.forget_password')->with($data);
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix|exists:users,email',
+        ]);
+
+        $count = User::where('email', $request->email)->role('STUDENT')->count();
+
+        if ($count > 0) {
+            $user = User::where('email', $request->email)->select('id', 'name', 'email')->first();
+            PasswordReset::where('email', $request->email)->delete();
+            $id = Crypt::encrypt($user->id);
+            $token = Str::random(20) . 'pass' . $user->id;
+            PasswordReset::create([
+                'email' => $request->email,
+                'token' => $token,
+                'created_at' => Carbon::now()
+            ]);
+
+            $details = [
+                'id' => $id,
+                'token' => $token
+            ];
+
+            Mail::to($request->email)->send(new SendCodeStudentResetPassword($details));
+            return redirect()->back()->with(['successmsg' => "Please! check your mail to reset your password."]);
+        } else {
+            return redirect()->back()->with(['errmsg' => "Couldn't find your account!"]);
+        }
+    }
+
+
+
+
+    public function resetPassword($id, $token)
+    {
+        $page_title = "Reset Password";
+        $user = User::findOrFail(Crypt::decrypt($id));
+        $resetPassword = PasswordReset::where('email', $user->email)->first();
+
+        if (!$resetPassword) {
+            abort(404);
+        }
+
+        // Get the expiration time (1 hour after creation)
+        $expiryTime = $resetPassword->created_at->addHour();
+
+        // Compare with current time
+        if (Carbon::now()->lessThan($expiryTime)) {
+            return view('frontend.student.auth.reset', compact('id', 'page_title'));
+        } else {
+            abort(404);
+        }
+    }
+
+
+    public function changePassword(Request $request)
+    {
+
+        $request->validate([
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|min:8|same:password'
+        ]);
+        // return $request->all();
+        try {
+            if ($request->id != '') {
+                $id = Crypt::decrypt($request->id);
+                User::where('id', $id)->update(['password' => bcrypt($request->password)]);
+                $now_time = Carbon::now()->toDateTimeString();
+                return redirect()->route('front.student_login')->with('message', 'Password has been changed successfully.');
+            } else {
+                abort(404);
+            }
+        } catch (\Throwable $th) {
+            return redirect()->route('front.student_login')->with('message', 'Something went wrong.');
+        }
+    }
+
+
+
+    // faculty forget password
+
+    public function faculty_forget_password()
+    {
+        $data['page_title'] = "Psychology";
+        $data['page_description'] = "E-learning platform";
+        $data['page_keyword'] = "Psychology";
+        return view('frontend.faculty_forget_password')->with($data);
+    }
+
+    public function faculty_forgetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix|exists:users,email',
+        ]);
+
+        $count = User::where('email', $request->email)->role('FACULTY')->count();
+
+        if ($count > 0) {
+            $user = User::where('email', $request->email)->select('id', 'name', 'email')->first();
+            PasswordReset::where('email', $request->email)->delete();
+            $id = Crypt::encrypt($user->id);
+            $token = Str::random(20) . 'pass' . $user->id;
+            PasswordReset::create([
+                'email' => $request->email,
+                'token' => $token,
+                'created_at' => Carbon::now()
+            ]);
+
+            $details = [
+                'id' => $id,
+                'token' => $token
+            ];
+
+            Mail::to($request->email)->send(new SendCodeFacultyResetPassword($details));
+            return redirect()->back()->with('message', "Please! check your mail to reset your password.");
+        } else {
+            return redirect()->back()->with('error', "Couldn't find your account!");
+        }
+    }
+
+    public function faculty_resetPassword($id, $token)
+    {
+        // return "dfs";
+
+        $page_title = "Reset Password";
+        $user = User::findOrFail(Crypt::decrypt($id));
+        $resetPassword = PasswordReset::where('email', $user->email)->first();
+
+        if (!$resetPassword) {
+            abort(404);
+        }
+
+        // Get the expiration time (1 hour after creation)
+        $expiryTime = $resetPassword->created_at->addHour();
+
+        // Compare with current time
+        if (Carbon::now()->lessThan($expiryTime)) {
+            return view('frontend.faculty_reset', compact('id', 'page_title'));
+        } else {
+            abort(404);
+        }
+    }
+
+    public function faculty_changePassword(Request $request)
+    {
+
+        $request->validate([
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|min:8|same:password'
+        ]);
+        // return $request->all();
+        try {
+            if ($request->id != '') {
+                $id = Crypt::decrypt($request->id);
+
+                User::where('id', $id)->update(['password' => bcrypt($request->password)]);
+                $now_time = Carbon::now()->toDateTimeString();
+                Session::flash('message', 'Password has been changed successfully.');
+                return redirect()->route('front.faculty_login');
+            } else {
+                abort(404);
+            }
+        } catch (\Throwable $th) {
+            Session::flash('error', 'Something went wrong.');
+            return redirect()->route('front.faculty_login');
         }
     }
 }
