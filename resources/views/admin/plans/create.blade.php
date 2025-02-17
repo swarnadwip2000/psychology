@@ -39,10 +39,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="plan_duration">Plan Duration (Days)*</label>
-                                    <input type="number" class="form-control" min="0" id="plan_duration" name="plan_duration" value="{{ old('plan_duration') }}" placeholder="Enter Duration in Days">
-                                    @if ($errors->has('plan_duration'))
-                                        <div class="error" style="color:red;">{{ $errors->first('plan_duration') }}</div>
+                                    <label for="plan_duration_week">Plan Duration (Weeks)*</label>
+                                    <input type="number" class="form-control" min="0" id="plan_duration_week" name="plan_duration_week" value="{{ old('plan_duration') }}" placeholder="Enter Duration in Days">
+                                    @if ($errors->has('plan_duration_week'))
+                                        <div class="error" style="color:red;">{{ $errors->first('plan_duration_week') }}</div>
                                     @endif
                                 </div>
                             </div>
@@ -57,7 +57,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="free_tutorial">Free Tutorial</label>
+                                    <label for="free_tutorial">Free Tutorial*</label>
                                     <select name="free_tutorial" id="free_tutorial" class="form-control">
                                         <option value="0" {{ old('free_tutorial') == 0 ? 'selected' : '' }}>No</option>
                                         <option value="1" {{ old('free_tutorial') == 1 ? 'selected' : '' }}>Yes</option>
@@ -67,6 +67,19 @@
                                     @endif
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="free_notes">Free Notes*</label>
+                                    <select name="free_notes" id="free_notes" class="form-control">
+                                        <option value="0" {{ old('free_notes') == 0 ? 'selected' : '' }}>No</option>
+                                        <option value="1" {{ old('free_notes') == 1 ? 'selected' : '' }}>Yes</option>
+                                    </select>
+                                    @if ($errors->has('free_notes'))
+                                        <div class="error" style="color:red;">{{ $errors->first('free_notes') }}</div>
+                                    @endif
+                                </div>
+                            </div>
+
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="plan_description">Plan Description</label>

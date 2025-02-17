@@ -18,8 +18,11 @@ class CreatePlansTable extends Migration
             $table->string('plan_name')->nullable();
             $table->string('plan_price')->nullable();
             $table->string('plan_duration')->nullable();
+            $table->string('plan_duration_week')->nullable();
             $table->string('session')->nullable();
             $table->boolean('free_tutorial')->default(0);
+            $table->boolean('free_notes')->default(0);
+            $table->boolean('free_course')->default(0);
             $table->text('plan_description')->nullable();
             $table->timestamps();
         });

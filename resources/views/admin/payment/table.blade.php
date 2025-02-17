@@ -6,7 +6,7 @@
         <td>{{ $payment->user_email ?? 'N/A' }}</td>
         <td>{{ $payment->plan_name ?? 'N/A' }}</td>
         <td>{{ $payment->plan_price ?? 'N/A' }} {{ $payment->currency ?? 'N/A' }}</td>
-        <td>{{ $payment->plan_duration ?? 'N/A' }}</td>
+        <td>{{ $payment->plan_duration_week ?? 'N/A' }} Weeks</td>
         <td>{{ $payment->session ?? 'N/A' }}</td>
         <td>
             @if ($payment->free_tutorial)
@@ -16,6 +16,9 @@
             @endif
         </td>
         <td>{{ $payment->amount ?? 'N/A' }}</td>
+        <td>
+            {{ $payment->membership_start_date ? \Carbon\Carbon::parse($payment->membership_start_date)->format('d M Y') : 'N/A' }}
+        </td>
         <td>
             {{ $payment->membership_expiry_date ? \Carbon\Carbon::parse($payment->membership_expiry_date)->format('d M Y') : 'N/A' }}
         </td>

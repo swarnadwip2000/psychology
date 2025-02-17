@@ -49,9 +49,10 @@
                                 <th>ID</th>
                                 <th>Plan Name</th>
                                 <th>Price</th>
-                                <th>Duration (Days)</th>
+                                <th>Duration (Weeks)</th>
                                 <th>Video Sessions</th>
                                 <th>Free Tutorial</th>
+                                <th>Free Notes</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -62,9 +63,10 @@
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $plan->plan_name }}</td>
                                         <td>${{ number_format($plan->plan_price, 2) }}</td>
-                                        <td>{{ $plan->plan_duration }} Days</td>
+                                        <td>{{ $plan->plan_duration_week }} Weeks</td>
                                         <td>{{ $plan->session }}</td>
                                         <td>{{ $plan->free_tutorial ? 'Yes' : 'No' }}</td>
+                                        <td>{{ $plan->free_notes ? 'Yes' : 'No' }}</td>
                                         <td align="center">
                                             <div class="edit-1 d-flex align-items-center justify-content-center">
                                                 <a class="edit-plan edit-icon"
@@ -83,7 +85,7 @@
 
                             @else
                                 <tr>
-                                    <td colspan="7" class="text-center">No Data Found</td>
+                                    <td colspan="8" class="text-center">No Data Found</td>
                                 </tr>
                             @endif
                         </tbody>

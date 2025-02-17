@@ -23,9 +23,13 @@ class CreateUserSubscriptionsTable extends Migration
             $table->string('plan_name')->nullable();
             $table->string('plan_price')->nullable();
             $table->string('plan_duration')->nullable();
+            $table->string('plan_duration_week')->nullable();
             $table->string('session')->nullable();
             $table->boolean('free_tutorial')->default(0);
+            $table->boolean('free_notes')->default(0);
+            $table->boolean('free_course')->default(0);
             $table->string('amount')->nullable();
+            $table->date('membership_start_date')->nullable();
             $table->date('membership_expiry_date')->nullable();
             $table->string('currency')->nullable();
             $table->string('payment_method')->nullable();

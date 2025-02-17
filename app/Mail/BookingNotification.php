@@ -32,7 +32,7 @@ class BookingNotification extends Mailable
     public function build()
     {
         $subject = $this->recipientType === 'teacher'
-            ? 'New Booking Notification'
+            ? 'Your new Booking Notification'
             : 'Booking Confirmation';
 
         return $this->view('frontend.email.booking_notification')

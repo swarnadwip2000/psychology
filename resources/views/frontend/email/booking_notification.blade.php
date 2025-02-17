@@ -90,7 +90,7 @@
 
         <div class="footer">
             <p>Thank you for using our service!</p>
-            <p>If you have any questions, feel free to contact us.</p>
+            <p>If you have any questions, feel free to contact us at info@epsychology.com.</p>
         </div>
     </div>
 </body>

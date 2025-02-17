@@ -61,10 +61,13 @@
                             <a class="nav-link" href="javascript:void(0);"> Tutorials </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0);">Counseling</a>
+                            <a class="nav-link" href="javascript:void(0);">Notes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:void(0);">Reviews</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('subscription')}}"> Subscription </a>
                         </li>
                         <li class="nav-item dropdown mr-2">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button"

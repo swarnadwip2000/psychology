@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\FacultyTutorialController;
 use App\Http\Controllers\Frontend\SubscriptionController;
 use App\Models\Plan;
 
@@ -48,7 +49,7 @@ Route::get('reset-password/{id}/{token}', [ForgetPasswordController::class, 'res
 Route::post('change-password', [ForgetPasswordController::class, 'changePassword'])->name('admin.change.password');
 Route::post('/get-cities', [CustomerController::class, 'getCities'])->name('get.cities');
 
-Route::group(['middleware' => ['admin'], 'prefix'=>'admin'], function () {
+Route::group(['middleware' => ['admin'], 'prefix' => 'admin'], function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('profile/update', [ProfileController::class, 'profileUpdate'])->name('admin.profile.update');
@@ -124,10 +125,10 @@ Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'
 Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy.policy');
 
 
-Route::controller(HomeController::class)->group(function(){
+Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('front.home');
 
-    Route::prefix('registration')->group(function(){
+    Route::prefix('registration')->group(function () {
         Route::get('school', 'school_registration')->name('front.school_registration');
         Route::get('college', 'college_registration')->name('front.college_registration');
         Route::get('faculty', 'faculty_registration')->name('front.faculty_registration');
@@ -138,45 +139,44 @@ Route::controller(HomeController::class)->group(function(){
 
         Route::get('student-personal-details', "studentPersonalDetails")->name('front.student_personal_details');
         Route::get('email-confirmation', 'emailConfirmation')->name('front.email_confirmation');
-        Route::get('payment', 'payment')->name('front.payment');
-
+        // Route::get('payment', 'payment')->name('front.payment');
     });
 
     Route::get('email-verification', 'emailVerification')->name('email_verification');
 
-    Route::prefix('login')->group(function(){
+    Route::prefix('login')->group(function () {
         Route::get('student', 'student_login')->name('front.student_login');
         Route::post('student', 'student_login_success')->name('front.student_login_success');
         Route::get('faculty', 'faculty_login')->name('front.faculty_login');
         Route::post('faculty', 'faculty_login_success')->name('front.faculty_login_success');
     });
-
 });
 
 // subscription
-Route::middleware('student.auth')->group(function(){
+Route::middleware('student.auth')->group(function () {
     Route::get('/subscription', [SubscriptionController::class, 'subscription'])->name('subscription');
+    Route::get('/subscription/{id}', [SubscriptionController::class, 'payment'])->name('student.subscription.payment');
+    Route::get('/paypal-checkout-success', [SubscriptionController::class, 'paypalSuccess'])->name('paypal.success');
+    Route::get('/paypal-checkout-cancel', [SubscriptionController::class, 'paypalCancel'])->name('paypal.cancel');
 });
 
 
-Route::controller(StudentController::class)->middleware('student.auth')->group(function(){
-    Route::prefix('student')->group(function(){
+Route::controller(StudentController::class)->middleware('student.auth')->group(function () {
+    Route::prefix('student')->group(function () {
         Route::get('dashboard', 'dashboard')->name('front.student_dashboard');
         Route::get('book-now', 'bookTeacher')->name('student.book_now');
         Route::get('get-slot', 'getAvailableSlot')->name('student.available_slot');
         Route::get('live-class', 'liveClass')->name('front.live_class');
         Route::get('logout', 'logout')->name('student.logout');
         Route::get('check-meeting', 'checkMeeting')->name('student.start_new_meeting');
-        Route::prefix('booking')->group(function(){
+        Route::prefix('booking')->group(function () {
             Route::post('/', 'facultyBooking')->name('student.faculity_booking');
-
         });
-
     });
 });
 
-Route::controller(TeacherController::class)->middleware('teacher.auth')->group(function(){
-    Route::prefix('teacher')->group(function(){
+Route::controller(TeacherController::class)->middleware('teacher.auth')->group(function () {
+    Route::prefix('teacher')->group(function () {
         Route::get('dashboard', 'dashboard')->name('auth_teacher_dashboard');
         Route::get('session', 'session')->name('auth_teacher_session');
         Route::post('session', 'addsession')->name('add_teacher_session');
@@ -189,6 +189,29 @@ Route::controller(TeacherController::class)->middleware('teacher.auth')->group(f
         Route::post('profile', 'updateProfile')->name('teacher.update_profile');
     });
 });
+
+Route::controller(FacultyTutorialController::class)
+    ->middleware('teacher.auth')
+    ->prefix('teacher')
+    ->group(function () {
+
+        // List all tutorials
+        Route::get('/tutorials', 'index')->name('teacher.tutorials.index');
+
+
+        // Store a new tutorial
+        Route::post('/tutorials', 'store')->name('teacher.tutorials.store');
+
+        // Show edit form for a specific tutorial
+        Route::get('/tutorials/{id}/edit', 'edit')->name('teacher.tutorials.edit');
+
+        // Update an existing tutorial
+        Route::put('/tutorials/{id}', 'update')->name('teacher.tutorials.update');
+
+        // Delete a tutorial
+        Route::delete('/tutorials/{id}', 'destroy')->name('teacher.tutorials.destroy');
+
+    });
 
 
 Route::get('/zoom/callback', [MeetingController::class, 'handleCallback']);

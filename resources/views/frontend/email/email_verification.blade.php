@@ -46,6 +46,7 @@
     }
     .verify-button:hover {
       background-color: #0056b3;
+      color: #ffffff;
     }
     .footer {
       text-align: center;
@@ -68,11 +69,11 @@
         <a href="{{ route('email_verification', ['toke_code' => $token_code]) }}" class="verify-button">Verify Email</a>
       </div>
       <p>If you didn't sign up for this account, you can safely ignore this email.</p>
-      <p>Thank you,<br>The Team</p>
+      <p>Thank you,<br>epsychology Team</p>
     </div>
     <div class="footer">
-      &copy; 2024 Your Company. All rights reserved.<br>
-      If you have any questions, contact us at support@yourcompany.com.
+    <p> <a href="https://epsychology.ca/">www.epsychology.ca</a> &copy; 2024 Your Company. All rights reserved.<br>
+        If you have any questions, contact us at info@epsychology.com.</p>
     </div>
   </div>
 </body>

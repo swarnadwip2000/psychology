@@ -52,6 +52,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('auth_teacher_session') }}">My Session</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('teacher.tutorials.index') }}">Tutorials</a>
+                        </li>
                         {{-- <li class="nav-item">
                             <a class="nav-link" href="#">Live Class</a>
                           </li> --}}
@@ -186,6 +189,7 @@
     <script src="{{ asset('client_assets/js/bootstrap-slider.min.js') }}"></script>
     <script src="{{ asset('client_assets/js/owl.carousel.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    @stack('script')
  <script>
         @if (Session::has('message'))
             toastr.options = {
@@ -219,7 +223,7 @@
             toastr.warning("{{ session('warning') }}");
         @endif
     </script>
-    @yield('script')
+
 </body>
 
 </html>

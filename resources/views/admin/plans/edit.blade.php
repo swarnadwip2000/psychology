@@ -56,11 +56,11 @@
                                 <div class="col-md-6">
                                     <div class="form-group-div">
                                         <div class="form-group">
-                                            <label for="plan_duration">Plan Duration (in days)*</label>
-                                            <input type="number" class="form-control" min="0" id="plan_duration" name="plan_duration"
-                                                value="{{ old('plan_duration', $plan->plan_duration) }}" placeholder="Plan Duration">
-                                            @if ($errors->has('plan_duration'))
-                                                <div class="error" style="color:red;">{{ $errors->first('plan_duration') }}</div>
+                                            <label for="plan_duration_week">Plan Duration (in weeks)*</label>
+                                            <input type="number" class="form-control" min="0" id="plan_duration_week" name="plan_duration_week"
+                                                value="{{ old('plan_duration_week', $plan->plan_duration_week) }}" placeholder="Plan Duration">
+                                            @if ($errors->has('plan_duration_week'))
+                                                <div class="error" style="color:red;">{{ $errors->first('plan_duration_week') }}</div>
                                             @endif
                                         </div>
                                     </div>
@@ -89,6 +89,20 @@
                                             </select>
                                             @if ($errors->has('free_tutorial'))
                                                 <div class="error" style="color:red;">{{ $errors->first('free_tutorial') }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group-div">
+                                        <div class="form-group">
+                                            <label for="free_notes">Free Notes*</label>
+                                            <select class="form-control" id="free_notes" name="free_notes">
+                                                <option value="0" {{ old('free_notes', $plan->free_tutorial) == 0 ? 'selected' : '' }}>No</option>
+                                                <option value="1" {{ old('free_notes', $plan->free_tutorial) == 1 ? 'selected' : '' }}>Yes</option>
+                                            </select>
+                                            @if ($errors->has('free_notes'))
+                                                <div class="error" style="color:red;">{{ $errors->first('free_notes') }}</div>
                                             @endif
                                         </div>
                                     </div>

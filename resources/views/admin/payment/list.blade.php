@@ -79,6 +79,10 @@
                                     Amount <span id="amount_icon"></span>
                                 </th>
                                 <th class="sorting" data-tippy-content="Sort by Expiry Date" data-sorting_type="desc"
+                                    data-column_name="membership_start_date" style="cursor: pointer">
+                                    Start Date <span id="membership_start_date_icon"></span>
+                                </th>
+                                <th class="sorting" data-tippy-content="Sort by Expiry Date" data-sorting_type="desc"
                                     data-column_name="membership_expiry_date" style="cursor: pointer">
                                     Expiry Date <span id="membership_expiry_date_icon"></span>
                                 </th>
@@ -124,6 +128,7 @@
                 $('#free_tutorial_icon').html('');
                 $('#amount_icon').html('');
                 $('#membership_expiry_date_icon').html('');
+                $('#membership_start_date_icon').html('');
                 $('#currency_icon').html('');
                 $('#payment_method_icon').html('');
             }
