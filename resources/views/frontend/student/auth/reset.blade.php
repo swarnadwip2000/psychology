@@ -16,16 +16,18 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="city_name">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        placeholder="Password">
                                 </div>
 
                                 <div class="form-group col-md-6">
                                     <label for="city_name">Confirm Password</label>
-                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Password">
+                                    <input type="password" class="form-control" id="confirm_password"
+                                        name="confirm_password" placeholder="Password">
                                 </div>
                             </div>
                             <div class="col-md-12 text-center">
-                                <br/>
+                                <br />
                                 <input type="submit" class="btn btn-info" value="Reset" />
                             </div>
                         </form>
@@ -40,20 +42,30 @@
 @section('script')
     <script>
         function valid() {
-            if($("#email").val() == ''){
-                toastr.error('Enter your email id!!');
+            var password = $("#password").val();
+            var confirmPassword = $("#confirm_password").val();
+
+            if (password == '') {
+                toastr.error('Enter your password!');
                 return false;
-            }else if($("#password").val() == ''){
-                toastr.error('Enter your password!!');
+            } else if (confirmPassword == '') {
+                toastr.error('Enter your confirm password!');
+                return false;
+            } else if (password !== confirmPassword) {
+                toastr.error('Passwords do not match!');
+                return false;
+            } else if (password.length < 6) {
+                toastr.error('Password must be at least 6 characters long!');
                 return false;
             }
+
+            return true; 
         }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        document.getElementById('timezone').value = timezone;
-    });
-
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.getElementById('timezone').value = timezone;
+        });
     </script>
 @endsection

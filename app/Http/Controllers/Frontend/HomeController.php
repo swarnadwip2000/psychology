@@ -343,9 +343,8 @@ class HomeController extends Controller
         $request->validate([
             'email' => 'required|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix|exists:users,email',
         ]);
-
+        // return $validator->errors();
         $count = User::where('email', $request->email)->role('STUDENT')->count();
-
         if ($count > 0) {
             $user = User::where('email', $request->email)->select('id', 'name', 'email')->first();
             PasswordReset::where('email', $request->email)->delete();
@@ -363,9 +362,9 @@ class HomeController extends Controller
             ];
 
             Mail::to($request->email)->send(new SendCodeStudentResetPassword($details));
-            return redirect()->back()->with(['successmsg' => "Please! check your mail to reset your password."]);
+            return redirect()->back()->with('message', "Please! check your mail to reset your password.");
         } else {
-            return redirect()->back()->with(['errmsg' => "Couldn't find your account!"]);
+            return redirect()->back()->with('error', "Couldn't find your account!");
         }
     }
 
@@ -396,25 +395,35 @@ class HomeController extends Controller
 
     public function changePassword(Request $request)
     {
-
         $request->validate([
             'password' => 'required|min:8',
             'confirm_password' => 'required|min:8|same:password'
         ]);
-        // return $request->all();
+
         try {
-            if ($request->id != '') {
+            if (!empty($request->id)) {
+                // Ensure the ID is properly decrypted
                 $id = Crypt::decrypt($request->id);
-                User::where('id', $id)->update(['password' => bcrypt($request->password)]);
-                $now_time = Carbon::now()->toDateTimeString();
+
+                // Check if user exists before updating
+                $user = User::find($id);
+                if (!$user) {
+                    return redirect()->route('front.student_login')->with('error', 'User not found.');
+                }
+
+                // Update password using bcrypt
+                $user->password = bcrypt($request->password);
+                $user->save();
+
                 return redirect()->route('front.student_login')->with('message', 'Password has been changed successfully.');
             } else {
                 abort(404);
             }
         } catch (\Throwable $th) {
-            return redirect()->route('front.student_login')->with('message', 'Something went wrong.');
+            return redirect()->route('front.student_login')->with('error', 'Something went wrong. Please try again.');
         }
     }
+
 
 
 

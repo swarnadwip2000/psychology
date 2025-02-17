@@ -40,13 +40,24 @@
 @section('script')
     <script>
         function valid() {
-            if($("#email").val() == ''){
-                toastr.error('Enter your email id!!');
+            var password = $("#password").val();
+            var confirmPassword = $("#confirm_password").val();
+
+            if (password == '') {
+                toastr.error('Enter your password!');
                 return false;
-            }else if($("#password").val() == ''){
-                toastr.error('Enter your password!!');
+            } else if (confirmPassword == '') {
+                toastr.error('Enter your confirm password!');
+                return false;
+            } else if (password !== confirmPassword) {
+                toastr.error('Passwords do not match!');
+                return false;
+            } else if (password.length < 6) {
+                toastr.error('Password must be at least 6 characters long!');
                 return false;
             }
+
+            return true;
         }
     </script>
     <script>

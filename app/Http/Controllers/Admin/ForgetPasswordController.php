@@ -52,14 +52,31 @@ class ForgetPasswordController extends Controller
     public function resetPassword($id, $token)
     {
         // return "dfs";
+        // $user = User::findOrFail(Crypt::decrypt($id));
+        // $resetPassword = PasswordReset::where('email', $user->email)->first();
+        // $newTime =  date('h:i A', strtotime( $resetPassword->created_at->addHour()));
+
+        // if ($newTime > date('h:i A')) {
+
+        //     $id = $id;
+        //     return view('admin.auth.reset-password')->with(compact('id'));
+        // } else {
+        //     abort(404);
+        // }
+
         $user = User::findOrFail(Crypt::decrypt($id));
         $resetPassword = PasswordReset::where('email', $user->email)->first();
-        $newTime =  date('h:i A', strtotime( $resetPassword->created_at->addHour()));
 
-        if ($newTime > date('h:i A')) {
+        if (!$resetPassword) {
+            abort(404);
+        }
 
-            $id = $id;
-            return view('admin.auth.reset-password')->with(compact('id'));
+        // Get the expiration time (1 hour after creation)
+        $expiryTime = $resetPassword->created_at->addHour();
+
+        // Compare with current time
+        if (Carbon::now()->lessThan($expiryTime)) {
+            return view('admin.auth.reset-password', compact('id'));
         } else {
             abort(404);
         }
