@@ -2,39 +2,35 @@
 @section('content')
     <section class="boxArea" style="min-height: 580px; height: auto;">
         <div class="container">
-            <h4 class="page-head text-center mb-5"> Enter your details</h4>
+            <h4 class="page-head text-center mb-5">Forget Password</h4>
             <div class="row">
                 <div class="col-md-12">
                     <div class="row justify-content-center">
-                        <form action="{{ route('front.faculty_login') }}" method="POST" onsubmit="return valid()">
-                            @csrf()
+                        <form action="{{ route('front.faculty.change.password') }}" method="POST" onsubmit="return valid()">
+                            @csrf
                             <input type="hidden" name="timezone" id="timezone">
+                            <input type="hidden" name="id" value="{{ $id }}">
                             <div class="row">
                                 <div class="form-group col-md-12">
                                     <span class="text-success">{{ Session::get('successmsg') }}</span>
                                     <span class="text-danger">{{ Session::get('errmsg') }}</span>
-                                    </div>
-                                <div class="form-group col-md-6">
-                                    <label for="student_class">Registered Email ID</label>
-                                    <input type="text" class="form-control" id="email" name="email" placeholder="Email Address">
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="city_name">Enter Password</label>
+                                    <label for="city_name">Password</label>
                                     <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                                 </div>
-                            </div>
-                            <div class="text-center">
-                                <a href="{{route('front.faculty.forget_password')}}">Forget Password</a>
+
+                                <div class="form-group col-md-6">
+                                    <label for="city_name">Confirm Password</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Password">
+                                </div>
                             </div>
                             <div class="col-md-12 text-center">
-                                <span>New Register <a href="{{ route('front.faculty_registration') }}">here</a> | <a href="{{ route('front.student_login') }}">Student Login</a></span>
                                 <br/>
-                                {{-- <span>Are you want to login as a student? <a href="{{ route('front.student_login') }}">Click Here</a></span>
-                                <br/> --}}
-                                <br>
-                                <input type="submit" class="btn btn-info" value="Login" />
+                                <input type="submit" class="btn btn-info" value="Reset" />
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -45,13 +41,24 @@
 @section('script')
     <script>
         function valid() {
-            if($("#email").val() == ''){
-                toastr.error('Enter your email id!!');
+            var password = $("#password").val();
+            var confirmPassword = $("#confirm_password").val();
+
+            if (password == '') {
+                toastr.error('Enter your password!');
                 return false;
-            }else if($("#password").val() == ''){
-                toastr.error('Enter your password!!');
+            } else if (confirmPassword == '') {
+                toastr.error('Enter your confirm password!');
+                return false;
+            } else if (password !== confirmPassword) {
+                toastr.error('Passwords do not match!');
+                return false;
+            } else if (password.length < 6) {
+                toastr.error('Password must be at least 6 characters long!');
                 return false;
             }
+
+            return true;
         }
     </script>
     <script>

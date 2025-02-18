@@ -18,7 +18,7 @@ class ForgetPasswordController extends Controller
     {
         return view('admin.auth.forgot-password');
     }
-    
+
     public function forgetPassword(Request $request)
     {
         $request->validate([
@@ -52,24 +52,41 @@ class ForgetPasswordController extends Controller
     public function resetPassword($id, $token)
     {
         // return "dfs";
+        // $user = User::findOrFail(Crypt::decrypt($id));
+        // $resetPassword = PasswordReset::where('email', $user->email)->first();
+        // $newTime =  date('h:i A', strtotime( $resetPassword->created_at->addHour()));
+
+        // if ($newTime > date('h:i A')) {
+
+        //     $id = $id;
+        //     return view('admin.auth.reset-password')->with(compact('id'));
+        // } else {
+        //     abort(404);
+        // }
+
         $user = User::findOrFail(Crypt::decrypt($id));
         $resetPassword = PasswordReset::where('email', $user->email)->first();
-        $newTime =  date('h:i A', strtotime( $resetPassword->created_at->addHour()));
-        
-        if ($newTime > date('h:i A')) {
-             
-            $id = $id;
-            return view('admin.auth.reset-password')->with(compact('id'));
-        } else {           
+
+        if (!$resetPassword) {
             abort(404);
         }
 
-        
+        // Get the expiration time (1 hour after creation)
+        $expiryTime = $resetPassword->created_at->addHour();
+
+        // Compare with current time
+        if (Carbon::now()->lessThan($expiryTime)) {
+            return view('admin.auth.reset-password', compact('id'));
+        } else {
+            abort(404);
+        }
+
+
     }
 
     public function changePassword(Request $request)
     {
-        
+
         $request->validate([
             'password' => 'required|min:8',
             'confirm_password' => 'required|min:8|same:password'
@@ -79,15 +96,15 @@ class ForgetPasswordController extends Controller
             if ($request->id != '') {
                 $id = Crypt::decrypt($request->id);
                 User::where('id', $id)->update(['password' => bcrypt($request->password)]);
-                $now_time = Carbon::now()->toDateTimeString();    
+                $now_time = Carbon::now()->toDateTimeString();
                 return redirect()->route('admin.login')->with('message', 'Password has been changed successfully.');
             } else {
                 abort(404);
             }
-        } 
-        catch (\Throwable $th) {
-            return redirect()->route('admin.login')->with('message', 'Something went wrong.');
         }
-       
+        catch (\Throwable $th) {
+            return redirect()->route('admin.login')->with('error', 'Something went wrong.');
+        }
+
     }
 }
