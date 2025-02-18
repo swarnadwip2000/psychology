@@ -51,8 +51,8 @@ class HomeController extends Controller
         $model = User::where(['email' => $emailId])->whereIn('register_as', [1, 2])->first();
 
         if ($model) {
-            // if ($model->email_verified_at != null)
-            if (!isset($model->email_verified_at) || empty($model->email_verified_at)){
+
+            if ($model->email_verified_at != null){
                 if (Auth::guard('web')->attempt(['email' => $emailId, 'password' => $password])) {
                     if (auth()->user()->hasRole('STUDENT')) {
                         if (auth()->user()->status == 1) {
@@ -247,7 +247,7 @@ class HomeController extends Controller
         $model = User::where(['email' => $emailId])->whereIn('register_as', [3])->first();
 
         if ($model) {
-            if (!isset($model->email_verified_at) || empty($model->email_verified_at)) {
+            if ($model->email_verified_at != null) {
 
                 if (Auth::attempt(['email' => $emailId, 'password' => $password])) {
                     if (auth()->user()->hasRole('FACULTY')) {
