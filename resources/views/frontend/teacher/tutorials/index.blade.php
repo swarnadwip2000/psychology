@@ -41,7 +41,7 @@
                                             @else
                                                 @foreach ($tutorials as $tutorial)
                                                     <tr>
-                                                        <td> {{ config('class.fuclaty_degree')[$tutorial->degree] ?? 'N/A' }}</td>
+                                                        <td> {{ config('class.all_class')[$tutorial->class] ?? 'N/A' }}</td>
                                                         <td><a href="{{ $tutorial->url }}" target="_blank">View</a></td>
                                                         <td>{{ $tutorial->short_description }}</td>
                                                         <td>
@@ -60,6 +60,9 @@
                                             @endif
                                         </tbody>
                                     </table>
+                                    <div class="d-flex justify-content-center mt-3">
+                                        {{ $tutorials->links() }}
+                                    </div>
 
                                 </div>
                             </div>
@@ -84,11 +87,11 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="degree">Degree</label>
-                            <select name="degree" id="degree" class="form-control">
-                                <option value="">Select Degree</option>
-                                @foreach (config('class.fuclaty_degree') as $key => $val)
-                                    <option value="{{ $key }}" {{ old('degree') == $key ? 'selected' : '' }}>
+                            <label for="class">Class</label>
+                            <select name="class" id="class" class="form-control">
+                                <option value="">Select Class</option>
+                                @foreach (config('class.all_class') as $key => $val)
+                                    <option value="{{ $key }}" {{ old('class') == $key ? 'selected' : '' }}>
                                         {{ $val }}
                                     </option>
                                 @endforeach

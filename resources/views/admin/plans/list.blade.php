@@ -13,8 +13,8 @@
     Plans Details
 @endsection
 @section('create_button')
-    <a href="{{route('plans.create')}}" id="create-state" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_admin">Add
-        Plan</a>
+    {{-- <a href="{{route('plans.create')}}" id="create-state" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_admin">Add
+        Plan</a> --}}
 @endsection
 @section('content')
     <section id="loading">

@@ -12,16 +12,35 @@ return [
         12 => 'Grade XII',
     ],
 
-   'college_class' => [
-    3 => 'Bachelor Year 1',
-    4 => 'Bachelor Year 2',
-    5 => 'Bachelor Year 3',
-    6 => 'Master Year 1',
-    7 => 'Master Year 2',
-    8 => 'PHD',
-    10 => 'Certificate',
-],
+    'college_class' => [
+        13 => 'Bachelor Year 1',
+        14 => 'Bachelor Year 2',
+        15 => 'Bachelor Year 3',
+        16 => 'Master Year 1',
+        17 => 'Master Year 2',
+        18 => 'PHD',
+        19 => 'Certificate',
+    ],
 
+
+    'all_class' => [
+        4 => 'Grade IV',
+        5 => 'Grade V',
+        6 => 'Grade VI',
+        7 => 'Grade VII',
+        8 => 'Grade VIII',
+        9 => 'Grade IX',
+        10 => 'Grade X',
+        11 => 'Grade XI',
+        12 => 'Grade XII',
+        13 => 'Bachelor Year 1',
+        14 => 'Bachelor Year 2',
+        15 => 'Bachelor Year 3',
+        16 => 'Master Year 1',
+        17 => 'Master Year 2',
+        18 => 'PHD',
+        19 => 'Certificate',
+    ],
 
     'allow_country' => [
         1 => 'CANADA',

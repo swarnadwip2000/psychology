@@ -58,10 +58,10 @@
                             <a class="nav-link" href="{{ route('front.live_class') }}">Live Class</a>
                           </li> --}}
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0);"> Tutorials </a>
+                            <a class="nav-link" href="{{route('tutorials')}}"> Tutorials </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0);">Notes</a>
+                            <a class="nav-link" href="{{route('notes')}}">Notes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:void(0);">Reviews</a>

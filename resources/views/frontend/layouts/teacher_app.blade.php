@@ -55,6 +55,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('teacher.tutorials.index') }}">Tutorials</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('teacher.notes.index') }}">Notes</a>
+                        </li>
                         {{-- <li class="nav-item">
                             <a class="nav-link" href="#">Live Class</a>
                           </li> --}}

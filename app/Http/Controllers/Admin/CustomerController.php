@@ -82,6 +82,7 @@ class CustomerController extends Controller
         $data->student_class = $request->student_class;
         $data->institute_name = $request->institute_name;
         $data->status = $request->status ?? 0; // Default to 0 if not provided
+        $data->email_verified_at = date('Y-m-d H:i:s');
         $data->save();
 
         $data->assignRole('STUDENT'); // Assuming you have roles set up
