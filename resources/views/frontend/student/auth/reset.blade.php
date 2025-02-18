@@ -9,6 +9,7 @@
                         <form action="{{ route('front.change.password') }}" method="POST" onsubmit="return valid()">
                             @csrf
                             <input type="hidden" name="timezone" id="timezone">
+                            <input type="hidden" name="id" value="{{ $id }}">
                             <div class="row">
                                 <div class="form-group col-md-12">
                                     <span class="text-success">{{ Session::get('successmsg') }}</span>
@@ -59,7 +60,7 @@
                 return false;
             }
 
-            return true; 
+            return true;
         }
     </script>
     <script>

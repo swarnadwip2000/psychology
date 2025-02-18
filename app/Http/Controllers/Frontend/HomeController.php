@@ -51,7 +51,8 @@ class HomeController extends Controller
         $model = User::where(['email' => $emailId])->whereIn('register_as', [1, 2])->first();
 
         if ($model) {
-            if ($model->email_verified_at != null) {
+            // if ($model->email_verified_at != null)
+            if (!isset($model->email_verified_at) || empty($model->email_verified_at)){
                 if (Auth::guard('web')->attempt(['email' => $emailId, 'password' => $password])) {
                     if (auth()->user()->hasRole('STUDENT')) {
                         if (auth()->user()->status == 1) {
@@ -246,7 +247,7 @@ class HomeController extends Controller
         $model = User::where(['email' => $emailId])->whereIn('register_as', [3])->first();
 
         if ($model) {
-            if ($model->email_verified_at != null) {
+            if (!isset($model->email_verified_at) || empty($model->email_verified_at)) {
 
                 if (Auth::attempt(['email' => $emailId, 'password' => $password])) {
                     if (auth()->user()->hasRole('FACULTY')) {
@@ -402,25 +403,29 @@ class HomeController extends Controller
 
         try {
             if (!empty($request->id)) {
-                // Ensure the ID is properly decrypted
                 $id = Crypt::decrypt($request->id);
+                $user = User::findOrFail($id);
+                $resetPassword = PasswordReset::where('email', $user->email)->first();
 
-                // Check if user exists before updating
-                $user = User::find($id);
-                if (!$user) {
-                    return redirect()->route('front.student_login')->with('error', 'User not found.');
+                if (!$resetPassword) {
+                    return redirect()->route('front.student_login')->with('message', 'Invalid password reset request.');
                 }
 
-                // Update password using bcrypt
-                $user->password = bcrypt($request->password);
-                $user->save();
+
+                $expiryTime = $resetPassword->created_at->addHour();
+                if (Carbon::now()->greaterThan($expiryTime)) {
+                    return redirect()->route('front.student_login')->with('message', 'Password reset link has expired.');
+                }
+
+
+                User::where('id', $id)->update(['password' => bcrypt($request->password)]);
 
                 return redirect()->route('front.student_login')->with('message', 'Password has been changed successfully.');
             } else {
                 abort(404);
             }
         } catch (\Throwable $th) {
-            return redirect()->route('front.student_login')->with('error', 'Something went wrong. Please try again.');
+            return redirect()->route('front.student_login')->with('error', 'Something went wrong.');
         }
     }
 
@@ -439,33 +444,34 @@ class HomeController extends Controller
 
     public function faculty_forgetPassword(Request $request)
     {
+
         $request->validate([
             'email' => 'required|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix|exists:users,email',
         ]);
-
+        // return $validator->errors();
         $count = User::where('email', $request->email)->role('FACULTY')->count();
-
         if ($count > 0) {
             $user = User::where('email', $request->email)->select('id', 'name', 'email')->first();
             PasswordReset::where('email', $request->email)->delete();
-            $id = Crypt::encrypt($user->id);
-            $token = Str::random(20) . 'pass' . $user->id;
-            PasswordReset::create([
+             $id = Crypt::encrypt($user->id);
+             $token = Str::random(20) . 'pass' . $user->id;
+             PasswordReset::create([
                 'email' => $request->email,
                 'token' => $token,
                 'created_at' => Carbon::now()
-            ]);
+             ]);
 
-            $details = [
+             $details = [
                 'id' => $id,
                 'token' => $token
-            ];
+             ];
 
             Mail::to($request->email)->send(new SendCodeFacultyResetPassword($details));
             return redirect()->back()->with('message', "Please! check your mail to reset your password.");
         } else {
-            return redirect()->back()->with('error', "Couldn't find your account!");
+             return redirect()->back()->with('error', "Couldn't find your account!");
         }
+
     }
 
     public function faculty_resetPassword($id, $token)
@@ -502,17 +508,15 @@ class HomeController extends Controller
         try {
             if ($request->id != '') {
                 $id = Crypt::decrypt($request->id);
-
                 User::where('id', $id)->update(['password' => bcrypt($request->password)]);
                 $now_time = Carbon::now()->toDateTimeString();
-                Session::flash('message', 'Password has been changed successfully.');
-                return redirect()->route('front.faculty_login');
+                return redirect()->route('front.faculty_login')->with('message', 'Password has been changed successfully.');
             } else {
                 abort(404);
             }
-        } catch (\Throwable $th) {
-            Session::flash('error', 'Something went wrong.');
-            return redirect()->route('front.faculty_login');
+        }
+        catch (\Throwable $th) {
+            return redirect()->route('front.faculty_login')->with('error', 'Something went wrong.');
         }
     }
 }

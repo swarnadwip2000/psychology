@@ -103,7 +103,7 @@ class ForgetPasswordController extends Controller
             }
         }
         catch (\Throwable $th) {
-            return redirect()->route('admin.login')->with('message', 'Something went wrong.');
+            return redirect()->route('admin.login')->with('error', 'Something went wrong.');
         }
 
     }
