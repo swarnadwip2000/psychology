@@ -43,9 +43,15 @@
                     <li class="{{ Request::is('admin/faculty') ? 'active' : ' ' }}"><a class="nav-link" href="{{ route('faculty.index') }}"> User List</a></li>
                 </ul>
             </li>
-            <li class="menu-header">Payments</li>
-            <li class="dropdown">
-                <a href="javascript:void(0);">
+            <li class="menu-header">Manage Subscription</li>
+            <li class="dropdown {{ Request::is('admin/plans') ? 'active' : ' ' }}">
+                <a href="{{route('plans.index')}}">
+                    <i class="ph ph-closed-captioning"></i>
+                    <span>Subscription Plans</span>
+                </a>
+            </li>
+            <li class="dropdown {{ Request::is('admin/plans') ? 'active' : ' ' }}">
+                <a href="{{route('admin.payments')}}">
                     <i class="ph ph-currency-circle-dollar"></i>
                     <span>Manage Payments</span>
                 </a>

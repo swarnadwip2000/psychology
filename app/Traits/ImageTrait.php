@@ -10,14 +10,23 @@ trait ImageTrait
      * @param Request $request
      * @return $this|false|string
      */
-    public function imageUpload($file, $path)
+    protected function imageUpload($file, $folder)
     {
+        // Define the destination path (e.g., public/uploads/profile)
+        $destinationPath = public_path('uploads/' . $folder);
 
-        if ($file) {
-            $filename = date('YmdHi') . $file->getClientOriginalName();
-            $image_path = $file->store($path, 'public');
-
-            return $image_path;
+        // Create the directory if it doesn't exist
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0777, true);
         }
+
+        // Generate a unique file name
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        // Move the file to the destination path
+        $file->move($destinationPath, $filename);
+
+        // Return the relative path that you can store in the database
+        return 'uploads/' . $folder . '/' . $filename;
     }
 }

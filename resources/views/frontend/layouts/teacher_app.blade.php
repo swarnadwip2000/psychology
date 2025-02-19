@@ -19,7 +19,8 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('client_assets/css/asgar.css') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
@@ -51,26 +52,34 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('auth_teacher_session') }}">My Session</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('teacher.tutorials.index') }}">Tutorials</a>
+                        </li>
                         {{-- <li class="nav-item">
                             <a class="nav-link" href="#">Live Class</a>
                           </li> --}}
                           <li class="nav-item dropdown mr-2">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="text-decoration: none;">
+                                @if (Auth::user()->profile_picture)
+                                <img src="{{ asset(Auth::user()->profile_picture) }}" alt="Profile"
+                                    style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd;">
+                                @else
                                 <img src="{{ asset('client_assets/img/images.png') }}" alt="Profile"
                                     style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd;">
+                                @endif
                                 <span class="ml-2 font-weight-bold">{{auth()->user()->name}}</span> <!-- Replace 'John Doe' dynamically -->
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow" aria-labelledby="profileDropdown">
-                                <a class="dropdown-item d-flex align-items-center ml-3" href="javascript:void(0);">
+                                <a class="dropdown-item d-flex align-items-center ml-3" href="{{route('teacher.profile')}}">
                                     <i class="fa fa-user-circle mr-2 text-primary"></i> Profile
                                 </a>
-                                <form method="POST" action="{{ route('teacher.logout') }}" class="m-0">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item d-flex align-items-center">
+                                <a href="{{ route('teacher.logout') }}" class="m-0">
+
+                                    <button type="button" class="dropdown-item d-flex align-items-center">
                                         <i class="fa fa-sign-out-alt mr-2 text-danger"></i> Logout
                                     </button>
-                                </form>
+                                </a>
                             </div>
                         </li>
 
@@ -127,7 +136,7 @@
                                 </li>|
                             @endif
                             <li>
-                                <a href="{{ route('subscriptions') }}">Subscriptions</a>
+                                <a href="{{ route('subscription') }}">Subscriptions</a>
                             </li>|
                             <li>
                                 <a href="{{ route('terms.conditions') }}">Terms & Conditions</a>
@@ -179,8 +188,42 @@
     <script src="{{ asset('client_assets/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('client_assets/js/bootstrap-slider.min.js') }}"></script>
     <script src="{{ asset('client_assets/js/owl.carousel.min.js') }}"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    @yield('script')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    @stack('script')
+ <script>
+        @if (Session::has('message'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.success("{{ session('message') }}");
+        @endif
+
+        @if (Session::has('error'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.error("{{ session('error') }}");
+        @endif
+
+        @if (Session::has('info'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.info("{{ session('info') }}");
+        @endif
+
+        @if (Session::has('warning'))
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.warning("{{ session('warning') }}");
+        @endif
+    </script>
+
 </body>
 
 </html>
