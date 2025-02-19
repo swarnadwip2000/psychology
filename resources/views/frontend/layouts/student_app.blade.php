@@ -28,7 +28,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-
+    @stack('style')
 </head>
 
 <body>
@@ -87,6 +87,11 @@
                                 <a class="dropdown-item d-flex align-items-center ml-3" href="{{route('student.profile')}}">
                                     <i class="fa fa-user-circle mr-2 text-primary"></i> Profile
                                 </a>
+
+                                <a href="{{ route('front.subscription_history')}}" class="dropdown-item d-flex align-items-center ml-3" href="javascript:void(0);">
+                                    <i class="fa fa-list-alt mr-2 text-primary"></i> Subscription History
+                                </a>
+
                                 <a href="{{ route('student.logout') }}" class="m-0">
                                     <button type="button" class="dropdown-item d-flex align-items-center">
                                         <i class="fa fa-sign-out-alt mr-2 text-danger"></i> Logout

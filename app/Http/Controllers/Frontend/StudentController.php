@@ -18,9 +18,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
+
 class StudentController extends Controller
 {
     use ImageTrait;
+    public function subscription_history()
+    {
+        $user = auth()->user();
+
+        $data['page_title'] = "Dashboard";
+        $data['page_description'] = "Dashboard";
+        $data['page_keyword'] = "Dashboard";
+
+        // Get the last active subscription (if any)
+        $data['last_active_subscription'] = UserSubscription::where('user_id', $user->id)
+            ->where('membership_expiry_date', '>=', now()) // Only active subscriptions
+            ->latest('id')
+            ->first();
+
+        // Get subscription history (excluding the last active one)
+        $data['subscription_history'] = UserSubscription::where('user_id', $user->id)
+            ->where('id', '!=', optional($data['last_active_subscription'])->id) // Exclude last active subscription
+            ->orderBy('id', 'desc')
+            ->paginate(10);
+
+        return view('frontend.student.subscription_history')->with($data);
+    }
+
     public function dashboard(Request $request)
     {
         $data['page_title'] = "Dashboard";
@@ -253,17 +277,17 @@ class StudentController extends Controller
                 return $teacher;
             });
 
-            $last_user_subscription = UserSubscription::where('user_id', auth()->id())->orderBy('id', 'desc')->first();
+        $last_user_subscription = UserSubscription::where('user_id', auth()->id())->orderBy('id', 'desc')->first();
 
-            if ($last_user_subscription) {
-                if ($last_user_subscription->membership_expiry_date >=  now()->toDateString()) {
-                    $bio_show = true;
-                } else{
-                    $bio_show = false;
-                }
-            } else{
+        if ($last_user_subscription) {
+            if ($last_user_subscription->membership_expiry_date >=  now()->toDateString()) {
+                $bio_show = true;
+            } else {
                 $bio_show = false;
             }
+        } else {
+            $bio_show = false;
+        }
 
         // dd($data['teacher']->toArray());
         return view('frontend.student.book_now')->with(compact('page_title', 'bio_show', 'teacher'));
@@ -522,7 +546,7 @@ class StudentController extends Controller
         // Combine the date and time to create a full start datetime
 
         $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time, $booking->teacher->time_zone)
-        ->setTimezone($my_timezone); // Format as 24-hour time
+            ->setTimezone($my_timezone); // Format as 24-hour time
 
         // $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time);
         // dd($scheduledStart, Carbon::now($my_timezone));
