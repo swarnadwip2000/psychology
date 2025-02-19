@@ -18,8 +18,10 @@ use App\Http\Controllers\Admin\StateController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\FacultyNotesController;
 use App\Http\Controllers\FacultyTutorialController;
 use App\Http\Controllers\Frontend\SubscriptionController;
+use App\Http\Controllers\StudentCmsController;
 use App\Models\Plan;
 
 /*
@@ -171,6 +173,9 @@ Route::middleware('student.auth')->group(function () {
     Route::get('/subscription/{id}', [SubscriptionController::class, 'payment'])->name('student.subscription.payment');
     Route::get('/paypal-checkout-success', [SubscriptionController::class, 'paypalSuccess'])->name('paypal.success');
     Route::get('/paypal-checkout-cancel', [SubscriptionController::class, 'paypalCancel'])->name('paypal.cancel');
+
+    Route::get('/tutorials', [StudentCmsController::class, 'tutorials'])->name('tutorials');
+    Route::get('/notes', [StudentCmsController::class, 'notes'])->name('notes');
 });
 
 
@@ -223,6 +228,29 @@ Route::controller(FacultyTutorialController::class)
 
         // Delete a tutorial
         Route::delete('/tutorials/{id}', 'destroy')->name('teacher.tutorials.destroy');
+
+    });
+
+    Route::controller(FacultyNotesController::class)
+    ->middleware('teacher.auth')
+    ->prefix('teacher')
+    ->group(function () {
+
+        // List all notes
+        Route::get('/notes', 'index')->name('teacher.notes.index');
+
+
+        // Store a new notes
+        Route::post('/notes', 'store')->name('teacher.notes.store');
+
+        // Show edit form for a specific tutorial
+        Route::get('/notes/{id}/edit', 'edit')->name('teacher.notes.edit');
+
+        // Update an existing tutorial
+        Route::put('/notes/{id}', 'update')->name('teacher.notes.update');
+
+        // Delete a tutorial
+        Route::delete('/notes/{id}', 'destroy')->name('teacher.notes.destroy');
 
     });
 

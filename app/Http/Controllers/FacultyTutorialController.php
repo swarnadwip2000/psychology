@@ -10,7 +10,7 @@ class FacultyTutorialController extends Controller
     public function index()
     {
         $page_title = 'Tutorials';
-        $tutorials = Tutorial::latest()->paginate();
+        $tutorials = Tutorial::where('teacher_id', auth()->id())->latest()->paginate(10);
         return view('frontend.teacher.tutorials.index', compact('tutorials','page_title'));
     }
 
@@ -19,14 +19,15 @@ class FacultyTutorialController extends Controller
     {
         // Validate the incoming request
         $validated = $request->validate([
-            'degree' => 'required|string|max:255',
+            'class' => 'required|string|max:255',
             'url' => 'required|url',
             'short_description' => 'required|string|max:500',
         ]);
 
         // Create the new tutorial
         $tutorial = Tutorial::create([
-            'degree' => $request->degree,
+            'teacher_id' => auth()->id(),
+            'class' => $request->class,
             'url' => $request->url,
             'short_description' => $request->short_description,
         ]);
@@ -47,13 +48,13 @@ class FacultyTutorialController extends Controller
     public function update(Request $request, Tutorial $tutorial)
     {
         $request->validate([
-            'grade' => 'required|string|max:255',
+            'class' => 'required|string|max:255',
             'url' => 'required|url',
             'short_description' => 'nullable|string|max:500',
         ]);
 
         $tutorial->update([
-            'grade' => $request->grade,
+            'class' => $request->class,
             'url' => $request->url,
             'short_description' => $request->short_description,
         ]);

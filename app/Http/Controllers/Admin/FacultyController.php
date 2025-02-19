@@ -78,6 +78,8 @@ class FacultyController extends Controller
         $data->country_id = $request->country_id;
         $data->degree = $request->degree;
         $data->status = $request->status ?? 0; // Default to 0 if not provided
+
+        $data->email_verified_at = date('Y-m-d H:i:s');
         // dd($data);
         $data->save();
 

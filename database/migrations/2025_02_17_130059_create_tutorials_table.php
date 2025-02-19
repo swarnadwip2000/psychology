@@ -15,7 +15,8 @@ class CreateTutorialsTable extends Migration
     {
         Schema::create('tutorials', function (Blueprint $table) {
             $table->id();
-            $table->string('degree')->nullable();
+            $table->unsignedBigInteger('teacher_id')->nullable();
+            $table->string('class')->nullable();
             $table->text('url')->nullable();
             $table->text('short_description')->nullable();
             $table->timestamps();

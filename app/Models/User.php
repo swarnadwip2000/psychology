@@ -68,4 +68,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Slot::class, 'teacher_id', 'id');
     }
+
+    public function userLastSubscription()
+    {
+        return $this->hasOne(UserSubscription::class, 'user_id', 'id')->latestOfMany();
+
+    }
 }

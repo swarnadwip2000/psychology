@@ -12,9 +12,7 @@
         <div class="inner_page">
             <div class="card search_bar sales-report-card">
                 <div class="sales-report-card-wrap">
-                    <div class="form-head">
-                        <h4>Login Information</h4>
-                    </div>
+                    
                     <form action="{{ route('plans.update', $plan->id) }}" method="POST" enctype="multipart/form-data">
                         @method('PUT')
                         @csrf

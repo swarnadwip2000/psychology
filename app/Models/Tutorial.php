@@ -10,7 +10,8 @@ class Tutorial extends Model
     use HasFactory;
 
     protected $fillable = [
-        'degree',
+        'teacher_id',
+        'class',
         'url',
         'short_description'
     ];
