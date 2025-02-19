@@ -14,10 +14,19 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Models\UserSubscription;
+
 
 class StudentController extends Controller
 {
-
+    public function subscription_history(){
+        $data['page_title'] = "Dashboard";
+        $data['page_description'] = "Dashboard";
+        $data['page_keyword'] = "Dashboard";
+        $data['subscription_history']=UserSubscription::orderBy('id','desc')->paginate(10);
+        // dd($data['subscription_history']);
+        return view('frontend.student.subscription_history')->with($data);
+    }
     public function dashboard(Request $request)
     {
         $data['page_title'] = "Dashboard";

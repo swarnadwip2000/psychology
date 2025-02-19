@@ -80,6 +80,11 @@
                                 <a class="dropdown-item d-flex align-items-center ml-3" href="javascript:void(0);">
                                     <i class="fa fa-user-circle mr-2 text-primary"></i> Profile
                                 </a>
+
+                                <a href="{{ route('front.subscription_history')}}" class="dropdown-item d-flex align-items-center ml-3" href="javascript:void(0);">
+                                    <i class="fa fa-list-alt mr-2 text-primary"></i> Subscription History
+                                </a>
+
                                 <a href="{{ route('student.logout') }}" class="m-0">
                                     <button type="button" class="dropdown-item d-flex align-items-center">
                                         <i class="fa fa-sign-out-alt mr-2 text-danger"></i> Logout

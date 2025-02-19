@@ -182,6 +182,8 @@ Route::middleware('student.auth')->group(function () {
 Route::controller(StudentController::class)->middleware('student.auth')->group(function () {
     Route::prefix('student')->group(function () {
         Route::get('dashboard', 'dashboard')->name('front.student_dashboard');
+        //subscription history
+        Route::get('subscription-history', 'subscription_history')->name('front.subscription_history');
         Route::get('book-now', 'bookTeacher')->name('student.book_now');
         Route::get('get-slot', 'getAvailableSlot')->name('student.available_slot');
         Route::get('live-class', 'liveClass')->name('front.live_class');
