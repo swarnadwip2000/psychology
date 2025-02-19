@@ -35,7 +35,10 @@
                                 @endif
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $val->name }}</h5>
+                                    @if ($bio_show == true)
                                     <p class="card-text">{!! nl2br($val->bio)!!}</p>
+                                    @endif
+
                                     <button type="button" class="btn btn-primary" data-toggle="modal"
                                         data-target="{{ '#exampleModal_' . $index }}">
                                         Book Now

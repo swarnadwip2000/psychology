@@ -99,7 +99,7 @@ class MeetingController extends Controller
             'topic' => $topic,
             'agenda' => $agenda,
             'start_time' => $startTimeFormatted,  // Use the formatted datetime string
-            'duration' => 30,  // Set a default duration
+            'duration' => 60,  // Set a default duration
             'password' => $password,
             'settings' => [
                 'show_share_button' => false,

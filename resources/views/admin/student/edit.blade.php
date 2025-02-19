@@ -166,7 +166,7 @@
                                 <label for="floatingInputValue">Age*</label>
                                 <select name="student_age" id="student_age" class="form-control">
                                     <option value="">Select Age</option>
-                                    @for ($i = 20; $i < 45; $i++)
+                                    @for ($i = 10; $i < 45; $i++)
                                         <option value="{{ $i }}" {{ old('student_age', $student->student_age) == $i ? 'selected' : '' }}>
                                             {{ $i }}
                                         </option>

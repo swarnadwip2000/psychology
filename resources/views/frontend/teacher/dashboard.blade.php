@@ -148,7 +148,7 @@
     </section>
 @endsection
 
-@section('script')
+@push('script')
     <script>
         function getbookingTime(bookingId) {
             $('#loading').addClass('loading');
@@ -206,4 +206,4 @@
             });
         }
     </script>
-@endsection
+@endpush

@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Mail\BookingNotification;
 use App\Models\BookingSlot;
 use App\Models\City;
+use App\Models\Country;
 use App\Models\MeetingHistory;
 use App\Models\Slot;
 use App\Models\User;
+use App\Models\UserSubscription;
+use App\Traits\ImageTrait;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
@@ -17,7 +20,7 @@ use Illuminate\Support\Facades\Mail;
 
 class StudentController extends Controller
 {
-
+    use ImageTrait;
     public function dashboard(Request $request)
     {
         $data['page_title'] = "Dashboard";
@@ -98,49 +101,66 @@ class StudentController extends Controller
 
     public function facultyBooking(Request $request)
     {
-        // Find the slot
-        $slot = Slot::findOrFail($request->booking_time);
-
-        // Create the booking
-        $booking = BookingSlot::create([
-            'slot_id' => $slot->id,
-            'teacher_id' => $request->teacher_id,
-            'student_id' => Auth::guard('web')->id(),
-            'date' => $slot->slot_date,
-            'time' => $slot->slot_time,
-            'meeting_status' => 0,
-        ]);
-
+        $token = auth()->user()->session_token;
         // Get teacher and student information
         $teacher = User::findOrFail($request->teacher_id);
-        $student = Auth::guard('web')->user();
+        $student = User::findOrFail(auth()->id());
 
-        // Email data
-        $emailDataTeacher = [
-            'date' => $slot->slot_date,
-            'time' => $slot->slot_time,
-            'teacher_name' => $teacher->name,
-            'student_name' => $student->name,
-        ];
-        $my_time_zone = auth()->user()->time_zone;
-       $date_time = Carbon::parse($slot->date . ' ' . $slot->time, $slot->teacher->time_zone)
-        ->setTimezone($my_time_zone)
-        ->format('Y-m-d H:i');
+        $last_user_subscription = UserSubscription::where('user_id', auth()->id())->orderBy('id', 'desc')->first();
 
-        $emailDataStudent = [
-            'date' => date('Y-m-d', strtotime($date_time)),
-            'time' => date('H:i', strtotime($date_time)),
-            'teacher_name' => $teacher->name,
-            'student_name' => $student->name,
-        ];
+        if ($last_user_subscription) {
+            if ($last_user_subscription->membership_expiry_date >=  now()->toDateString()) {
+                if ($token <= 0) {
+                    return redirect()->back()->with('error', 'No session token available in your bucket! Please upgrade your plan');
+                }
+                // Find the slot
+                $slot = Slot::findOrFail($request->booking_time);
 
-        // Send email to the teacher
-        Mail::to($teacher->email)->send(new BookingNotification($emailDataTeacher, 'teacher'));
+                // Create the booking
+                $booking = BookingSlot::create([
+                    'slot_id' => $slot->id,
+                    'teacher_id' => $request->teacher_id,
+                    'student_id' => Auth::guard('web')->id(),
+                    'date' => $slot->slot_date,
+                    'time' => $slot->slot_time,
+                    'meeting_status' => 0,
+                ]);
 
-        // Send email to the student
-        Mail::to($student->email)->send(new BookingNotification($emailDataStudent, 'student'));
 
-        return redirect()->route('front.student_dashboard')->with('successmsg', 'Booking created successfully!');
+                // Email data
+                $emailDataTeacher = [
+                    'date' => $slot->slot_date,
+                    'time' => $slot->slot_time,
+                    'teacher_name' => $teacher->name,
+                    'student_name' => $student->name,
+                ];
+                $my_time_zone = auth()->user()->time_zone;
+                $date_time = Carbon::parse($slot->date . ' ' . $slot->time, $slot->teacher->time_zone)
+                    ->setTimezone($my_time_zone)
+                    ->format('Y-m-d H:i');
+
+                $emailDataStudent = [
+                    'date' => date('Y-m-d', strtotime($date_time)),
+                    'time' => date('H:i', strtotime($date_time)),
+                    'teacher_name' => $teacher->name,
+                    'student_name' => $student->name,
+                ];
+
+                $student->session_token  = $student->session_token - 1;
+                $student->save();
+                // Send email to the teacher
+                Mail::to($teacher->email)->send(new BookingNotification($emailDataTeacher, 'teacher'));
+
+                // Send email to the student
+                Mail::to($student->email)->send(new BookingNotification($emailDataStudent, 'student'));
+
+                return redirect()->route('front.student_dashboard')->with('message', 'Booking created successfully!');
+            } else {
+                return redirect()->route('subscription')->with('error', 'Please upgrade your Subscription');
+            }
+        } else {
+            return redirect()->route('subscription')->with('error', 'Please upgrade your Subscription');
+        }
     }
 
 
@@ -186,7 +206,7 @@ class StudentController extends Controller
     //         ]);
 
     //         // Provide a fallback message to the user
-    //         return redirect()->route('front.student_dashboard')->with('errmsg', 'Booking created, but meeting link is unavailable. Please contact support.');
+    //         return redirect()->route('front.student_dashboard')->with('error', 'Booking created, but meeting link is unavailable. Please contact support.');
     //     }
 
     //     // Update booking with meeting details
@@ -206,13 +226,13 @@ class StudentController extends Controller
     {
         $date = $request->date ?? null;
         $facultyName = $request->faculty_name; // Get the faculty name from the form
-        $data['page_title'] = "Book Faculty";
+        $page_title = "Book Faculty";
         $data['page_description'] = "Dashboard";
         $data['page_keyword'] = "Dashboard";
 
         $my_time_zone = auth()->user()->time_zone; // User's timezone
 
-        $data['teacher'] = User::role('FACULTY')->where('status', 1)
+        $teacher = User::role('FACULTY')->where('status', 1)
             ->when($facultyName, function ($query) use ($facultyName) {
                 return $query->where('name', 'like', '%' . $facultyName . '%');
             })
@@ -233,8 +253,20 @@ class StudentController extends Controller
                 return $teacher;
             });
 
+            $last_user_subscription = UserSubscription::where('user_id', auth()->id())->orderBy('id', 'desc')->first();
+
+            if ($last_user_subscription) {
+                if ($last_user_subscription->membership_expiry_date >=  now()->toDateString()) {
+                    $bio_show = true;
+                } else{
+                    $bio_show = false;
+                }
+            } else{
+                $bio_show = false;
+            }
+
         // dd($data['teacher']->toArray());
-        return view('frontend.student.book_now')->with($data);
+        return view('frontend.student.book_now')->with(compact('page_title', 'bio_show', 'teacher'));
     }
 
 
@@ -486,12 +518,16 @@ class StudentController extends Controller
     public function checkMeeting(Request $request)
     {
         $booking = BookingSlot::findOrFail($request->booking_id);
-
+        $my_timezone = auth()->user()->time_zone;
         // Combine the date and time to create a full start datetime
-        $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time);
 
+        $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time, $booking->teacher->time_zone)
+        ->setTimezone($my_timezone); // Format as 24-hour time
+
+        // $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time);
+        // dd($scheduledStart, Carbon::now($my_timezone));
         // Check if the current time is before the scheduled start time
-        if (Carbon::now()->lt($scheduledStart)) {
+        if (Carbon::now($my_timezone)->lt($scheduledStart)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Cannot start the session before the scheduled time and date.'
@@ -512,5 +548,43 @@ class StudentController extends Controller
             'status' => false,
             'message' => 'Faculty not available to start call. Please try again later.'
         ]);
+    }
+
+    public function profile()
+    {
+        $page_title  = "Profile";
+        $countries   = Country::get();
+        $student = User::find(auth()->id());
+        return view('frontend.student.profile')->with(compact('countries', 'page_title', 'student'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif', // If profile picture is uploaded
+            'address' => 'nullable|string|max:255',
+            'city_id' => 'required|string|max:255',
+            'country_id' => 'required|string|max:255',
+            'student_age' => 'required|integer|min:1|max:120',
+            'student_class' => 'required|string|max:255',
+            'institute_name' => 'required|string|max:255',
+        ]);
+
+        $data = User::find(auth()->user()->id);
+        $data->name = $request->name;
+        $data->phone = $request->phone;
+        $data->address = $request->address;
+        $data->city_id = $request->city_id;
+        $data->country_id = $request->country_id;
+        $data->student_age = $request->student_age;
+        $data->student_class = $request->student_class;
+        $data->institute_name = $request->institute_name;
+        if ($request->profile_picture) {
+            $data->profile_picture = $this->imageUpload($request->file('profile_picture'), 'profile');
+        }
+        $data->save();
+        return redirect()->back()->with('message', 'Student updated successfully.');
     }
 }

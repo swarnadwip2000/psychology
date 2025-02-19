@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SubscriptionConfirmation;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class SubscriptionController extends Controller
@@ -23,6 +25,15 @@ class SubscriptionController extends Controller
 
         $plan_id = $id;
         $subscription = Plan::find($plan_id);
+
+        $last_user_subscription = UserSubscription::where('user_id', auth()->id())->orderBy('id', 'desc')->first();
+        if ($last_user_subscription) {
+            if ($last_user_subscription->membership_expiry_date >=  now()->toDateString() && $last_user_subscription->plan_id == $plan_id  && auth()->user()->session_token > 0) {
+           return redirect()
+           ->back()
+           ->with('error', 'You have already purchased this subscription, and it is still active.');
+        }
+    }
 
         // Initialize PayPal client
         $provider = new PayPalClient;
@@ -82,7 +93,6 @@ class SubscriptionController extends Controller
 
             $user = auth()->user();
 
-            // Ensuring values are not null, providing default values where necessary
             $user_subscription = new UserSubscription();
             $user_subscription->user_id = $user->id ?? null;
             $user_subscription->plan_id = $subscription->id ?? null;
@@ -97,9 +107,8 @@ class SubscriptionController extends Controller
             $user_subscription->free_notes = $subscription->free_notes ?? 0;
             $user_subscription->free_course = $subscription->free_course ?? 0;
             $user_subscription->membership_start_date = now();
-            $user_subscription->membership_expiry_date = now()->addDays($subscription->plan_duration ?? 30); // Default to 30 days if null
+            $user_subscription->membership_expiry_date = now()->addDays($subscription->plan_duration ?? 30);
 
-            // Checking for payment details in response
             $paymentDetails = $response['purchase_units'][0]['payments']['captures'][0] ?? [];
 
             $user_subscription->amount = $paymentDetails['amount']['value'] ?? $subscription->plan_price ?? '0.00';
@@ -109,22 +118,24 @@ class SubscriptionController extends Controller
             $user_subscription->payment_status = $response['status'] ?? 'FAILED';
             $user_subscription->payment_response = json_encode($response);
 
-            // Ensure no critical fields are missing before saving
             if (!$user_subscription->user_id || !$user_subscription->plan_id || !$user_subscription->payment_id) {
                 return redirect()->route('subscription')->with('error', 'Subscription data is incomplete.');
             }
 
             $user_subscription->save();
 
-            $user = User::find($user_subscription->user_id);
             $user->session_token =  $subscription->session;
             $user->save();
+
+            // Send subscription confirmation email
+            Mail::to($user->email)->send(new SubscriptionConfirmation($user_subscription));
 
             return redirect()->route('subscription')->with('message', 'Thank you for your subscription. Please check your email for details.');
         } else {
             return redirect()->route('subscription')->with('error', 'Subscription payment failed.');
         }
     }
+
 
 
     public function paypalCancel()

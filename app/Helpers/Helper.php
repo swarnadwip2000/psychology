@@ -15,4 +15,6 @@ class Helper
         $days = floor($datediff / (60 * 60 * 24));
         return $days;
     }
+
+    public function checkLastSubscription
 }

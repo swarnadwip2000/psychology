@@ -115,14 +115,14 @@ class TeacherController extends Controller
             $slot = Slot::create($data);
         }
 
-        return redirect()->route('auth_teacher_session')->with('successmsg', 'Session create successfully');
+        return redirect()->route('auth_teacher_session')->with('message', 'Session create successfully');
     }
 
     public function deletesession(Request $request)
     {
         $slotId = $request->id;
         Slot::where('id', $slotId)->delete();
-        return redirect()->route('auth_teacher_session')->with('errmsg', 'Session create successfully');
+        return redirect()->route('auth_teacher_session')->with('error', 'Session create successfully');
     }
 
     public function createMeeting(Request $request)
@@ -138,9 +138,9 @@ class TeacherController extends Controller
             ]);
         }
 
-        // Combine the date and time to create a full start datetime
-        $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time);
-        // dd(now());
+        $scheduledStart = Carbon::parse($booking->date . ' ' . $booking->time, $my_timezone); // Format as 24-hour time
+
+        // dd($scheduledStart, Carbon::now($my_timezone));
         // Check if the current time is before the scheduled start time
         if (Carbon::now($my_timezone)->lt($scheduledStart)) {
             return response()->json([

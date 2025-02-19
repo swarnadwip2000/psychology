@@ -1,9 +1,9 @@
-@extends('frontend.layouts.teacher_app')
+@extends('frontend.layouts.student_app')
 @section('content')
     <section class="dshboard" style="height: 100%">
         <div class="dshboard-contain">
             <div class="container">
-                <form action="{{ route('teacher.update_profile') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('student.update_profile') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="row mb-4">
                         <div class="col-lg-12 col-md-12">
@@ -21,7 +21,7 @@
                                     <div class="profile_eidd">
                                         <input type="file" id="edit_profile" onchange="readURL(this);"
                                             name="profile_picture" />
-                                        <label for="edit_profile"><i class="fas fa-pencil"></i></label>
+                                        <label for="edit_profile"><i class="fa fa-pencil"></i></label>
                                     </div>
                                     @if ($errors->has('profile_picture'))
                                         <div class="error" style="color:red;">{{ $errors->first('profile_picture') }}</div>
@@ -33,7 +33,7 @@
                                     <p>{{ Auth::user()->email }}</p>
                                     <span>
 
-                                       
+
                                     </span>
                                 </div>
                             </div>
@@ -52,7 +52,19 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="col-xl-4 col-md-6">
+                            <div class="form-group-div">
+                                <div class="form-group">
+                                    <label for="floatingInputValue">School Name*</label>
+                                    <input type="text" class="form-control" id="floatingInputValue"
+                                        name="institute_name" value="{{ old('institute_name', $student->institute_name) }}"
+                                        placeholder="School Name*">
+                                    @if ($errors->has('institute_name'))
+                                        <div class="error" style="color:red;">{{ $errors->first('institute_name') }}</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
@@ -85,7 +97,8 @@
                                     <select id="country_id" name="country_id" class="form-control">
                                         <option value="">Select Country</option>
                                         @foreach ($countries as $key => $country)
-                                            <option value="{{ $country->id }}" {{ old('country_id', Auth::user()->country_id) == $country->id ? 'selected' : '' }}>
+                                            <option value="{{ $country->id }}"
+                                                {{ old('country_id', Auth::user()->country_id) == $country->id ? 'selected' : '' }}>
                                                 {{ $country->name }}
                                             </option>
                                         @endforeach
@@ -115,34 +128,42 @@
                             </div>
                         </div>
 
-
-
-                        <div class="col-xl-4 col-md-6">
+                        <div class="col-xl-6 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="degree">Degree</label>
-                                    <select name="degree" id="degree" class="form-control">
-                                        <option value="">Select Degree</option>
-                                        @foreach (config('class.fuclaty_degree') as $key => $val)
-                                            <option value="{{ $key }}" {{ old('degree', Auth::user()->degree) == $key ? 'selected' : '' }}>
-                                                {{ $val }}
+                                    <label for="floatingInputValue">Age*</label>
+                                    <select name="student_age" id="student_age" class="form-control">
+                                        <option value="">Select Age</option>
+                                        @for ($i = 10; $i < 45; $i++)
+                                            <option value="{{ $i }}"
+                                                {{ old('student_age', $student->student_age) == $i ? 'selected' : '' }}>
+                                                {{ $i }}
                                             </option>
-                                        @endforeach
+                                        @endfor
                                     </select>
-                                    @if ($errors->has('degree'))
-                                        <div class="error" style="color:red;">{{ $errors->first('degree') }}</div>
+                                    @if ($errors->has('student_age'))
+                                        <div class="error" style="color:red;">{{ $errors->first('student_age') }}</div>
                                     @endif
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-xl-12">
+                        <div class="col-xl-6 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="bio">Bio</label>
-                                    <textarea class="form-control" id="bio" name="bio" placeholder="Write something about yourself">{{ Auth::user()->bio }}</textarea>
-                                    @if ($errors->has('bio'))
-                                        <div class="error" style="color:red;">{{ $errors->first('bio') }}</div>
+                                    <label for="floatingInputValue">Student Class*</label>
+                                    <select name="student_class" id="student_class" class="form-control">
+                                        <option value="">Select Student Class</option>
+                                        @foreach (config('class.all_class') as $key => $val)
+                                            <option value="{{ $key }}"
+                                                {{ old('student_class', $student->student_class) == $key ? 'selected' : '' }}>
+                                                {{ $val }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @if ($errors->has('student_class'))
+                                        <div class="error" style="color:red;">{{ $errors->first('student_class') }}
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -161,64 +182,65 @@
     </section>
 @endsection
 @section('script')
+    <script>
+        $(document).ready(function() {
+            // This is to load cities for the selected country when editing
+            var selectedCountryId = '{{ Auth::user()->country_id ?? '' }}'; // Laravel variable passed to view
+            var selectedCityId = '{{ Auth::user()->city_id ?? '' }}'; // Laravel variable passed to view
 
-<script>
-    $(document).ready(function() {
-        // This is to load cities for the selected country when editing
-        var selectedCountryId = '{{ Auth::user()->country_id ?? '' }}'; // Laravel variable passed to view
-        var selectedCityId = '{{ Auth::user()->city_id ?? '' }}'; // Laravel variable passed to view
-
-        if (selectedCountryId) {
-            loadCities(selectedCountryId, selectedCityId); // Load cities based on the selected country
-        }
-
-        // When the country is selected
-        $('#country_id').change(function() {
-            var countryId = $(this).val();  // Get the selected country id
-            if (countryId) {
-                loadCities(countryId); // Load cities when a country is selected
-            } else {
-                $('#city_id').empty();
-                $('#city_id').append('<option value="">Select State</option>');
+            if (selectedCountryId) {
+                loadCities(selectedCountryId, selectedCityId); // Load cities based on the selected country
             }
-        });
 
-        // Function to load cities
-        function loadCities(countryId, selectedCityId = null) {
-            $.ajax({
-                url: "{{route('get.cities')}}", // Your AJAX route
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',  // CSRF token
-                    country_id: countryId
-                },
-                success: function(data) {
+            // When the country is selected
+            $('#country_id').change(function() {
+                var countryId = $(this).val(); // Get the selected country id
+                if (countryId) {
+                    loadCities(countryId); // Load cities when a country is selected
+                } else {
                     $('#city_id').empty();
                     $('#city_id').append('<option value="">Select State</option>');
-                    $.each(data, function(key, city) {
-                        var selected = (selectedCityId && selectedCityId == city.id) ? 'selected' : '';
-                        $('#city_id').append('<option value="' + city.id + '" ' + selected + '>' + city.name + '</option>');
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.log("Error: " + error);  // Handle errors
                 }
             });
-        }
-    });
-</script>
-<script>
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
 
-            reader.onload = function(e) {
-                $('#blah')
-                    .attr('src', e.target.result);
-            };
+            // Function to load cities
+            function loadCities(countryId, selectedCityId = null) {
+                $.ajax({
+                    url: "{{ route('get.cities') }}", // Your AJAX route
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}', // CSRF token
+                        country_id: countryId
+                    },
+                    success: function(data) {
+                        $('#city_id').empty();
+                        $('#city_id').append('<option value="">Select State</option>');
+                        $.each(data, function(key, city) {
+                            var selected = (selectedCityId && selectedCityId == city.id) ?
+                                'selected' : '';
+                            $('#city_id').append('<option value="' + city.id + '" ' + selected +
+                                '>' + city.name + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error: " + error); // Handle errors
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
 
-            reader.readAsDataURL(input.files[0]);
+                reader.onload = function(e) {
+                    $('#blah')
+                        .attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
         }
-    }
-</script>
+    </script>
 @endsection

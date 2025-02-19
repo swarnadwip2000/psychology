@@ -190,6 +190,9 @@ Route::controller(StudentController::class)->middleware('student.auth')->group(f
         Route::prefix('booking')->group(function () {
             Route::post('/', 'facultyBooking')->name('student.faculity_booking');
         });
+
+        Route::get('profile', 'profile')->name('student.profile');
+        Route::post('profile', 'updateProfile')->name('student.update_profile');
     });
 });
 
