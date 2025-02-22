@@ -15,4 +15,9 @@ class Note extends Model
         'file',
         'short_description'
     ];
+
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
 }

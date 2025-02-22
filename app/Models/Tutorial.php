@@ -15,4 +15,9 @@ class Tutorial extends Model
         'url',
         'short_description'
     ];
+
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
 }

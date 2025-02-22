@@ -50,7 +50,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('auth_teacher_session') }}">My Session</a>
+                            <a class="nav-link" href="{{ route('auth_teacher_session') }}">My Sessions</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('teacher.tutorials.index') }}">Tutorials</a>

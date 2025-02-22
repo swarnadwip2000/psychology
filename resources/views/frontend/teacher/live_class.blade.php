@@ -39,5 +39,5 @@
 </section>
 
 @endsection
-@section('script')
-@endsection
+@push('script')
+@endpush

@@ -33,7 +33,7 @@
                                     <p>{{ Auth::user()->email }}</p>
                                     <span>
 
-                                       
+
                                     </span>
                                 </div>
                             </div>
@@ -160,7 +160,7 @@
         </div>
     </section>
 @endsection
-@section('script')
+@push('script')
 
 <script>
     $(document).ready(function() {
@@ -221,4 +221,4 @@
         }
     }
 </script>
-@endsection
+@endpush

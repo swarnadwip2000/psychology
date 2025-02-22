@@ -38,7 +38,7 @@ class TeacherController extends Controller
             ->get()
             ->map(function ($items) use ($my_time_zone, $today_date) {
                 // Convert slot time from teacher's timezone to user's timezone
-                $slot_date_time_in_user_timezone = Carbon::parse($items->date . ' ' . $items->time)
+                $slot_date_time_in_user_timezone = Carbon::parse($items->date . ' ' . $items->time, $my_time_zone)
                     ->setTimezone($my_time_zone)->addMinutes(40)
                     ->format('Y-m-d H:i'); // Format as 24-hour time
 
@@ -63,7 +63,7 @@ class TeacherController extends Controller
 
             foreach ($bookings as $booking) {
                 // Convert slot time from teacher's timezone to user's timezone
-                $slot_date_time_in_user_timezone = Carbon::parse($booking->date . ' ' . $booking->time)
+                $slot_date_time_in_user_timezone = Carbon::parse($booking->date . ' ' . $booking->time, $my_time_zone)
                     ->setTimezone($my_time_zone)->addMinutes(40)
                     ->format('Y-m-d H:i'); // Format as 24-hour time
 
@@ -122,7 +122,7 @@ class TeacherController extends Controller
     {
         $slotId = $request->id;
         Slot::where('id', $slotId)->delete();
-        return redirect()->route('auth_teacher_session')->with('error', 'Session create successfully');
+        return redirect()->route('auth_teacher_session')->with('error', 'Session deleted successfully');
     }
 
     public function createMeeting(Request $request)

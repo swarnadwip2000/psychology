@@ -99,11 +99,11 @@
                         </div>
                         <div class="form-group">
                             <label for="url">URL</label>
-                            <input type="url" class="form-control" id="url" name="url">
+                            <input type="url" class="form-control" id="url" name="url" placeholder="https://">
                         </div>
                         <div class="form-group">
                             <label for="short_description">Short Description</label>
-                            <textarea class="form-control" id="short_description" name="short_description"></textarea>
+                            <textarea class="form-control" id="short_description" name="short_description" ></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
