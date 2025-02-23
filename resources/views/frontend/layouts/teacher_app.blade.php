@@ -26,6 +26,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css"
         href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+        <style>
+            html, body {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+        </style>
 </head>
 
 <body>
@@ -95,7 +102,7 @@
 
     @yield('content')
 
-    <div class="footer">
+    <div class="footer mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-8">

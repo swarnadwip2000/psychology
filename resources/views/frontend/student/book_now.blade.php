@@ -105,7 +105,7 @@
 @endpush
 
 @section('content')
-    <section class="dshboard">
+    <section class="">
         <div class="container">
             <!-- Search Form -->
             <div class="search-container mb-4">

@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 use App\Mail\SendCodeStudentResetPassword;
 use App\Mail\SendCodeFacultyResetPassword;
+use App\Mail\SubscriptionConfirmation;
+use App\Models\Plan;
+use App\Models\UserSubscription;
 use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
@@ -172,6 +175,47 @@ class HomeController extends Controller
                 'status' => 0,
                 'remember_token' => $remember_token,
             ]);
+
+            $user = User::where('email', $emailId)->first();
+            $subscription = Plan::where('plan_price', 0)->first();
+
+            if ($subscription) {
+                $user_subscription = new UserSubscription();
+                $user_subscription->user_id = $user->id ?? null;
+                $user_subscription->plan_id = $subscription->id ?? null;
+                $user_subscription->user_name = $user->name ?? 'Unknown';
+                $user_subscription->user_email = $user->email ?? 'Unknown';
+                $user_subscription->plan_name = $subscription->plan_name ?? 'No Plan Name';
+                $user_subscription->plan_price = $subscription->plan_price ?? '0.00';
+                $user_subscription->plan_duration = $subscription->plan_duration ?? 0;
+                $user_subscription->plan_duration_week = $subscription->plan_duration_week ?? 0;
+                $user_subscription->session = $subscription->session ?? 0;
+                $user_subscription->free_tutorial = $subscription->free_tutorial ?? 0;
+                $user_subscription->free_notes = $subscription->free_notes ?? 0;
+                $user_subscription->free_course = $subscription->free_course ?? 0;
+                $user_subscription->membership_start_date = now();
+                $user_subscription->membership_expiry_date = now()->addDays($subscription->plan_duration ?? 30);
+
+
+
+                $user_subscription->amount =  $subscription->plan_price ?? '0.00';
+                $user_subscription->currency = 'USD';
+                $user_subscription->payment_id = 'Free' ?? 'N/A';
+                $user_subscription->payment_method = 'No Payment';
+                $user_subscription->payment_status = 'COMPLETED' ?? 'FAILED';
+                $user_subscription->payment_response = 'Free Trial';
+
+                if (!$user_subscription->user_id || !$user_subscription->plan_id || !$user_subscription->payment_id) {
+                    return redirect()->route('subscription')->with('error', 'Subscription data is incomplete.');
+                }
+
+                $user_subscription->save();
+
+                $user->session_token =  $subscription->session;
+                $user->save();
+
+
+            }
 
             $userDetails->assignRole('STUDENT');
             Mail::to($emailId)->send(new MyTestEmail($remember_token));

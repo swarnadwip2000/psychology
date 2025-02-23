@@ -174,8 +174,10 @@ Route::middleware('student.auth')->group(function () {
     Route::get('/paypal-checkout-success', [SubscriptionController::class, 'paypalSuccess'])->name('paypal.success');
     Route::get('/paypal-checkout-cancel', [SubscriptionController::class, 'paypalCancel'])->name('paypal.cancel');
 
-    Route::get('/tutorials', [StudentCmsController::class, 'tutorials'])->name('tutorials');
-    Route::get('/notes', [StudentCmsController::class, 'notes'])->name('notes');
+    // Route::get('/tutorials', [StudentCmsController::class, 'tutorials'])->name('tutorials');
+    // Route::get('/notes', [StudentCmsController::class, 'notes'])->name('notes');
+
+    Route::get('/student/resources', [StudentCmsController::class, 'resources'])->name('resources');
 });
 
 

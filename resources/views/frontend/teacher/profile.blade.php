@@ -43,7 +43,7 @@
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="name">Full Name</label>
+                                    <label for="name">Full Name*</label>
                                     <input type="text" class="form-control" id="name" name="name"
                                         value="{{ Auth::user()->name }}" placeholder="Full Name">
                                     @if ($errors->has('name'))
@@ -69,7 +69,7 @@
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="address">Address</label>
+                                    <label for="address">Address*</label>
                                     <input type="text" class="form-control" id="address" name="address"
                                         value="{{ Auth::user()->address }}" placeholder="Address">
                                     @if ($errors->has('address'))
@@ -81,7 +81,7 @@
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="country_id">Country</label>
+                                    <label for="country_id">Country*</label>
                                     <select id="country_id" name="country_id" class="form-control">
                                         <option value="">Select Country</option>
                                         @foreach ($countries as $key => $country)
@@ -99,7 +99,7 @@
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="city_id">State</label>
+                                    <label for="city_id">State*</label>
                                     <select id="city_id" name="city_id" class="form-control">
                                         <option value="">Select State</option>
                                         {{--  @foreach ($cities as $key => $val)
@@ -120,7 +120,7 @@
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="degree">Degree</label>
+                                    <label for="degree">Degree*</label>
                                     <select name="degree" id="degree" class="form-control">
                                         <option value="">Select Degree</option>
                                         @foreach (config('class.fuclaty_degree') as $key => $val)
@@ -139,7 +139,7 @@
                         <div class="col-xl-12">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="bio">Bio</label>
+                                    <label for="bio">Bio*</label>
                                     <textarea class="form-control" id="bio" name="bio" placeholder="Write something about yourself">{{ Auth::user()->bio }}</textarea>
                                     @if ($errors->has('bio'))
                                         <div class="error" style="color:red;">{{ $errors->first('bio') }}</div>

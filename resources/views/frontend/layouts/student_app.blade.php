@@ -29,6 +29,13 @@
     <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     @stack('style')
+    <style>
+        html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+    </style>
 </head>
 
 <body>
@@ -59,11 +66,14 @@
                         {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('front.live_class') }}">Live Class</a>
                           </li> --}}
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="{{route('tutorials')}}"> Tutorials </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('notes')}}">Notes</a>
+                        </li> --}}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('resources')}}">Resources</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:void(0);">Reviews</a>
@@ -109,7 +119,7 @@
 
     @yield('content')
 
-    <div class="footer">
+    <div class="footer  mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-8">

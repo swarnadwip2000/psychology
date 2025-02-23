@@ -16,7 +16,7 @@ class SubscriptionController extends Controller
     public function subscription()
     {
         $page_title = "Subscription";
-        $plans = Plan::orderBy('id', 'asc')->get();
+        $plans = Plan::orderBy('id', 'desc')->get();
         return view('frontend.subscription')->with(compact('page_title', 'plans'));
     }
 
@@ -29,11 +29,12 @@ class SubscriptionController extends Controller
         $last_user_subscription = UserSubscription::where('user_id', auth()->id())->orderBy('id', 'desc')->first();
         if ($last_user_subscription) {
             if ($last_user_subscription->membership_expiry_date >=  now()->toDateString() && $last_user_subscription->plan_id == $plan_id  && auth()->user()->session_token > 0) {
-           return redirect()
-           ->back()
-           ->with('error', 'You have already purchased this subscription, and it is still active.');
+                return redirect()
+                    ->back()
+                    ->with('error', 'You have already purchased this subscription, and it is still active.');
+            }
         }
-    }
+
 
         // Initialize PayPal client
         $provider = new PayPalClient;

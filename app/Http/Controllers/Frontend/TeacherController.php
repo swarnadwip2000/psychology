@@ -272,7 +272,7 @@ class TeacherController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:15',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif', // If profile picture is uploaded
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp', // If profile picture is uploaded
             'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:255',
             'country_id' => 'required|string|max:255',
