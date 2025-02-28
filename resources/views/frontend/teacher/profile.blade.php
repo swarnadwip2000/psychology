@@ -1,6 +1,6 @@
 @extends('frontend.layouts.teacher_app')
 @section('content')
-    <section class="dshboard" style="height: 100%">
+    <section class="" style="">
         <div class="dshboard-contain">
             <div class="container">
                 <form action="{{ route('teacher.update_profile') }}" method="post" enctype="multipart/form-data">

@@ -64,9 +64,11 @@
                                             <div class="price-button">
                                                 @if ($plan->plan_price != 0)
                                                 <a href="{{ route('student.subscription.payment', $plan->id) }}">Select</a>
-                                                
-                                                @endif
 
+                                                @endif
+                                                @if ($activePlanId == $plan->id)
+                                                <a href="{{ route('student.book_now') }}" class="mt-1">Book Now</a>
+                                                @endif
                                                 <p>{{ $plan->plan_price == 0 ? 'Free' : '$' . $plan->plan_price }}</p>
                                             </div>
                                             @if ($activePlanId == $plan->id)

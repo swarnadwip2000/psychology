@@ -60,7 +60,7 @@ class HomeController extends Controller
                     if (auth()->user()->hasRole('STUDENT')) {
                         if (auth()->user()->status == 1) {
                             User::where(['email' => $emailId])->whereIn('register_as', [1, 2])->update(['time_zone' => $request->timezone]);
-                            return redirect()->route('front.student_dashboard');
+                            return redirect()->route('subscription');
                         } else {
                             auth()->logout();
                             return redirect()->back()->with('errmsg', 'Your account is not active!');
@@ -193,6 +193,7 @@ class HomeController extends Controller
                 $user_subscription->free_tutorial = $subscription->free_tutorial ?? 0;
                 $user_subscription->free_notes = $subscription->free_notes ?? 0;
                 $user_subscription->free_course = $subscription->free_course ?? 0;
+                $user_subscription->free_documents = $subscription->free_documents ?? 0;
                 $user_subscription->membership_start_date = now();
                 $user_subscription->membership_expiry_date = now()->addDays($subscription->plan_duration ?? 30);
 

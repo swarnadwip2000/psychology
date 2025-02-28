@@ -12,7 +12,7 @@
         <div class="inner_page">
             <div class="card search_bar sales-report-card">
                 <div class="sales-report-card-wrap">
-                    
+
                     <form action="{{ route('plans.update', $plan->id) }}" method="POST" enctype="multipart/form-data">
                         @method('PUT')
                         @csrf
@@ -101,6 +101,21 @@
                                             </select>
                                             @if ($errors->has('free_notes'))
                                                 <div class="error" style="color:red;">{{ $errors->first('free_notes') }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group-div">
+                                        <div class="form-group">
+                                            <label for="free_documents">Free Documents*</label>
+                                            <select class="form-control" id="free_documents" name="free_documents">
+                                                <option value="0" {{ old('free_documents', $plan->free_tutorial) == 0 ? 'selected' : '' }}>No</option>
+                                                <option value="1" {{ old('free_documents', $plan->free_tutorial) == 1 ? 'selected' : '' }}>Yes</option>
+                                            </select>
+                                            @if ($errors->has('free_documents'))
+                                                <div class="error" style="color:red;">{{ $errors->first('free_documents') }}</div>
                                             @endif
                                         </div>
                                     </div>

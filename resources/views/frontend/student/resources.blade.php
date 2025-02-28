@@ -14,13 +14,13 @@
             <ul class="nav nav-tabs mb-4" id="resourceTabs" role="tablist">
                 @if($hasTutorialAccess)
                     <li class="nav-item">
-                        <a class="nav-link active" id="tutorials-tab" data-bs-toggle="tab" href="#tutorials" role="tab">Tutorials</a>
+                        <a class="nav-link active" id="tutorials-tab" data-bs-toggle="tab" href="#tutorials" role="tab">Videos</a>
                     </li>
                 @endif
 
                 @if($hasNotesAccess)
                     <li class="nav-item">
-                        <a class="nav-link {{ !$hasTutorialAccess ? 'active' : '' }}" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab">Notes</a>
+                        <a class="nav-link {{ !$hasTutorialAccess ? 'active' : '' }}" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab">Documents</a>
                     </li>
                 @endif
             </ul>
@@ -60,7 +60,7 @@
                 @if($hasNotesAccess)
                     <div class="tab-pane fade {{ !$hasTutorialAccess ? 'show active' : '' }}" id="notes" role="tabpanel">
                         @if ($notes->isEmpty())
-                            <div class="alert alert-warning text-center">No notes found.</div>
+                            <div class="alert alert-warning text-center">No documents found.</div>
                         @else
                             <div class="row">
                                 @foreach ($notes as $note)
@@ -122,5 +122,5 @@
         }
 
     </style>
-    
+
 @endsection

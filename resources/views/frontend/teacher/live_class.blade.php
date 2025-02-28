@@ -1,7 +1,7 @@
 @extends('frontend.layouts.teacher_app')
 @section('content')
 
-  <section class="dshboard" style="height: ">
+  <section class="" style="height: ">
   <div class="dshboard-contain">
     <div class="container">
       <div class="row">

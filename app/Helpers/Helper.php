@@ -39,6 +39,12 @@ class Helper
                 } else {
                     return false;
                 }
+            }elseif ($type == 'free_documents') {
+                if ($last_user_subscription->membership_expiry_date >=  now()->toDateString() && $last_user_subscription->free_documents == 1) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }

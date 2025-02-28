@@ -72,9 +72,17 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('notes')}}">Notes</a>
                         </li> --}}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{route('resources')}}">Resources</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Resources
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="resourcesDropdown">
+                                <li><a class="dropdown-item" href="{{route('tutorials')}}">Tutorial</a></li>
+                                <li><a class="dropdown-item" href="{{route('notes')}}">Notes</a></li>
+                            </ul>
                         </li>
+
+
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:void(0);">Reviews</a>
                         </li>

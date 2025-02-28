@@ -52,6 +52,7 @@
                                 <th>Duration (Weeks)</th>
                                 <th>Video Sessions</th>
                                 <th>Free Tutorial</th>
+                                <th>Free Documents</th>
                                 <th>Free Notes</th>
                                 <th>Action</th>
                             </tr>
@@ -66,6 +67,7 @@
                                         <td>{{ $plan->plan_duration_week }} Weeks</td>
                                         <td>{{ $plan->session }}</td>
                                         <td>{{ $plan->free_tutorial ? 'Yes' : 'No' }}</td>
+                                        <td>{{ $plan->free_documents ? 'Yes' : 'No' }}</td>
                                         <td>{{ $plan->free_notes ? 'Yes' : 'No' }}</td>
                                         <td align="center">
                                             <div class="edit-1 d-flex align-items-center justify-content-center">

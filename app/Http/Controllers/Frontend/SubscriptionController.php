@@ -107,6 +107,7 @@ class SubscriptionController extends Controller
             $user_subscription->free_tutorial = $subscription->free_tutorial ?? 0;
             $user_subscription->free_notes = $subscription->free_notes ?? 0;
             $user_subscription->free_course = $subscription->free_course ?? 0;
+            $user_subscription->free_documents = $subscription->free_documents ?? 0;
             $user_subscription->membership_start_date = now();
             $user_subscription->membership_expiry_date = now()->addDays($subscription->plan_duration ?? 30);
 

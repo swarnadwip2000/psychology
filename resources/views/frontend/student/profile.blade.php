@@ -1,6 +1,6 @@
 @extends('frontend.layouts.student_app')
 @section('content')
-    <section class="dshboard" style="height: 100%">
+    <section class="" style="">
         <div class="dshboard-contain">
             <div class="container">
                 <form action="{{ route('student.update_profile') }}" method="post" enctype="multipart/form-data">

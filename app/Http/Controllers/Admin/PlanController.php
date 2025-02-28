@@ -44,6 +44,7 @@ class PlanController extends Controller
             'session' => 'numeric|string|max:255',
             'free_tutorial' => 'required|boolean',
             'free_notes' => 'required|boolean',
+            'free_documents' => 'required|boolean',
             'plan_description' => 'required|string',
         ]);
 
@@ -55,6 +56,7 @@ class PlanController extends Controller
         $plan->session = $request->session;
         $plan->free_tutorial = $request->free_tutorial;
         $plan->free_notes = $request->free_notes;
+        $plan->free_documents = $request->free_documents;
         $plan->plan_description = $request->plan_description;
         $plan->save();
 
@@ -100,6 +102,7 @@ class PlanController extends Controller
             'session' => 'numeric|string|max:255',
             'free_tutorial' => 'required|boolean',
             'free_notes' => 'required|boolean',
+            'free_documents' => 'required|boolean',
             'plan_description' => 'required|string',
         ]);
 
@@ -111,6 +114,7 @@ class PlanController extends Controller
         $plan->session = $request->session;
         $plan->free_tutorial = $request->free_tutorial;
         $plan->free_notes = $request->free_notes;
+        $plan->free_documents = $request->free_documents;
         $plan->plan_description = $request->plan_description;
         $plan->save();
 

@@ -80,6 +80,19 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="free_documents">Free Documents*</label>
+                                    <select name="free_documents" id="free_documents" class="form-control">
+                                        <option value="0" {{ old('free_documents') == 0 ? 'selected' : '' }}>No</option>
+                                        <option value="1" {{ old('free_documents') == 1 ? 'selected' : '' }}>Yes</option>
+                                    </select>
+                                    @if ($errors->has('free_documents'))
+                                        <div class="error" style="color:red;">{{ $errors->first('free_documents') }}</div>
+                                    @endif
+                                </div>
+                            </div>
+
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="plan_description">Plan Description</label>
