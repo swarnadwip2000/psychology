@@ -73,13 +73,13 @@ class FacultyNotesController extends Controller
             'short_description' => $request->short_description,
         ]);
 
-        return redirect()->route('notes.index')->with('success', 'Note updated successfully!');
+        return redirect()->route('notes.index')->with('success', 'Notes updated successfully!');
     }
 
     public function destroy($id)
     {
         $note = Note::findOrFail($id);
         $note->delete();
-        return redirect()->route('teacher.notes.index')->with('message', 'Note deleted successfully!');
+        return redirect()->route('teacher.notes.index')->with('message', 'Notes deleted successfully!');
     }
 }

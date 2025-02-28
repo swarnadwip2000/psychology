@@ -115,7 +115,7 @@ class TeacherController extends Controller
             $slot = Slot::create($data);
         }
 
-        return redirect()->route('auth_teacher_session')->with('message', 'Session create successfully');
+        return redirect()->route('auth_teacher_session')->with('message', 'Session created successfully');
     }
 
     public function deletesession(Request $request)
@@ -271,7 +271,7 @@ class TeacherController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:15',
+            'phone' =>'required|string|max:15',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp', // If profile picture is uploaded
             'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:255',
@@ -292,7 +292,7 @@ class TeacherController extends Controller
             $data->profile_picture = $this->imageUpload($request->file('profile_picture'), 'profile');
         }
         $data->save();
-        return redirect()->back()->with('message', 'Faculty updated successfully.');
+        return redirect()->back()->with('message', 'Profile updated successfully.');
     }
 
 }

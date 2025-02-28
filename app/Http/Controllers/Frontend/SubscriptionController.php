@@ -60,6 +60,7 @@ class SubscriptionController extends Controller
 
         if (isset($response['id']) && $response['id'] != null) {
             // redirect to approve href
+    //   dd($response);
             foreach ($response['links'] as $links) {
                 if ($links['rel'] == 'approve') {
                     return redirect()->away($links['href']);
@@ -69,6 +70,7 @@ class SubscriptionController extends Controller
                 ->back()
                 ->with('error', 'Something went wrong.');
         } else {
+            // dd($response);
             return redirect()
                 ->back()
                 ->with('error', $response['message'] ?? 'Something went wrong.');

@@ -27,7 +27,7 @@
                                     <table class="table mt-3">
                                         <thead>
                                             <tr>
-                                                <th>Degree</th>
+                                                <th>Class</th>
                                                 <th>URL</th>
                                                 <th>File</th>
                                                 <th>Actions</th>

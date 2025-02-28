@@ -56,7 +56,7 @@
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="phone">Phone Number</label>
+                                    <label for="phone">Phone Number*</label>
                                     <input type="text" class="form-control" id="phone" name="phone"
                                         value="{{ Auth::user()->phone }}" placeholder="Phone Number">
                                     @if ($errors->has('phone'))
@@ -69,7 +69,7 @@
                         <div class="col-xl-4 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="address">Address*</label>
+                                    <label for="address">Address</label>
                                     <input type="text" class="form-control" id="address" name="address"
                                         value="{{ Auth::user()->address }}" placeholder="Address">
                                     @if ($errors->has('address'))
