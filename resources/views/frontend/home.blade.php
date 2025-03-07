@@ -16,17 +16,24 @@
                             @elseif (auth()->user()->hasRole('FACULTY'))
                                 <a href="{{ route('auth_teacher_dashboard') }}" class="btn ton-btn"
                                     style="width: 110px;">Dashboard</a>
+                            @elseif (auth()->user()->hasRole('PATIENT'))
+                                <a href="{{ route('front.patient_dashboard') }}" class="btn ton-btn"
+                                    style="width: 110px;">Dashboard</a>
                             @else
                                 <a href="{{ route('front.school_registration') }}" class="btn ton-btn"
                                     style="width: 110px;">School</a>
                                 <a href="{{ route('front.college_registration') }}" class="btn ton-btn"
                                     style="width: 110px;">College</a>
+                                <a href="{{ route('front.patient_registration') }}" class="btn ton-btn"
+                                    style="width: 200px;">Special Education</a>
                             @endif
                         @else
                             <a href="{{ route('front.school_registration') }}" class="btn ton-btn"
                                 style="width: 110px;">School</a>
                             <a href="{{ route('front.college_registration') }}" class="btn ton-btn"
                                 style="width: 110px;">College</a>
+                            <a href="{{ route('front.patient_registration') }}" class="btn ton-btn"
+                                style="width: 200px;">Special Education</a>
                         @endif
                         <a href="javascript:void(0);" class="button-text">Reviews & Testimonials</a>
                     </div>

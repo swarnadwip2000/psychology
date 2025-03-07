@@ -586,7 +586,7 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:15',
+            'phone' => 'required|string|max:15',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp', // If profile picture is uploaded
             'address' => 'nullable|string|max:255',
             'city_id' => 'required|string|max:255',
@@ -609,6 +609,6 @@ class StudentController extends Controller
             $data->profile_picture = $this->imageUpload($request->file('profile_picture'), 'profile');
         }
         $data->save();
-        return redirect()->back()->with('message', 'Student updated successfully.');
+        return redirect()->back()->with('message', 'Profile updated successfully.');
     }
 }

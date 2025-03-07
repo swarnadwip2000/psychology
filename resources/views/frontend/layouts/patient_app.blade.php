@@ -9,72 +9,111 @@
     <meta name="description" content="">
     <title>{{ $page_title }}</title>
     <link rel="stylesheet" href="{{ asset('client_assets/css/bootstrap.min.css') }}" type="text/css">
+
     <link rel="stylesheet" href="{{ asset('client_assets/css/owl.carousel.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('client_assets/css/owl.transitions.css') }}" type="text/css">
-    <link href="{{ asset('client_assets/css/font-awesome.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css"
-        href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+
     <script src="{{ asset('client_assets/js/jquery.min.js') }}"></script>
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
     <link href="{{ asset('client_assets/css/custom.css') }}" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="{{ asset('client_assets/css/asgar.css') }}">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    @stack('style')
+    <style>
+        html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+    </style>
 </head>
 
 <body>
-    <header class="ton_header">
+    <section id="loading">
+        <div id="loading-content"></div>
+    </section>
+    <header class="ton_header dashboard">
         <div class="container-ton">
-            <nav class="navbar navbar-expand-lg">
+            <nav class="navbar navbar-expand-lg ">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
                     aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <a class="navbar-brand" href="{{ route('front.home') }}"><span class="logo-img"><img
+                <a class="navbar-brand" href="{{ route('front.patient_dashboard') }}"><span class="logo-img">
+                    <img
                             src="{{ asset('client_assets/img/logo/logo.png') }}" alt=""></span> e-Psychology</a>
 
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
                     <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                        @if (auth()->check())
-                            @if (auth()->user()->hasRole('STUDENT'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('front.student_dashboard') }}">Dashboard</a>
-                                </li>
-                            @elseif (auth()->user()->hasRole('FACULTY'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('auth_teacher_dashboard') }}">Dashboard</a>
-                                </li>
-                                @elseif (auth()->user()->hasRole('PATIENT'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('front.patient_dashboard') }}">Dashboard</a>
-                                </li>
-                            @else
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('front.student_login') }}">LogIn</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('front.home') }}">Register</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('front.student_login') }}">LogIn</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('front.home') }}">Register</a>
-                            </li>
-                        @endif
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('front.patient_dashboard') }}"><i class="fa fa-home"
+                                    aria-hidden="true"></i></a>
+                        </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Book Faculty</a>
+                        </li>
+                        {{-- <li class="nav-item">
+                            <a class="nav-link" href="{{ route('front.live_class') }}">Live Class</a>
+                          </li> --}}
+                        {{-- <li class="nav-item">
+                            <a class="nav-link" href="{{route('tutorials')}}"> Tutorials </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('notes')}}">Notes</a>
+                        </li> --}}
+
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:void(0);">Reviews</a>
+                        </li>
+
+                        <li class="nav-item dropdown mr-2">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="text-decoration: none;">
+                                @if (Auth::user()->profile_picture)
+                                <img src="{{ asset(Auth::user()->profile_picture) }}" alt="Profile"
+                                    style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd;">
+                                @else
+                                <img src="{{ asset('client_assets/img/images.png') }}" alt="Profile"
+                                    style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd;">
+                                @endif
+                                <span class="ml-2 font-weight-bold">{{auth()->user()->name}}</span> <!-- Replace 'John Doe' dynamically -->
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow" aria-labelledby="profileDropdown">
+                                <a class="dropdown-item d-flex align-items-center ml-3" href="{{route('patient.profile')}}">
+                                    <i class="fa fa-user-circle mr-2 text-primary"></i> Profile
+                                </a>
+
+                                <a href="{{ route('patient.logout') }}" class="m-0">
+                                    <button type="button" class="dropdown-item d-flex align-items-center">
+                                        <i class="fa fa-sign-out-alt mr-2 text-danger"></i> Logout
+                                    </button>
+                                </a>
+                            </div>
+                        </li>
 
 
                     </ul>
                 </div>
-
             </nav>
         </div>
     </header>
 
     @yield('content')
 
-    <div class="footer">
+    <div class="footer  mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
@@ -105,7 +144,7 @@
                                 <a href="{{ route('blog') }}">Blog</a>
                             </li>|
                             @if (auth()->check())
-                                @if (auth()->user()->hasRole('STUDENT') || auth()->user()->hasRole('FACULTY'))
+                                @if (auth()->user()->hasRole('STUDENT') || auth()->user()->hasRole('PATIENT') || auth()->user()->hasRole('FACULTY'))
                                     <!-- No additional links -->
                                 @else
                                     <li>
@@ -127,7 +166,6 @@
                                 <a href="{{ route('privacy.policy') }}">Privacy Policy</a>
                             </li>
                         </ul>
-
                         <p>Powered By Canaeroit</p>
                     </div>
                 </div>
@@ -206,22 +244,6 @@
         @endif
     </script>
     @yield('script')
-
-    <!-- jQuery (Required for Toastr) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Toastr JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-    <script>
-        @if (Session::has('message'))
-            toastr.success("{{ Session::get('message') }}");
-        @endif
-
-        @if (Session::has('error'))
-            toastr.error("{{ Session::get('error') }}");
-        @endif
-    </script>
-
 </body>
 
 </html>

@@ -1,9 +1,9 @@
-@extends('frontend.layouts.student_app')
+@extends('frontend.layouts.patient_app')
 @section('content')
     <section class="" style="">
         <div class="dshboard-contain">
             <div class="container">
-                <form action="{{ route('student.update_profile') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('patient.update_profile') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="row mb-4">
                         <div class="col-lg-12 col-md-12">
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                     <div class="row justify-content-between mt-5 mb-5">
-                        <div class="col-xl-4 col-md-6">
+                        <div class="col-xl-6 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
                                     <label for="name">Full Name*</label>
@@ -52,20 +52,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-4 col-md-6">
-                            <div class="form-group-div">
-                                <div class="form-group">
-                                    <label for="floatingInputValue">School Name*</label>
-                                    <input type="text" class="form-control" id="floatingInputValue"
-                                        name="institute_name" value="{{ old('institute_name', $student->institute_name) }}"
-                                        placeholder="School Name*">
-                                    @if ($errors->has('institute_name'))
-                                        <div class="error" style="color:red;">{{ $errors->first('institute_name') }}</div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6">
+
+                        <div class="col-xl-6 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
                                     <label for="phone">Phone Number*</label>
@@ -78,19 +66,7 @@
                             </div>
                         </div>
 
-                        <div class="col-xl-4 col-md-6">
-                            <div class="form-group-div">
-                                <div class="form-group">
-                                    <label for="address">Address</label>
-                                    <input type="text" class="form-control" id="address" name="address"
-                                        value="{{ Auth::user()->address }}" placeholder="Address">
-                                    @if ($errors->has('address'))
-                                        <div class="error" style="color:red;">{{ $errors->first('address') }}</div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6">
+                        <div class="col-xl-6 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
                                     <label for="country_id">Country*</label>
@@ -109,7 +85,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-4 col-md-6">
+                        <div class="col-xl-6 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
                                     <label for="city_id">State*</label>
@@ -134,12 +110,17 @@
                                     <label for="floatingInputValue">Age*</label>
                                     <select name="student_age" id="student_age" class="form-control">
                                         <option value="">Select Age</option>
-                                        @for ($i = 10; $i < 45; $i++)
+                                        @for ($i = 1; $i < 25; $i++)
                                             <option value="{{ $i }}"
-                                                {{ old('student_age', $student->student_age) == $i ? 'selected' : '' }}>
+                                                {{ old('student_age', $patient->student_age) == $i ? 'selected' : '' }}>
                                                 {{ $i }}
                                             </option>
+
                                         @endfor
+                                        <option value="25+"
+                                        {{ old('student_age', $patient->student_age) == "25+" ? 'selected' : '' }}>
+                                       25+
+                                    </option>
                                     </select>
                                     @if ($errors->has('student_age'))
                                         <div class="error" style="color:red;">{{ $errors->first('student_age') }}</div>
@@ -151,12 +132,12 @@
                         <div class="col-xl-6 col-md-6">
                             <div class="form-group-div">
                                 <div class="form-group">
-                                    <label for="floatingInputValue">Student Class*</label>
+                                    <label for="floatingInputValue"> Class*</label>
                                     <select name="student_class" id="student_class" class="form-control">
-                                        <option value="">Select Student Class</option>
-                                        @foreach (config('class.all_class') as $key => $val)
+                                        <option value="">Select Class</option>
+                                        @foreach (config('class.patient_class') as $key => $val)
                                             <option value="{{ $key }}"
-                                                {{ old('student_class', $student->student_class) == $key ? 'selected' : '' }}>
+                                                {{ old('student_class', $patient->student_class) == $key ? 'selected' : '' }}>
                                                 {{ $val }}
                                             </option>
                                         @endforeach
@@ -165,6 +146,35 @@
                                         <div class="error" style="color:red;">{{ $errors->first('student_class') }}
                                         </div>
                                     @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-6 col-md-6">
+                            <div class="form-group-div">
+                                <div class="form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" class="form-control" id="address" name="address"
+                                        value="{{ Auth::user()->address }}" placeholder="Address">
+                                    @if ($errors->has('address'))
+                                        <div class="error" style="color:red;">{{ $errors->first('address') }}</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-md-6">
+                            <div class="form-group-div">
+                                <div class="form-group">
+                                    <label for="problem_face">Problems Being Faced</label>
+                                <select id="problem_face" name="problem_face" class="form-control">
+                                    <option value="">Select</option>
+                                    @foreach (config('class.problem_faced') as $key => $val)
+                                        <option value="{{ $key }}"   {{ old('problem_face', $patient->problem_face) == $key ? 'selected' : '' }}>{{ $val }}</option>
+                                    @endforeach
+                                </select>
+                                @error('problem_face')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                                 </div>
                             </div>
                         </div>

@@ -26,6 +26,10 @@ class assignRoleSeeder extends Seeder
             [
                 'name' => 'FACULTY',
                 'guard_name' => 'web',
+            ],
+            [
+                'name' => 'PATIENT',
+                'guard_name' => 'web',
             ]
         ];
 

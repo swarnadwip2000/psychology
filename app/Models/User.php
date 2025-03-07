@@ -32,7 +32,9 @@ class User extends Authenticatable
         'register_as',
         'status',
         'degree',
-        'phone'
+        'phone',
+        'problem_face',
+        'prefered_date_time',
     ];
 
     /**

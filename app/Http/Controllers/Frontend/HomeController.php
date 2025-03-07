@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 use App\Mail\SendCodeStudentResetPassword;
 use App\Mail\SendCodeFacultyResetPassword;
+use App\Mail\SendCodePatientResetPassword;
 use App\Mail\SubscriptionConfirmation;
 use App\Models\Plan;
 use App\Models\UserSubscription;
@@ -55,7 +56,7 @@ class HomeController extends Controller
 
         if ($model) {
 
-            if ($model->email_verified_at != null){
+            if ($model->email_verified_at != null) {
                 if (Auth::guard('web')->attempt(['email' => $emailId, 'password' => $password])) {
                     if (auth()->user()->hasRole('STUDENT')) {
                         if (auth()->user()->status == 1) {
@@ -96,6 +97,24 @@ class HomeController extends Controller
         $data['city'] = City::get();
         $data['countries'] = Country::get();
         return view('frontend.faculty_registration')->with($data);
+    }
+
+    public function patient_login(Request $request)
+    {
+        $data['page_title'] = "Login as patient";
+        $data['page_description'] = "login as patient";
+        $data['page_keyword'] = "Login as patient";
+        return view('frontend.patient_login')->with($data);
+    }
+
+    public function patient_registration(Request $request)
+    {
+        $data['page_title'] = "Register as patient";
+        $data['page_description'] = "register as patient";
+        $data['page_keyword'] = "Register as patient";
+        $data['city'] = City::get();
+        $data['countries'] = Country::get();
+        return view('frontend.patient_registration')->with($data);
     }
 
     public function school_registration(Request $request)
@@ -214,8 +233,6 @@ class HomeController extends Controller
 
                 $user->session_token =  $subscription->session;
                 $user->save();
-
-
             }
 
             $userDetails->assignRole('STUDENT');
@@ -318,6 +335,92 @@ class HomeController extends Controller
         }
     }
 
+    public function patient_registration_success(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email_id' => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|same:password',
+            'country_name' => 'required|string|max:255',
+            'city_name' => 'required|string|max:255',
+            'student_class' => 'nullable|string|max:255',
+            'problem_face' => 'required|string|max:255',
+
+        ]);
+
+        $name = $request->name ?? null;
+        $emailId = $request->email_id;
+        $password = Hash::make($request->password) ?? null;
+        $countryName = $request->country_name ?? null;
+        $cityName = $request->city_name ?? null;
+        $problem_face = $request->problem_face ?? null;
+        $prefered_date_time = $request->prefered_date_time ?? null;
+        $student_class = $request->student_class ?? null;
+        $student_age = $request->student_age ?? null;
+        $registerAs = 4;
+        $remember_token = Str::random(4);
+
+        $userDetails = User::updateOrCreate(['email' => $emailId, 'register_as' => 3], [
+            'country_id' => $countryName,
+            'city_id' => $cityName,
+            'name' => $name,
+            'email' => $emailId,
+            'password' => $password,
+            'register_as' => $registerAs,
+            'student_class' => $student_class,
+            'problem_face' => $problem_face,
+            'prefered_date_time' => $prefered_date_time,
+            'student_age' => $student_age,
+            'remember_token' => $remember_token,
+            'status' => 0,
+
+        ]);
+
+        $userDetails->assignRole('PATIENT');
+        Mail::to($emailId)->send(new MyTestEmail($remember_token));
+        $data['id'] = $userDetails->id;
+        $data['page_title'] = "Email Confirmation";
+        $data['page_description'] = "Email Confirmation";
+        $data['page_keyword'] = "Email Confirmation";
+        return redirect()->route('front.patient_login')->with('successmsg', 'Please check your mail for verified your account.');
+    }
+
+    public function patient_login_success(Request $request)
+    {
+
+        $emailId = $request->email ?? null;
+        $password = $request->password ?? null;
+
+        $model = User::where(['email' => $emailId])->whereIn('register_as', [4])->first();
+
+        if ($model) {
+            if ($model->email_verified_at != null) {
+
+                if (Auth::attempt(['email' => $emailId, 'password' => $password])) {
+                    if (auth()->user()->hasRole('PATIENT')) {
+                        if (auth()->user()->status == 1) {
+                            User::where(['email' => $emailId])->whereIn('register_as', [4])->update(['time_zone' => $request->timezone]);
+                            return redirect()->route('front.patient_dashboard');
+                        } else {
+                            auth()->logout();
+                            return redirect()->back()->with('errmsg', 'Your account is not active!');
+                        }
+                    } else {
+                        Auth::logout();
+                        return redirect()->back()->with('errmsg', 'You entered wrong password');
+                    }
+                } else {
+                    return redirect()->back()->with('errmsg', 'You entered wrong password');
+                }
+            } else {
+                return redirect()->back()->with('errmsg', 'Registered Email id yet not verified');
+            }
+        } else {
+            return redirect()->back()->with('errmsg', 'Please enter a registered email id');
+        }
+    }
+
     public function checkDuplicateEmail(Request $request)
     {
         $emailId = $request->email_id ?? null;
@@ -362,6 +465,7 @@ class HomeController extends Controller
     {
         $user = User::role('STUDENT')->where(['remember_token' => $request->toke_code])->first();
         $teacher = User::role('FACULTY')->where(['remember_token' => $request->toke_code])->first();
+        $patient = User::role('PATIENT')->where(['remember_token' => $request->toke_code])->first();
         $page_title = "Email confirmation";
         if ($user) {
             $type = "student";
@@ -369,6 +473,10 @@ class HomeController extends Controller
             return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
         } else if ($teacher) {
             $type = "teacher";
+            User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s'), 'status' => 1]);
+            return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
+        } else if ($patient) {
+            $type = "patient";
             User::where(['remember_token' => $request->toke_code])->update(['email_verified_at' => date('Y-m-d H:i:s'), 'status' => 1]);
             return view('frontend.email_confirmation')->with(compact('page_title', 'type'));
         } else {
@@ -498,25 +606,24 @@ class HomeController extends Controller
         if ($count > 0) {
             $user = User::where('email', $request->email)->select('id', 'name', 'email')->first();
             PasswordReset::where('email', $request->email)->delete();
-             $id = Crypt::encrypt($user->id);
-             $token = Str::random(20) . 'pass' . $user->id;
-             PasswordReset::create([
+            $id = Crypt::encrypt($user->id);
+            $token = Str::random(20) . 'pass' . $user->id;
+            PasswordReset::create([
                 'email' => $request->email,
                 'token' => $token,
                 'created_at' => Carbon::now()
-             ]);
+            ]);
 
-             $details = [
+            $details = [
                 'id' => $id,
                 'token' => $token
-             ];
+            ];
 
             Mail::to($request->email)->send(new SendCodeFacultyResetPassword($details));
             return redirect()->back()->with('message', "Please! check your mail to reset your password.");
         } else {
-             return redirect()->back()->with('error', "Couldn't find your account!");
+            return redirect()->back()->with('error', "Couldn't find your account!");
         }
-
     }
 
     public function faculty_resetPassword($id, $token)
@@ -559,9 +666,93 @@ class HomeController extends Controller
             } else {
                 abort(404);
             }
-        }
-        catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             return redirect()->route('front.faculty_login')->with('error', 'Something went wrong.');
+        }
+    }
+
+
+    public function patient_forget_password()
+    {
+        $data['page_title'] = "Psychology";
+        $data['page_description'] = "E-learning platform";
+        $data['page_keyword'] = "Psychology";
+        return view('frontend.patient_forget_password')->with($data);
+    }
+
+    public function patient_forgetPassword(Request $request)
+    {
+
+        $request->validate([
+            'email' => 'required|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix|exists:users,email',
+        ]);
+        // return $validator->errors();
+        $count = User::where('email', $request->email)->role('PATIENT')->count();
+        if ($count > 0) {
+            $user = User::where('email', $request->email)->select('id', 'name', 'email')->first();
+            PasswordReset::where('email', $request->email)->delete();
+            $id = Crypt::encrypt($user->id);
+            $token = Str::random(20) . 'pass' . $user->id;
+            PasswordReset::create([
+                'email' => $request->email,
+                'token' => $token,
+                'created_at' => Carbon::now()
+            ]);
+
+            $details = [
+                'id' => $id,
+                'token' => $token
+            ];
+
+            Mail::to($request->email)->send(new SendCodePatientResetPassword($details));
+            return redirect()->back()->with('message', "Please! check your mail to reset your password.");
+        } else {
+            return redirect()->back()->with('error', "Couldn't find your account!");
+        }
+    }
+
+    public function patient_resetPassword($id, $token)
+    {
+        // return "dfs";
+
+        $page_title = "Reset Password";
+        $user = User::findOrFail(Crypt::decrypt($id));
+        $resetPassword = PasswordReset::where('email', $user->email)->first();
+
+        if (!$resetPassword) {
+            abort(404);
+        }
+
+        // Get the expiration time (1 hour after creation)
+        $expiryTime = $resetPassword->created_at->addHour();
+
+        // Compare with current time
+        if (Carbon::now()->lessThan($expiryTime)) {
+            return view('frontend.patient_reset', compact('id', 'page_title'));
+        } else {
+            abort(404);
+        }
+    }
+
+    public function patient_changePassword(Request $request)
+    {
+
+        $request->validate([
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|min:8|same:password'
+        ]);
+        // return $request->all();
+        try {
+            if ($request->id != '') {
+                $id = Crypt::decrypt($request->id);
+                User::where('id', $id)->update(['password' => bcrypt($request->password)]);
+                $now_time = Carbon::now()->toDateTimeString();
+                return redirect()->route('front.patient_login')->with('message', 'Password has been changed successfully.');
+            } else {
+                abort(404);
+            }
+        } catch (\Throwable $th) {
+            return redirect()->route('front.patient_login')->with('error', 'Something went wrong.');
         }
     }
 }

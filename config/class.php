@@ -42,6 +42,27 @@ return [
         19 => 'Certificate',
     ],
 
+    'patient_class' => [
+        20 => 'Below grade I',
+        21 => 'Grade II to V',
+        22 => 'Grade VI to VIII',
+        23 => 'Grade IX to XII',
+        24 => 'Bachelors',
+        25 => 'Masters',
+        26 => 'Others',
+    ],
+
+    'problem_faced' => [
+        1 => 'Autism',
+        2 => 'ADHD',
+        3 => 'Speech and Language',
+        4 => 'Stress',
+        5 => 'Sleeping',
+        6 => 'Learning disabilities',
+    ],
+
+
+
     'allow_country' => [
         1 => 'CANADA',
     ],

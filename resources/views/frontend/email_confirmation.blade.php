@@ -13,6 +13,8 @@
                             @if ($type == 'teacher')
                             <a href="{{ route('front.faculty_login') }}" class="btn ton-btn w-50">Start</a>
 
+                            @elseif ($type == 'patient')
+                            <a href="{{ route('front.patient_login') }}" class="btn ton-btn w-50">Start</a>
                             @else
                             <a href="{{ route('front.student_login') }}" class="btn ton-btn w-50">Start</a>
                             @endif

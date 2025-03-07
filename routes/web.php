@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\FacultyDocumentController;
 use App\Http\Controllers\FacultyNotesController;
 use App\Http\Controllers\FacultyTutorialController;
+use App\Http\Controllers\Frontend\PatientController;
 use App\Http\Controllers\Frontend\SubscriptionController;
 use App\Http\Controllers\StudentCmsController;
 use App\Models\Plan;
@@ -136,6 +137,8 @@ Route::controller(HomeController::class)->group(function () {
         Route::get('college', 'college_registration')->name('front.college_registration');
         Route::get('faculty', 'faculty_registration')->name('front.faculty_registration');
         Route::post('faculty', 'faculty_registration_success')->name('front.faculty_registration_success');
+        Route::get('patient', 'patient_registration')->name('front.patient_registration');
+        Route::post('patient', 'patient_registration_success')->name('front.patient_registration_success');
 
         Route::post('success', "registrationSuccess")->name('front.registration_success');
         Route::post('studentRegisterSubmit', "studentRegisterSubmit")->name('front.student_register_submit');
@@ -152,6 +155,8 @@ Route::controller(HomeController::class)->group(function () {
         Route::post('student', 'student_login_success')->name('front.student_login_success');
         Route::get('faculty', 'faculty_login')->name('front.faculty_login');
         Route::post('faculty', 'faculty_login_success')->name('front.faculty_login_success');
+        Route::get('patient', 'patient_login')->name('front.patient_login');
+        Route::post('patient', 'patient_login_success')->name('front.patient_login_success');
 
         //student forget password
         Route::get('student/forget-password/show', 'forget_password')->name('front.forget_password');
@@ -164,6 +169,12 @@ Route::controller(HomeController::class)->group(function () {
         Route::post('faculty/forget-password',  'faculty_forgetPassword')->name('front.faculty.forget.password');
         Route::get('faculty/reset-password/{id}/{token}', 'faculty_resetPassword')->name('front.faculty.reset.password');
         Route::post('faculty/change-password', 'faculty_changePassword')->name('front.faculty.change.password');
+
+        //patient forget password
+        Route::get('patient/forget-password/show', 'patient_forget_password')->name('front.patient.forget_password');
+        Route::post('patient/forget-password', 'patient_forgetPassword')->name('front.patient.forget.password');
+        Route::get('patient/reset-password/{id}/{token}', 'patient_resetPassword')->name('front.patient.reset.password');
+        Route::post('patient/change-password', 'patient_changePassword')->name('front.patient.change.password');
         // Route::post('change-password', 'changePassword')->name('front.change.password');
     });
 });
@@ -201,6 +212,16 @@ Route::controller(StudentController::class)->middleware('student.auth')->group(f
     });
 });
 
+Route::controller(PatientController::class)->middleware('patient.auth')->group(function () {
+    Route::prefix('patient')->group(function () {
+        Route::get('dashboard', 'dashboard')->name('front.patient_dashboard');
+        Route::get('logout', 'logout')->name('patient.logout');
+
+        Route::get('profile', 'profile')->name('patient.profile');
+        Route::post('profile', 'updateProfile')->name('patient.update_profile');
+    });
+});
+
 Route::controller(TeacherController::class)->middleware('teacher.auth')->group(function () {
     Route::prefix('teacher')->group(function () {
         Route::get('dashboard', 'dashboard')->name('auth_teacher_dashboard');
@@ -215,6 +236,8 @@ Route::controller(TeacherController::class)->middleware('teacher.auth')->group(f
         Route::post('profile', 'updateProfile')->name('teacher.update_profile');
     });
 });
+
+
 
 Route::controller(FacultyTutorialController::class)
     ->middleware('teacher.auth')
